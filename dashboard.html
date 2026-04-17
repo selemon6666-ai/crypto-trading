@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luno Trading - Trade Smarter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #00d4ff;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: rgba(255, 0, 0, 0.5);
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+            padding: 40px 50px;
+            gap: 40px;
+        }
+
+        /* Left Content */
+        .left-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .badge {
+            background: rgba(0, 212, 255, 0.2);
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            width: fit-content;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s;
+            width: fit-content;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Right Panel - Trading Chart */
+        .right-panel {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .panel-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat {
+            text-align: right;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .stat-value.up {
+            color: #00ff88;
+        }
+
+        /* Chart Placeholder */
+        .chart-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 250px;
+            display: flex;
+            align-items: flex-end;
+            gap: 5px;
+        }
+
+        .candle {
+            flex: 1;
+            background: linear-gradient(to top, #00d4ff, #7c3aed);
+            border-radius: 3px;
+            transition: height 0.5s;
+        }
+
+        /* Trading Form */
+        .trade-form {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .trade-form h4 {
+            margin-bottom: 15px;
+        }
+
+        .trade-inputs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .trade-inputs select, .trade-inputs input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+
+        .trade-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-buy {
+            flex: 1;
+            background: #00ff88;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-sell {
+            flex: 1;
+            background: #ff4444;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Login Modal (Hidden by default) */
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-card {
+            background: linear-gradient(135deg, #1a1a3e, #0a0e27);
+            padding: 40px;
+            border-radius: 20px;
+            width: 400px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .login-card h2 {
+            margin-bottom: 10px;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+
+        .login-card button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .error-msg {
+            color: #ff4444;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        /* User info */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .username {
+            color: #00d4ff;
+        }
+
+        /* Dashboard (Hidden until login) */
+        .dashboard-content {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Login Modal -->
+<div id="loginModal" class="login-modal" style="display: flex;">
+    <div class="login-card">
+        <h2>🔐 Welcome to Luno Trading</h2>
+        <p style="margin-bottom: 20px; color: rgba(255,255,255,0.6);">Trade Smarter, Trade Better</p>
+        <input type="text" id="loginUsername" placeholder="Username">
+        <input type="password" id="loginPassword" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <div id="loginError" class="error-msg"></div>
+        <p style="margin-top: 20px; font-size: 0.8rem; color: rgba(255,255,255,0.5);">
+            Demo: username: "trader" / password: "1234"
+        </p>
+    </div>
+</div>
+
+<!-- Main Dashboard (Hidden until login) -->
+<div class="dashboard-content" id="dashboardContent">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">📈 Luno Trading</div>
+        <div class="nav-links">
+            <a href="#">Home</a>
+            <a href="#">Markets</a>
+            <a href="#">Trades</a>
+            <a href="#">My Profile</a>
+        </div>
+        <div class="user-info">
+            <span class="username" id="displayUsername">trader</span>
+            <a href="#" class="logout-btn" onclick="logout()">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Left Side -->
+        <div class="left-content">
+            <div class="badge">⚡ Live Trading Platform</div>
+            <h1>
+                Trade <span class="gradient-text">Smarter,</span><br>
+                Trade Better
+            </h1>
+            <p class="subtitle">
+                Empower your trading journey with real-time insights<br>
+                and expert analysis. Start trading with $10,000 virtual capital.
+            </p>
+            <button class="start-btn" onclick="scrollToTrade()">🚀 Start Trading</button>
+        </div>
+
+        <!-- Right Panel - Trading -->
+        <div class="right-panel">
+            <div class="panel-header">
+                <div class="panel-title">📊 iPanel_TREND</div>
+                <div class="panel-stats">
+                    <div class="stat">
+                        <div class="stat-label">Balance</div>
+                        <div class="stat-value" id="balance">$10,000</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Net Worth</div>
+                        <div class="stat-value" id="netWorth">$10,000</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="chart-container" id="chartContainer">
+                <!-- Dynamic candles will go here -->
+            </div>
+
+            <!-- Trading Form -->
+            <div class="trade-form">
+                <h4>🔄 Quick Trade</h4>
+                <div class="trade-inputs">
+                    <select id="cryptoSelect">
+                        <option value="BTC">Bitcoin (BTC)</option>
+                        <option value="ETH">Ethereum (ETH)</option>
+                        <option value="BNB">Binance Coin</option>
+                        <option value="SOL">Solana</option>
+                    </select>
+                    <input type="number" id="tradeAmount" placeholder="Amount">
+                </div>
+                <div class="trade-buttons">
+                    <button class="btn-buy" onclick="buy()">BUY</button>
+                    <button class="btn-sell" onclick="sell()">SELL</button>
+                </div>
+                <div style="margin-top: 15px; font-size: 0.8rem; color: rgba(255,255,255,0.5);">
+                    Current Price: $<span id="currentPrice">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Trading data
+    let balance = 10000;
+    let portfolio = {};
+    let currentUser = null;
+
+    // Market prices
+    let marketPrices = {
+        BTC: 52000,
+        ETH: 3200,
+        BNB: 420,
+        SOL: 110
+    };
+
+    // Login function
+    function login() {
+        const username = document.getElementById('loginUsername').value;
+        const password = document.getElementById('loginPassword').value;
+        const errorDiv = document.getElementById('loginError');
+
+        // Demo credentials
+        if (username === "trader" && password === "1234") {
+            currentUser = username;
+            document.getElementById('displayUsername').innerText = username;
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
+            errorDiv.innerHTML = '';
+            startTrading();
+        } else {
+            errorDiv.innerHTML = '❌ Invalid username or password. Try: trader / 1234';
+        }
+    }
+
+    // Logout function
+    function logout() {
+        currentUser = null;
+        document.getElementById('dashboardContent').style.display = 'none';
+        document.getElementById('loginModal').style.display = 'flex';
+        document.getElementById('loginUsername').value = '';
+        document.getElementById('loginPassword').value = '';
+    }
+
+    // Scroll to trade section
+    function scrollToTrade() {
+        document.querySelector('.right-panel').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Update chart with random candles
+    function updateChart() {
+        const chartContainer = document.getElementById('chartContainer');
+        chartContainer.innerHTML = '';
+        for (let i = 0; i < 20; i++) {
+            const height = 30 + Math.random() * 200;
+            const candle = document.createElement('div');
+            candle.className = 'candle';
+            candle.style.height = height + 'px';
+            chartContainer.appendChild(candle);
+        }
+    }
+
+    // Update current price display
+    function updatePriceDisplay() {
+        const selected = document.getElementById('cryptoSelect').value;
+        document.getElementById('currentPrice').innerText = marketPrices[selected].toFixed(2);
+    }
+
+    // Update balance and net worth display
+    function updateUI() {
+        document.getElementById('balance').innerText = `$${balance.toFixed(2)}`;
+        
+        let holdingsValue = 0;
+        for (let [symbol, amount] of Object.entries(portfolio)) {
+            holdingsValue += amount * marketPrices[symbol];
+        }
+        const netWorth = balance + holdingsValue;
+        document.getElementById('netWorth').innerText = `$${netWorth.toFixed(2)}`;
+    }
+
+    // Buy function
+    function buy() {
+        const symbol = document.getElementById('cryptoSelect').value;
+        const price = marketPrices[symbol];
+        const amount = parseFloat(document.getElementById('tradeAmount').value);
+        
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+        
+        const cost = price * amount;
+        
+        if (cost > balance) {
+            alert(`Insufficient balance! Need $${cost.toFixed(2)}`);
+            return;
+        }
+        
+        balance -= cost;
+        
+        if (!portfolio[symbol]) {
+            portfolio[symbol] = 0;
+        }
+        portfolio[symbol] += amount;
+        
+        updateUI();
+        alert(`✅ Bought ${amount} ${symbol} for $${cost.toFixed(2)}`);
+        document.getElementById('tradeAmount').value = '';
+    }
+
+    // Sell function
+    function sell() {
+        const symbol = document.getElementById('cryptoSelect').value;
+        const price = marketPrices[symbol];
+        const amount = parseFloat(document.getElementById('tradeAmount').value);
+        
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+        
+        if (!portfolio[symbol] || portfolio[symbol] < amount) {
+            alert(`You don't have enough ${symbol}!`);
+            return;
+        }
+        
+        const revenue = price * amount;
+        balance += revenue;
+        
+        portfolio[symbol] -= amount;
+        if (portfolio[symbol] === 0) {
+            delete portfolio[symbol];
+        }
+        
+        updateUI();
+        alert(`✅ Sold ${amount} ${symbol} for $${revenue.toFixed(2)}`);
+        document.getElementById('tradeAmount').value = '';
+    }
+
+    // Simulate price changes
+    function simulatePriceChanges() {
+        setInterval(() => {
+            for (let crypto in marketPrices) {
+                const change = (Math.random() - 0.5) * 200;
+                let newPrice = marketPrices[crypto] + change;
+                if (newPrice < 1) newPrice = 1;
+                marketPrices[crypto] = parseFloat(newPrice.toFixed(2));
+            }
+            updatePriceDisplay();
+            updateUI();
+            updateChart();
+        }, 3000);
+    }
+
+    // Event listener for crypto selection
+    document.getElementById('cryptoSelect').addEventListener('change', updatePriceDisplay);
+
+    // Start everything
+    function startTrading() {
+        updatePriceDisplay();
+        updateUI();
+        updateChart();
+        simulatePriceChanges();
+    }
+
+    // Initialize chart on load
+    updateChart();
+</script>
+</body>
+</html>
