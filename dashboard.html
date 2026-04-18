@@ -35,7 +35,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.65);
             z-index: -1;
         }
 
@@ -170,13 +170,13 @@
             box-shadow: 0 15px 35px rgba(0, 212, 255, 0.3);
         }
 
-        /* Trading Panel (Hidden until Start Trading clicked) */
+        /* Trading Panel */
         .trading-panel {
             display: none;
             max-width: 1200px;
             width: 100%;
             margin-top: 60px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
@@ -233,14 +233,12 @@
             color: #00ff88;
         }
 
-        /* Trading Grid */
         .trading-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
         }
 
-        /* Chart Section */
         .chart-section {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
@@ -262,7 +260,6 @@
             transition: height 0.5s;
         }
 
-        /* Trade Form */
         .trade-section {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
@@ -337,7 +334,6 @@
             color: rgba(255, 255, 255, 0.6);
         }
 
-        /* Portfolio Section */
         .portfolio-section {
             margin-top: 30px;
             background: rgba(0, 0, 0, 0.3);
@@ -377,7 +373,6 @@
             color: #00ff88;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .navbar {
                 padding: 15px 20px;
@@ -407,11 +402,13 @@
 </head>
 <body>
 
-<!-- Video Background -->
-<video class="video-background" autoplay muted loop id="bgVideo">
-    <source src="https://assets.mixkit.co/videos/preview/mixkit-stock-market-charts-and-graphs-3771-large.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-</video>
+<!-- Video Background - Using YouTube embed as fallback -->
+<iframe class="video-background" 
+        src="https://www.youtube.com/embed/QX_oy-7wUaI?autoplay=1&mute=1&controls=0&loop=1&playlist=QX_oy-7wUaI&modestbranding=1&showinfo=0&rel=0"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+</iframe>
 <div class="overlay"></div>
 
 <!-- Navigation -->
@@ -441,7 +438,7 @@
     </p>
     <button class="start-btn" onclick="startTrading()">🚀 Start Trading</button>
 
-    <!-- Trading Panel (Hidden initially) -->
+    <!-- Trading Panel -->
     <div id="tradingPanel" class="trading-panel">
         <div class="panel-header">
             <div class="panel-title">📊 Trading Dashboard</div>
@@ -458,7 +455,6 @@
         </div>
 
         <div class="trading-grid">
-            <!-- Chart Section -->
             <div class="chart-section">
                 <h3>📈 Live Chart</h3>
                 <div class="chart-container" id="chartContainer">
@@ -466,7 +462,6 @@
                 </div>
             </div>
 
-            <!-- Trade Section -->
             <div class="trade-section">
                 <h3>🔄 Quick Trade</h3>
                 <div class="trade-inputs">
@@ -489,7 +484,6 @@
             </div>
         </div>
 
-        <!-- Portfolio Section -->
         <div class="portfolio-section">
             <h3>📊 Your Portfolio</h3>
             <div id="portfolioList" class="portfolio-list">
@@ -500,12 +494,11 @@
 </div>
 
 <script>
-    // Trading data
     let balance = 10000;
     let portfolio = {};
     let tradingActive = false;
+    let priceInterval;
     
-    // Market prices
     let marketPrices = {
         BTC: 52000,
         ETH: 3200,
@@ -522,9 +515,6 @@
         DOGE: 'Dogecoin'
     };
     
-    let priceInterval;
-    
-    // Get username
     function getUserName() {
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
         if (savedUser) {
@@ -539,7 +529,6 @@
         }
     }
     
-    // Start trading - show panel and initialize
     function startTrading() {
         const panel = document.getElementById('tradingPanel');
         panel.classList.add('show');
@@ -549,11 +538,9 @@
             tradingActive = true;
         }
         
-        // Smooth scroll to panel
         panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     
-    // Update chart
     function updateChart() {
         const chartContainer = document.getElementById('chartContainer');
         if (!chartContainer) return;
@@ -567,13 +554,11 @@
         }
     }
     
-    // Update price display
     function updatePriceDisplay() {
         const selected = document.getElementById('cryptoSelect').value;
         document.getElementById('currentPrice').innerText = marketPrices[selected].toFixed(2);
     }
     
-    // Update UI
     function updateUI() {
         document.getElementById('balance').innerText = `$${balance.toFixed(2)}`;
         
@@ -584,7 +569,6 @@
         const netWorth = balance + holdingsValue;
         document.getElementById('netWorth').innerText = `$${netWorth.toFixed(2)}`;
         
-        // Update portfolio display
         const portfolioDiv = document.getElementById('portfolioList');
         if (Object.keys(portfolio).length === 0) {
             portfolioDiv.innerHTML = '<p style="color: rgba(255,255,255,0.5);">No holdings yet. Start trading!</p>';
@@ -604,7 +588,6 @@
         }
     }
     
-    // Buy function
     function buy() {
         const symbol = document.getElementById('cryptoSelect').value;
         const price = marketPrices[symbol];
@@ -634,7 +617,6 @@
         document.getElementById('tradeAmount').value = '';
     }
     
-    // Sell function
     function sell() {
         const symbol = document.getElementById('cryptoSelect').value;
         const price = marketPrices[symbol];
@@ -663,7 +645,6 @@
         document.getElementById('tradeAmount').value = '';
     }
     
-    // Simulate price changes
     function simulatePriceChanges() {
         priceInterval = setInterval(() => {
             for (let crypto in marketPrices) {
@@ -678,7 +659,6 @@
         }, 3000);
     }
     
-    // Logout function
     function logout() {
         if (priceInterval) clearInterval(priceInterval);
         localStorage.removeItem('lunoUser');
@@ -686,7 +666,6 @@
         window.location.href = 'index.html';
     }
     
-    // Check if user is logged in
     function checkAuth() {
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
         if (!savedUser) {
@@ -694,7 +673,6 @@
         }
     }
     
-    // Initialize trading (without auto-showing)
     function initTrading() {
         updatePriceDisplay();
         updateUI();
@@ -702,21 +680,10 @@
         simulatePriceChanges();
     }
     
-    // Handle video fallback
-    function setupVideo() {
-        const video = document.getElementById('bgVideo');
-        video.play().catch(e => {
-            console.log('Video autoplay prevented, using fallback');
-        });
-    }
-    
-    // Event listener
     document.getElementById('cryptoSelect').addEventListener('change', updatePriceDisplay);
     
-    // Initialize
     checkAuth();
     getUserName();
-    setupVideo();
 </script>
 
 </body>
