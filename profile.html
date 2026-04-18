@@ -344,6 +344,67 @@
             font-size: 0.8rem;
         }
 
+        /* Trade History Table */
+        .history-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .history-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th {
+            text-align: left;
+            padding: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+
+        .history-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .history-status-completed {
+            color: #00ff88;
+        }
+
+        .history-status-pending {
+            color: #ffaa00;
+        }
+
+        .history-profit {
+            color: #00ff88;
+        }
+
+        .history-loss {
+            color: #ff4444;
+        }
+
+        .clear-history-btn {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #ff6666;
+            font-size: 0.8rem;
+            margin-top: 15px;
+        }
+
+        .clear-history-btn:hover {
+            background: rgba(255, 68, 68, 0.3);
+        }
+
+        .no-history {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
         /* Modal */
         .modal {
             display: none;
@@ -461,6 +522,10 @@
                 <span class="icon">👤</span>
                 <span>User Profile</span>
             </li>
+            <li class="sidebar-item" data-page="history">
+                <span class="icon">📜</span>
+                <span>Trade History</span>
+            </li>
             <li class="sidebar-item" data-page="kyc">
                 <span class="icon">✅</span>
                 <span>KYC Verification</span>
@@ -539,6 +604,28 @@
                         <span class="info-label">Total Volume:</span>
                         <span class="info-value" id="totalVolume">$0</span>
                     </div>
+                    <div class="info-row">
+                        <span class="info-label">Total Profit:</span>
+                        <span class="info-value" id="totalProfit">$0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trade History Page -->
+        <div id="historyPage" class="page-content" style="display: none;">
+            <div class="page-header">
+                <h1>Trade History</h1>
+                <p>View all your past trades and transactions</p>
+            </div>
+
+            <div class="profile-card full-width">
+                <div class="card-title">
+                    <span>📜</span> All Trades
+                    <button class="clear-history-btn" onclick="clearHistory()" style="margin-left: auto;">Clear All</button>
+                </div>
+                <div class="history-table" id="historyTable">
+                    <!-- Trade history will be loaded here -->
                 </div>
             </div>
         </div>
@@ -674,6 +761,16 @@
 </div>
 
 <script>
+    // Coin names mapping
+    const coinNames = {
+        BTC: 'Bitcoin', ETH: 'Ethereum', USDT: 'Tether', BNB: 'Binance Coin',
+        XRP: 'XRP', SOL: 'Solana', ADA: 'Cardano', AVAX: 'Avalanche',
+        DOGE: 'Dogecoin', DOT: 'Polkadot', LINK: 'Chainlink', MATIC: 'Polygon',
+        ATOM: 'Cosmos', FIL: 'Filecoin', VET: 'VeChain', UNI: 'Uniswap',
+        AAVE: 'Aave', CRV: 'Curve DAO', MKR: 'Maker', COMP: 'Compound',
+        SHIB: 'Shiba Inu', PEPE: 'Pepe', FLOKI: 'Floki', BONK: 'Bonk'
+    };
+
     // User data
     let userData = {
         fullName: '',
@@ -684,10 +781,119 @@
         totalTrades: 0,
         winRate: 0,
         totalVolume: 0,
-        phoneNumber: ''
+        totalProfit: 0,
+        phoneNumber: '',
+        tradeHistory: []
     };
     
     let currentTransactionType = '';
+    
+    // Load trade history from localStorage
+    function loadTradeHistory() {
+        const savedHistory = localStorage.getItem('lunoTradeHistory');
+        if (savedHistory) {
+            try {
+                userData.tradeHistory = JSON.parse(savedHistory);
+                updateTradeStats();
+            } catch(e) {}
+        }
+    }
+    
+    // Save trade history to localStorage
+    function saveTradeHistory() {
+        localStorage.setItem('lunoTradeHistory', JSON.stringify(userData.tradeHistory));
+        updateTradeStats();
+    }
+    
+    // Add a new trade to history
+    function addTradeToHistory(trade) {
+        userData.tradeHistory.unshift(trade); // Add to beginning (newest first)
+        saveTradeHistory();
+        renderTradeHistory();
+    }
+    
+    // Update trade statistics
+    function updateTradeStats() {
+        const completedTrades = userData.tradeHistory.filter(t => t.status === 'completed');
+        userData.totalTrades = completedTrades.length;
+        
+        let totalProfit = 0;
+        let winningTrades = 0;
+        
+        completedTrades.forEach(trade => {
+            totalProfit += trade.profit || 0;
+            if (trade.profit > 0) winningTrades++;
+        });
+        
+        userData.totalProfit = totalProfit;
+        userData.winRate = userData.totalTrades > 0 ? (winningTrades / userData.totalTrades * 100).toFixed(1) : 0;
+        userData.totalVolume = userData.tradeHistory.reduce((sum, t) => sum + t.amount, 0);
+        
+        // Update UI if profile page is visible
+        const totalTradesElem = document.getElementById('totalTrades');
+        const winRateElem = document.getElementById('winRate');
+        const totalVolumeElem = document.getElementById('totalVolume');
+        const totalProfitElem = document.getElementById('totalProfit');
+        
+        if (totalTradesElem) totalTradesElem.innerText = userData.totalTrades;
+        if (winRateElem) winRateElem.innerText = userData.winRate + '%';
+        if (totalVolumeElem) totalVolumeElem.innerText = `$${userData.totalVolume.toFixed(2)}`;
+        if (totalProfitElem) {
+            totalProfitElem.innerText = `$${userData.totalProfit.toFixed(2)}`;
+            totalProfitElem.style.color = userData.totalProfit >= 0 ? '#00ff88' : '#ff4444';
+        }
+    }
+    
+    // Render trade history table
+    function renderTradeHistory() {
+        const historyContainer = document.getElementById('historyTable');
+        if (!historyContainer) return;
+        
+        if (userData.tradeHistory.length === 0) {
+            historyContainer.innerHTML = '<div class="no-history">📭 No trades yet. Start trading to see your history!</div>';
+            return;
+        }
+        
+        let html = `
+            <table>
+                <thead>
+                    <tr><th>Date & Time</th><th>Coin</th><th>Type</th><th>Amount</th><th>Duration</th><th>Return Rate</th><th>Profit</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+        `;
+        
+        userData.tradeHistory.forEach(trade => {
+            const profitClass = trade.profit >= 0 ? 'history-profit' : 'history-loss';
+            const statusClass = trade.status === 'completed' ? 'history-status-completed' : 'history-status-pending';
+            const typeClass = trade.tradeType === 'buy' ? '💰 BUY' : '💸 SELL';
+            
+            html += `
+                <tr>
+                    <td>${trade.date}</td>
+                    <td>${coinNames[trade.coin] || trade.coin} (${trade.coin})</td>
+                    <td>${typeClass}</td>
+                    <td>$${trade.amount.toFixed(2)}</td>
+                    <td>${trade.duration}s</td>
+                    <td>+${trade.rate}%</td>
+                    <td class="${profitClass}">${trade.profit >= 0 ? '+' : ''}$${trade.profit.toFixed(2)}</td>
+                    <td class="${statusClass}">${trade.status}</td>
+                </tr>
+            `;
+        });
+        
+        html += `</tbody></table>`;
+        historyContainer.innerHTML = html;
+    }
+    
+    // Clear trade history
+    function clearHistory() {
+        if (confirm('Are you sure you want to clear all trade history? This action cannot be undone.')) {
+            userData.tradeHistory = [];
+            saveTradeHistory();
+            renderTradeHistory();
+            alert('✅ Trade history cleared successfully!');
+        }
+    }
     
     // Load user data from localStorage
     function loadUserData() {
@@ -720,9 +926,6 @@
         document.getElementById('balance').innerText = `$${userData.balance.toFixed(2)}`;
         document.getElementById('kycStatus').innerText = userData.kycStatus;
         document.getElementById('kycStatusBadge').innerText = userData.kycStatus.charAt(0).toUpperCase() + userData.kycStatus.slice(1);
-        document.getElementById('totalTrades').innerText = userData.totalTrades;
-        document.getElementById('winRate').innerText = userData.winRate + '%';
-        document.getElementById('totalVolume').innerText = `$${userData.totalVolume.toFixed(2)}`;
         document.getElementById('displayUsername').innerText = userData.fullName.split(' ')[0];
         
         // Update form fields
@@ -763,12 +966,17 @@
             
             // Hide all pages
             document.getElementById('profilePage').style.display = 'none';
+            document.getElementById('historyPage').style.display = 'none';
             document.getElementById('kycPage').style.display = 'none';
             document.getElementById('updatePage').style.display = 'none';
             document.getElementById('supportPage').style.display = 'none';
             
             // Show selected page
             if (page === 'profile') document.getElementById('profilePage').style.display = 'block';
+            if (page === 'history') {
+                document.getElementById('historyPage').style.display = 'block';
+                renderTradeHistory();
+            }
             if (page === 'kyc') document.getElementById('kycPage').style.display = 'block';
             if (page === 'update') document.getElementById('updatePage').style.display = 'block';
             if (page === 'support') document.getElementById('supportPage').style.display = 'block';
@@ -901,18 +1109,30 @@
     function updateDailyPL() {
         const pl = (Math.random() - 0.5) * 500;
         const plElement = document.getElementById('dailyPL');
-        if (pl >= 0) {
-            plElement.innerHTML = `+${pl.toFixed(2)} USDT`;
-            plElement.className = 'profit-loss positive';
-        } else {
-            plElement.innerHTML = `${pl.toFixed(2)} USDT`;
-            plElement.className = 'profit-loss negative';
+        if (plElement) {
+            if (pl >= 0) {
+                plElement.innerHTML = `+${pl.toFixed(2)} USDT`;
+                plElement.className = 'profit-loss positive';
+            } else {
+                plElement.innerHTML = `${pl.toFixed(2)} USDT`;
+                plElement.className = 'profit-loss negative';
+            }
         }
     }
+    
+    // Expose addTradeToHistory to global for trade.html to use
+    window.addTradeToHistory = addTradeToHistory;
+    window.getUserBalance = () => userData.balance;
+    window.updateUserBalance = (newBalance) => {
+        userData.balance = newBalance;
+        saveUserData();
+        updateUI();
+    };
     
     // Initialize
     checkAuth();
     loadUserData();
+    loadTradeHistory();
     updateDailyPL();
     setInterval(updateDailyPL, 30000);
     
