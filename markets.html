@@ -283,7 +283,7 @@
             font-weight: bold;
         }
 
-        /* Modal with Graph */
+        /* Candlestick Chart Modal */
         .modal {
             display: none;
             position: fixed;
@@ -291,7 +291,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -299,11 +299,11 @@
 
         .modal-content {
             background: linear-gradient(135deg, #1a1a3e, #0a0e27);
-            padding: 30px;
+            padding: 25px;
             border-radius: 20px;
-            width: 650px;
-            max-width: 90%;
-            max-height: 85vh;
+            width: 900px;
+            max-width: 95%;
+            max-height: 90vh;
             overflow-y: auto;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -312,9 +312,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
         }
 
         .modal-header h2 {
@@ -332,30 +330,41 @@
             color: white;
         }
 
-        /* Chart Container */
-        .chart-container {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 20px;
+        /* Price Info */
+        .price-info {
             margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
         }
 
-        .chart-canvas {
-            width: 100%;
-            height: 300px;
+        .price-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
         }
 
-        canvas {
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
+        .current-price {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .price-change {
+            font-size: 1rem;
+            margin-left: 10px;
+        }
+
+        .price-change.positive {
+            color: #00ff88;
+        }
+
+        .price-change.negative {
+            color: #ff4444;
         }
 
         /* Timeframe Buttons */
         .timeframe-buttons {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
@@ -376,28 +385,50 @@
             border-color: transparent;
         }
 
-        /* Modal Info */
-        .modal-info {
+        /* Chart Container */
+        .chart-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .candlestick-chart {
+            position: relative;
+            min-width: 800px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 400px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        /* Additional Info */
+        .additional-info {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
-            margin-top: 20px;
+            margin-top: 15px;
             padding-top: 15px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .modal-info-item {
+        .info-item {
             text-align: center;
         }
 
-        .modal-info-label {
+        .info-label {
             font-size: 0.7rem;
             color: rgba(255, 255, 255, 0.5);
             margin-bottom: 5px;
         }
 
-        .modal-info-value {
-            font-size: 1.1rem;
+        .info-value {
+            font-size: 1rem;
             font-weight: bold;
         }
 
@@ -460,12 +491,8 @@
             .stats-cards {
                 grid-template-columns: repeat(2, 1fr);
             }
-            .modal-content {
-                width: 95%;
-                padding: 20px;
-            }
-            .modal-info {
-                grid-template-columns: 1fr;
+            .additional-info {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
@@ -545,7 +572,7 @@
     </div>
 </div>
 
-<!-- Coin Details Modal with Graph -->
+<!-- Candlestick Chart Modal -->
 <div id="coinModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -553,45 +580,49 @@
             <span class="close-modal" onclick="closeModal()">&times;</span>
         </div>
         
-        <!-- Timeframe Selector -->
+        <!-- Price Info -->
+        <div class="price-info">
+            <h3>BTC to USD</h3>
+            <div>
+                <span class="current-price" id="modalPrice">$0</span>
+                <span class="price-change" id="modalChange"></span>
+            </div>
+        </div>
+        
+        <!-- Timeframe Buttons -->
         <div class="timeframe-buttons">
-            <button class="timeframe-btn active" data-timeframe="1h" onclick="changeTimeframe('1h')">1H</button>
-            <button class="timeframe-btn" data-timeframe="24h" onclick="changeTimeframe('24h')">24H</button>
-            <button class="timeframe-btn" data-timeframe="7d" onclick="changeTimeframe('7d')">7D</button>
-            <button class="timeframe-btn" data-timeframe="30d" onclick="changeTimeframe('30d')">30D</button>
-            <button class="timeframe-btn" data-timeframe="1y" onclick="changeTimeframe('1y')">1Y</button>
+            <button class="timeframe-btn" data-timeframe="1D" onclick="changeTimeframe('1D')">1D</button>
+            <button class="timeframe-btn" data-timeframe="7D" onclick="changeTimeframe('7D')">7D</button>
+            <button class="timeframe-btn active" data-timeframe="1M" onclick="changeTimeframe('1M')">1M</button>
+            <button class="timeframe-btn" data-timeframe="3M" onclick="changeTimeframe('3M')">3M</button>
+            <button class="timeframe-btn" data-timeframe="1Y" onclick="changeTimeframe('1Y')">1Y</button>
+            <button class="timeframe-btn" data-timeframe="YTD" onclick="changeTimeframe('YTD')">YTD</button>
         </div>
         
         <!-- Chart Container -->
         <div class="chart-container">
-            <canvas id="priceChart" width="600" height="300" style="width:100%; height:300px;"></canvas>
+            <div class="candlestick-chart">
+                <canvas id="candlestickCanvas" width="850" height="400" style="width:100%; height:400px;"></canvas>
+            </div>
         </div>
         
-        <!-- Coin Info -->
-        <div class="modal-info">
-            <div class="modal-info-item">
-                <div class="modal-info-label">Current Price</div>
-                <div class="modal-info-value" id="modalPrice">$0</div>
+        <!-- Additional Info -->
+        <div class="additional-info">
+            <div class="info-item">
+                <div class="info-label">24h High</div>
+                <div class="info-value" id="modalHigh">$0</div>
             </div>
-            <div class="modal-info-item">
-                <div class="modal-info-label">24h Change</div>
-                <div class="modal-info-value" id="modalChange">0%</div>
+            <div class="info-item">
+                <div class="info-label">24h Low</div>
+                <div class="info-value" id="modalLow">$0</div>
             </div>
-            <div class="modal-info-item">
-                <div class="modal-info-label">24h High</div>
-                <div class="modal-info-value" id="modalHigh">$0</div>
+            <div class="info-item">
+                <div class="info-label">Market Cap</div>
+                <div class="info-value" id="modalMarketCap">$0</div>
             </div>
-            <div class="modal-info-item">
-                <div class="modal-info-label">24h Low</div>
-                <div class="modal-info-value" id="modalLow">$0</div>
-            </div>
-            <div class="modal-info-item">
-                <div class="modal-info-label">Market Cap</div>
-                <div class="modal-info-value" id="modalMarketCap">$0</div>
-            </div>
-            <div class="modal-info-item">
-                <div class="modal-info-label">Volume (24h)</div>
-                <div class="modal-info-value" id="modalVolume">$0</div>
+            <div class="info-item">
+                <div class="info-label">Volume (24h)</div>
+                <div class="info-value" id="modalVolume">$0</div>
             </div>
         </div>
         
@@ -604,9 +635,9 @@
 </div>
 
 <script>
-    // Cryptocurrency data with historical price data
+    // Cryptocurrency data
     const cryptocurrencies = [
-        { symbol: 'BTC', name: 'Bitcoin', fullName: 'Bitcoin (BTC)', price: 75875, marketCap: 1519025675788, volume24h: 32500000000, high24h: 76500, low24h: 75000, change24h: 2.5, category: 'large' },
+        { symbol: 'BTC', name: 'Bitcoin', fullName: 'Bitcoin (BTC)', price: 75678.36, marketCap: 1519025675788, volume24h: 32500000000, high24h: 77200, low24h: 75400, change24h: -2.33, category: 'large' },
         { symbol: 'ETH', name: 'Ethereum', fullName: 'Ethereum (ETH)', price: 2363.69, marketCap: 285249946479, volume24h: 18500000000, high24h: 2400, low24h: 2320, change24h: 1.8, category: 'large' },
         { symbol: 'USDT', name: 'Tether', fullName: 'Tether (USDT)', price: 1.00, marketCap: 186639389287, volume24h: 42000000000, high24h: 1.01, low24h: 0.99, change24h: 0.05, category: 'large' },
         { symbol: 'BNB', name: 'Binance Coin', fullName: 'Binance Coin (BNB)', price: 580.50, marketCap: 88500000000, volume24h: 1500000000, high24h: 590, low24h: 575, change24h: 0.8, category: 'large' },
@@ -635,119 +666,236 @@
     let currentSelectedCoin = null;
     let currentCategory = 'all';
     let currentSearch = '';
-    let currentTimeframe = '1h';
-    let chart = null;
+    let currentTimeframe = '1M';
+    let chartData = [];
 
-    // Generate historical price data based on timeframe
-    function generateHistoricalData(coin, timeframe) {
+    // Generate candlestick data
+    function generateCandlestickData(coin, timeframe) {
         const basePrice = coin.price;
-        const volatility = basePrice * 0.05;
         let dataPoints = [];
-        let points = 0;
+        let labels = [];
         
         switch(timeframe) {
-            case '1h': points = 12; break;
-            case '24h': points = 24; break;
-            case '7d': points = 7; break;
-            case '30d': points = 30; break;
-            case '1y': points = 12; break;
-            default: points = 12;
+            case '1D':
+                // 24 hours, hourly candles
+                for (let i = 0; i < 24; i++) {
+                    const hour = i % 12;
+                    const ampm = i < 12 ? 'AM' : 'PM';
+                    const hourLabel = hour === 0 ? 12 : hour;
+                    labels.push(`${hourLabel}:00 ${ampm}`);
+                    
+                    const change = (Math.random() - 0.5) * (basePrice * 0.01);
+                    const open = basePrice + (change * (i / 24));
+                    const close = open + (Math.random() - 0.5) * (basePrice * 0.005);
+                    const high = Math.max(open, close) + Math.random() * (basePrice * 0.003);
+                    const low = Math.min(open, close) - Math.random() * (basePrice * 0.003);
+                    dataPoints.push({ open, high, low, close });
+                }
+                break;
+            case '7D':
+                // 7 days, daily candles
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                    
+                    const change = (Math.random() - 0.5) * (basePrice * 0.03);
+                    const open = basePrice + (change * (i / 7));
+                    const close = open + (Math.random() - 0.5) * (basePrice * 0.02);
+                    const high = Math.max(open, close) + Math.random() * (basePrice * 0.015);
+                    const low = Math.min(open, close) - Math.random() * (basePrice * 0.015);
+                    dataPoints.push({ open, high, low, close });
+                }
+                break;
+            case '1M':
+                // 30 days, daily candles
+                for (let i = 29; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                    
+                    const change = (Math.random() - 0.5) * (basePrice * 0.05);
+                    const open = basePrice + (change * (i / 30));
+                    const close = open + (Math.random() - 0.5) * (basePrice * 0.03);
+                    const high = Math.max(open, close) + Math.random() * (basePrice * 0.02);
+                    const low = Math.min(open, close) - Math.random() * (basePrice * 0.02);
+                    dataPoints.push({ open, high, low, close });
+                }
+                break;
+            case '3M':
+                // 90 days, weekly candles (13 weeks)
+                for (let i = 12; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - (i * 7));
+                    labels.push(`${date.toLocaleDateString('en-US', { month: 'short' })} ${date.getDate()}`);
+                    
+                    const change = (Math.random() - 0.5) * (basePrice * 0.1);
+                    const open = basePrice + (change * (i / 13));
+                    const close = open + (Math.random() - 0.5) * (basePrice * 0.06);
+                    const high = Math.max(open, close) + Math.random() * (basePrice * 0.04);
+                    const low = Math.min(open, close) - Math.random() * (basePrice * 0.04);
+                    dataPoints.push({ open, high, low, close });
+                }
+                break;
+            case '1Y':
+                // 12 months, monthly candles
+                for (let i = 11; i >= 0; i--) {
+                    const date = new Date();
+                    date.setMonth(date.getMonth() - i);
+                    labels.push(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+                    
+                    const change = (Math.random() - 0.5) * (basePrice * 0.2);
+                    const open = basePrice + (change * (i / 12));
+                    const close = open + (Math.random() - 0.5) * (basePrice * 0.1);
+                    const high = Math.max(open, close) + Math.random() * (basePrice * 0.08);
+                    const low = Math.min(open, close) - Math.random() * (basePrice * 0.08);
+                    dataPoints.push({ open, high, low, close });
+                }
+                break;
+            case 'YTD':
+                // Year to date - from January
+                const now = new Date();
+                const startMonth = 0; // January
+                let months = now.getMonth() + 1;
+                for (let i = months; i >= 0; i--) {
+                    const date = new Date();
+                    date.setMonth(startMonth + i);
+                    labels.push(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+                    
+                    const change = (Math.random() - 0.5) * (basePrice * 0.15);
+                    const open = basePrice + (change * (i / months));
+                    const close = open + (Math.random() - 0.5) * (basePrice * 0.08);
+                    const high = Math.max(open, close) + Math.random() * (basePrice * 0.06);
+                    const low = Math.min(open, close) - Math.random() * (basePrice * 0.06);
+                    dataPoints.push({ open, high, low, close });
+                }
+                break;
+            default:
+                break;
         }
         
-        let currentPrice = basePrice;
-        for (let i = points; i >= 0; i--) {
-            const change = (Math.random() - 0.5) * volatility;
-            currentPrice = basePrice + (change * (i / points));
-            if (currentPrice < 0.01) currentPrice = 0.01;
-            dataPoints.push(currentPrice);
-        }
-        
-        return dataPoints;
+        return { dataPoints, labels };
     }
 
-    // Draw chart
-    function drawChart(coin, timeframe) {
-        const canvas = document.getElementById('priceChart');
+    // Draw candlestick chart
+    function drawCandlestickChart(coin, timeframe) {
+        const canvas = document.getElementById('candlestickCanvas');
         if (!canvas) return;
         
         const ctx = canvas.getContext('2d');
-        const data = generateHistoricalData(coin, timeframe);
+        const { dataPoints, labels } = generateCandlestickData(coin, timeframe);
+        chartData = { dataPoints, labels };
         
-        // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Set dimensions
+        // Set canvas dimensions
         const width = canvas.clientWidth;
         const height = canvas.clientHeight;
         canvas.width = width;
         canvas.height = height;
         
-        if (width === 0) return;
+        if (width === 0 || dataPoints.length === 0) return;
         
-        const padding = 40;
-        const chartWidth = width - padding * 2;
-        const chartHeight = height - padding * 2;
+        const padding = { left: 60, right: 40, top: 20, bottom: 40 };
+        const chartWidth = width - padding.left - padding.right;
+        const chartHeight = height - padding.top - padding.bottom;
         
-        const maxPrice = Math.max(...data);
-        const minPrice = Math.min(...data);
+        // Find min and max prices
+        let minPrice = Math.min(...dataPoints.map(d => d.low));
+        let maxPrice = Math.max(...dataPoints.map(d => d.high));
         const priceRange = maxPrice - minPrice;
         
-        // Draw grid lines
+        // Add padding to price range
+        minPrice = minPrice - priceRange * 0.05;
+        maxPrice = maxPrice + priceRange * 0.05;
+        const adjustedRange = maxPrice - minPrice;
+        
+        const candleWidth = chartWidth / dataPoints.length * 0.7;
+        const candleSpacing = chartWidth / dataPoints.length * 0.3;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.fillRect(0, 0, width, height);
+        
+        // Draw grid lines and price labels
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-        ctx.lineWidth = 1;
-        for (let i = 0; i <= 4; i++) {
-            const y = padding + (chartHeight / 4) * i;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.font = '11px Arial';
+        
+        const priceLevels = 8;
+        for (let i = 0; i <= priceLevels; i++) {
+            const price = minPrice + (adjustedRange / priceLevels) * i;
+            const y = padding.top + chartHeight - (i / priceLevels) * chartHeight;
+            
             ctx.beginPath();
-            ctx.moveTo(padding, y);
-            ctx.lineTo(width - padding, y);
+            ctx.moveTo(padding.left, y);
+            ctx.lineTo(width - padding.right, y);
             ctx.stroke();
-        }
-        
-        // Draw price line
-        ctx.beginPath();
-        ctx.strokeStyle = '#00d4ff';
-        ctx.lineWidth = 2;
-        
-        const step = chartWidth / (data.length - 1);
-        
-        for (let i = 0; i < data.length; i++) {
-            const x = padding + i * step;
-            const y = padding + chartHeight - ((data[i] - minPrice) / priceRange) * chartHeight;
             
-            if (i === 0) {
-                ctx.moveTo(x, y);
+            // Format price label (e.g., 77.44K)
+            let priceLabel;
+            if (price >= 1000) {
+                priceLabel = `${(price / 1000).toFixed(2)}K`;
             } else {
-                ctx.lineTo(x, y);
+                priceLabel = price.toFixed(2);
             }
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.fillText(priceLabel, 5, y + 3);
         }
-        ctx.stroke();
         
-        // Draw gradient fill
-        ctx.lineTo(width - padding, height - padding);
-        ctx.lineTo(padding, height - padding);
-        ctx.fillStyle = 'rgba(0, 212, 255, 0.1)';
-        ctx.fill();
-        
-        // Draw data points
-        for (let i = 0; i < data.length; i++) {
-            const x = padding + i * step;
-            const y = padding + chartHeight - ((data[i] - minPrice) / priceRange) * chartHeight;
+        // Draw candlesticks
+        for (let i = 0; i < dataPoints.length; i++) {
+            const candle = dataPoints[i];
+            const x = padding.left + i * (candleWidth + candleSpacing) + candleSpacing / 2;
+            const isGreen = candle.close >= candle.open;
             
+            // Calculate y positions
+            const openY = padding.top + chartHeight - ((candle.open - minPrice) / adjustedRange) * chartHeight;
+            const closeY = padding.top + chartHeight - ((candle.close - minPrice) / adjustedRange) * chartHeight;
+            const highY = padding.top + chartHeight - ((candle.high - minPrice) / adjustedRange) * chartHeight;
+            const lowY = padding.top + chartHeight - ((candle.low - minPrice) / adjustedRange) * chartHeight;
+            
+            // Draw wick (high-low line)
             ctx.beginPath();
-            ctx.arc(x, y, 4, 0, Math.PI * 2);
-            ctx.fillStyle = '#00d4ff';
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(x, y, 2, 0, Math.PI * 2);
-            ctx.fillStyle = 'white';
-            ctx.fill();
+            ctx.moveTo(x + candleWidth / 2, highY);
+            ctx.lineTo(x + candleWidth / 2, lowY);
+            ctx.strokeStyle = isGreen ? '#00ff88' : '#ff4444';
+            ctx.stroke();
+            
+            // Draw body
+            const bodyTop = Math.min(openY, closeY);
+            const bodyBottom = Math.max(openY, closeY);
+            const bodyHeight = Math.max(1, bodyBottom - bodyTop);
+            
+            ctx.fillStyle = isGreen ? '#00ff88' : '#ff4444';
+            ctx.fillRect(x, bodyTop, candleWidth, bodyHeight);
+            
+            // Border for better visibility
+            ctx.strokeStyle = isGreen ? '#00cc6a' : '#cc0000';
+            ctx.strokeRect(x, bodyTop, candleWidth, bodyHeight);
         }
         
-        // Draw labels
+        // Draw x-axis labels (time)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
         ctx.font = '10px Arial';
-        ctx.fillText(`$${maxPrice.toFixed(2)}`, width - padding - 50, padding - 5);
-        ctx.fillText(`$${minPrice.toFixed(2)}`, width - padding - 50, height - padding + 15);
+        
+        // Show limited labels to avoid clutter
+        const labelStep = Math.max(1, Math.floor(dataPoints.length / 8));
+        for (let i = 0; i < dataPoints.length; i += labelStep) {
+            const x = padding.left + i * (candleWidth + candleSpacing) + candleSpacing / 2 + candleWidth / 2;
+            const label = labels[i];
+            ctx.save();
+            ctx.translate(x, height - padding.bottom + 15);
+            ctx.rotate(-0.3);
+            ctx.fillText(label, 0, 0);
+            ctx.restore();
+        }
+        
+        // Draw axis labels
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.font = 'bold 11px Arial';
+        ctx.fillText('Price (USD)', 10, padding.top + chartHeight / 2);
     }
 
     // Change timeframe
@@ -763,7 +911,7 @@
         });
         
         if (currentSelectedCoin) {
-            drawChart(currentSelectedCoin, timeframe);
+            drawCandlestickChart(currentSelectedCoin, timeframe);
         }
     }
 
@@ -833,27 +981,27 @@
         `}).join('');
     }
 
-    // Show coin details with graph
+    // Show coin details with candlestick chart
     function showCoinDetails(symbol) {
         const coin = cryptocurrencies.find(c => c.symbol === symbol);
         if (!coin) return;
 
         currentSelectedCoin = coin;
 
-        document.getElementById('modalCoinName').innerText = coin.fullName;
+        document.getElementById('modalCoinName').innerText = `${coin.name} (${coin.symbol})`;
         document.getElementById('modalPrice').innerText = formatPrice(coin.price, coin.symbol);
-        document.getElementById('modalMarketCap').innerText = formatMarketCap(coin.marketCap);
         document.getElementById('modalHigh').innerText = formatPrice(coin.high24h, coin.symbol);
         document.getElementById('modalLow').innerText = formatPrice(coin.low24h, coin.symbol);
+        document.getElementById('modalMarketCap').innerText = formatMarketCap(coin.marketCap);
         document.getElementById('modalVolume').innerText = formatMarketCap(coin.volume24h);
         
-        const changeClass = coin.change24h >= 0 ? 'change-positive' : 'change-negative';
+        const changeClass = coin.change24h >= 0 ? 'positive' : 'negative';
         const changeSymbol = coin.change24h >= 0 ? '+' : '';
-        document.getElementById('modalChange').innerHTML = `<span class="${changeClass}">${changeSymbol}${coin.change24h}%</span>`;
+        document.getElementById('modalChange').innerHTML = `${changeSymbol}${coin.change24h}% 1D`;
+        document.getElementById('modalChange').className = `price-change ${changeClass}`;
         
-        // Draw chart
-        currentTimeframe = '1h';
-        drawChart(coin, '1h');
+        // Draw candlestick chart
+        drawCandlestickChart(coin, currentTimeframe);
         
         document.getElementById('coinModal').style.display = 'flex';
     }
@@ -896,13 +1044,13 @@
     function startPriceUpdates() {
         setInterval(() => {
             cryptocurrencies.forEach(coin => {
-                const change = (Math.random() - 0.5) * (coin.price * 0.02);
+                const change = (Math.random() - 0.5) * (coin.price * 0.01);
                 let newPrice = coin.price + change;
                 if (newPrice < 0.000001) newPrice = 0.000001;
                 coin.price = parseFloat(newPrice.toFixed(coin.price < 0.01 ? 8 : 2));
                 
                 coin.marketCap = coin.marketCap * (1 + (change / coin.price));
-                coin.change24h = parseFloat((coin.change24h + (Math.random() - 0.5) * 0.5).toFixed(1));
+                coin.change24h = parseFloat((coin.change24h + (Math.random() - 0.5) * 0.3).toFixed(1));
                 if (coin.change24h > 15) coin.change24h = 15;
                 if (coin.change24h < -15) coin.change24h = -15;
             });
@@ -915,10 +1063,11 @@
                 const updatedCoin = cryptocurrencies.find(c => c.symbol === currentSelectedCoin.symbol);
                 if (updatedCoin) {
                     document.getElementById('modalPrice').innerText = formatPrice(updatedCoin.price, updatedCoin.symbol);
-                    const changeClass = updatedCoin.change24h >= 0 ? 'change-positive' : 'change-negative';
+                    const changeClass = updatedCoin.change24h >= 0 ? 'positive' : 'negative';
                     const changeSymbol = updatedCoin.change24h >= 0 ? '+' : '';
-                    document.getElementById('modalChange').innerHTML = `<span class="${changeClass}">${changeSymbol}${updatedCoin.change24h}%</span>`;
-                    drawChart(updatedCoin, currentTimeframe);
+                    document.getElementById('modalChange').innerHTML = `${changeSymbol}${updatedCoin.change24h}% 1D`;
+                    document.getElementById('modalChange').className = `price-change ${changeClass}`;
+                    drawCandlestickChart(updatedCoin, currentTimeframe);
                 }
             }
         }, 5000);
@@ -974,10 +1123,10 @@
         }
     }
 
-    // Handle window resize for chart
+    // Handle window resize
     window.addEventListener('resize', () => {
         if (currentSelectedCoin) {
-            drawChart(currentSelectedCoin, currentTimeframe);
+            drawCandlestickChart(currentSelectedCoin, currentTimeframe);
         }
     });
 
