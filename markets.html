@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luno Trading - Markets</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: white;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #00d4ff;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .username {
+            color: #00d4ff;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 68, 68, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 30px 40px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Header */
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Search Bar */
+        .search-section {
+            margin-bottom: 30px;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 14px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Market Table */
+        .market-table {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 2fr 1fr;
+            padding: 18px 24px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .market-row {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 2fr 1fr;
+            padding: 18px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+
+        .market-row:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        /* Coin Info */
+        .coin-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .coin-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .coin-name {
+            font-weight: 600;
+        }
+
+        .coin-symbol {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Price */
+        .coin-price {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* Market Cap */
+        .market-cap {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Change Percent */
+        .change-positive {
+            color: #00ff88;
+        }
+
+        .change-negative {
+            color: #ff4444;
+        }
+
+        /* Details Button */
+        .details-btn {
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #00d4ff;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            width: fit-content;
+        }
+
+        .details-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+        }
+
+        /* Stats Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* Modal for Details */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a3e, #0a0e27);
+            padding: 30px;
+            border-radius: 20px;
+            width: 450px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .close-modal:hover {
+            color: white;
+        }
+
+        .modal-info {
+            margin-bottom: 20px;
+        }
+
+        .modal-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-label {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .modal-value {
+            font-weight: 600;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .modal-buy {
+            flex: 1;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+
+        .modal-sell {
+            flex: 1;
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            .nav-links {
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .main-content {
+                padding: 20px;
+                margin-top: 120px;
+            }
+            .table-header {
+                display: none;
+            }
+            .market-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="logo">📈 Luno Trading</div>
+    <div class="nav-links">
+        <a href="dashboard.html">Home</a>
+        <a href="markets.html" style="color: #00d4ff;">Markets</a>
+        <a href="#">Trades</a>
+        <a href="profile.html">My Profile</a>
+    </div>
+    <div class="user-info">
+        <span class="username" id="displayUsername">Trader</span>
+        <a href="#" class="logout-btn" onclick="logout()">Logout</a>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main-content">
+    <div class="page-header">
+        <h1>Cryptocurrency Prices</h1>
+        <p>Track live cryptocurrency prices and market data</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-cards">
+        <div class="stat-card">
+            <div class="stat-label">Total Market Cap</div>
+            <div class="stat-value" id="totalMarketCap">$2.45T</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">24h Volume</div>
+            <div class="stat-value" id="totalVolume">$68.5B</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">BTC Dominance</div>
+            <div class="stat-value" id="btcDominance">52.3%</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Active Coins</div>
+            <div class="stat-value" id="activeCoins">5</div>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-section">
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search cryptocurrency... (BTC, ETH, etc.)">
+        </div>
+    </div>
+
+    <!-- Market Table -->
+    <div class="market-table">
+        <div class="table-header">
+            <div>Coin</div>
+            <div>Price</div>
+            <div>Market Cap</div>
+            <div>Action</div>
+        </div>
+        <div id="marketList">
+            <!-- Dynamic market rows will appear here -->
+        </div>
+    </div>
+</div>
+
+<!-- Coin Details Modal -->
+<div id="coinModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalCoinName">Bitcoin (BTC)</h2>
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-info">
+            <div class="modal-row">
+                <span class="modal-label">Current Price:</span>
+                <span class="modal-value" id="modalPrice">$0</span>
+            </div>
+            <div class="modal-row">
+                <span class="modal-label">Market Cap:</span>
+                <span class="modal-value" id="modalMarketCap">$0</span>
+            </div>
+            <div class="modal-row">
+                <span class="modal-label">24h Change:</span>
+                <span class="modal-value" id="modalChange">0%</span>
+            </div>
+            <div class="modal-row">
+                <span class="modal-label">24h High:</span>
+                <span class="modal-value" id="modalHigh">$0</span>
+            </div>
+            <div class="modal-row">
+                <span class="modal-label">24h Low:</span>
+                <span class="modal-value" id="modalLow">$0</span>
+            </div>
+            <div class="modal-row">
+                <span class="modal-label">Volume (24h):</span>
+                <span class="modal-value" id="modalVolume">$0</span>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-buy" onclick="quickTrade('buy')">Buy</button>
+            <button class="modal-sell" onclick="quickTrade('sell')">Sell</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Cryptocurrency data
+    const cryptocurrencies = [
+        {
+            symbol: 'BTC',
+            name: 'Bitcoin',
+            fullName: 'Bitcoin (BTC)',
+            price: 75875,
+            marketCap: 1519025675788,
+            volume24h: 32500000000,
+            high24h: 76500,
+            low24h: 75000,
+            change24h: 2.5
+        },
+        {
+            symbol: 'ETH',
+            name: 'Ethereum',
+            fullName: 'Ethereum (ETH)',
+            price: 2363.69,
+            marketCap: 285249946479,
+            volume24h: 18500000000,
+            high24h: 2400,
+            low24h: 2320,
+            change24h: 1.8
+        },
+        {
+            symbol: 'USDT',
+            name: 'Tether',
+            fullName: 'Tether (USDT)',
+            price: 1.00,
+            marketCap: 186639389287,
+            volume24h: 42000000000,
+            high24h: 1.01,
+            low24h: 0.99,
+            change24h: 0.05
+        },
+        {
+            symbol: 'XRP',
+            name: 'XRP',
+            fullName: 'XRP (XRP)',
+            price: 1.43,
+            marketCap: 88256758366,
+            volume24h: 3200000000,
+            high24h: 1.48,
+            low24h: 1.38,
+            change24h: -1.2
+        },
+        {
+            symbol: 'BNB',
+            name: 'Binance Coin',
+            fullName: 'Binance Coin (BNB)',
+            price: 580.50,
+            marketCap: 88500000000,
+            volume24h: 1500000000,
+            high24h: 590,
+            low24h: 575,
+            change24h: 0.8
+        },
+        {
+            symbol: 'SOL',
+            name: 'Solana',
+            fullName: 'Solana (SOL)',
+            price: 142.30,
+            marketCap: 63200000000,
+            volume24h: 2100000000,
+            high24h: 148,
+            low24h: 138,
+            change24h: 3.2
+        },
+        {
+            symbol: 'DOGE',
+            name: 'Dogecoin',
+            fullName: 'Dogecoin (DOGE)',
+            price: 0.158,
+            marketCap: 22800000000,
+            volume24h: 850000000,
+            high24h: 0.162,
+            low24h: 0.154,
+            change24h: 1.5
+        },
+        {
+            symbol: 'ADA',
+            name: 'Cardano',
+            fullName: 'Cardano (ADA)',
+            price: 0.348,
+            marketCap: 12400000000,
+            volume24h: 320000000,
+            high24h: 0.355,
+            low24h: 0.342,
+            change24h: -0.5
+        }
+    ];
+
+    let currentSelectedCoin = null;
+
+    // Format market cap
+    function formatMarketCap(cap) {
+        if (cap >= 1e12) return `$${(cap / 1e12).toFixed(2)}T`;
+        if (cap >= 1e9) return `$${(cap / 1e9).toFixed(2)}B`;
+        if (cap >= 1e6) return `$${(cap / 1e6).toFixed(2)}M`;
+        return `$${cap.toFixed(2)}`;
+    }
+
+    // Format price
+    function formatPrice(price, symbol) {
+        if (symbol === 'DOGE' || symbol === 'ADA') return `$${price.toFixed(4)}`;
+        if (price < 1) return `$${price.toFixed(4)}`;
+        if (price < 10) return `$${price.toFixed(2)}`;
+        return `$${price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    }
+
+    // Get coin icon letter
+    function getCoinIcon(symbol) {
+        return symbol.charAt(0);
+    }
+
+    // Render market list
+    function renderMarketList(filter = '') {
+        const marketList = document.getElementById('marketList');
+        const filteredCoins = cryptocurrencies.filter(coin => 
+            coin.name.toLowerCase().includes(filter.toLowerCase()) ||
+            coin.symbol.toLowerCase().includes(filter.toLowerCase())
+        );
+
+        if (filteredCoins.length === 0) {
+            marketList.innerHTML = '<div class="no-results">No cryptocurrencies found. Try a different search.</div>';
+            return;
+        }
+
+        marketList.innerHTML = filteredCoins.map(coin => `
+            <div class="market-row" onclick="showCoinDetails('${coin.symbol}')">
+                <div class="coin-info">
+                    <div class="coin-icon">${getCoinIcon(coin.symbol)}</div>
+                    <div>
+                        <div class="coin-name">${coin.name}</div>
+                        <div class="coin-symbol">${coin.symbol}</div>
+                    </div>
+                </div>
+                <div class="coin-price">${formatPrice(coin.price, coin.symbol)}</div>
+                <div class="market-cap">${formatMarketCap(coin.marketCap)}</div>
+                <div>
+                    <button class="details-btn" onclick="event.stopPropagation(); showCoinDetails('${coin.symbol}')">Details</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Show coin details modal
+    function showCoinDetails(symbol) {
+        const coin = cryptocurrencies.find(c => c.symbol === symbol);
+        if (!coin) return;
+
+        currentSelectedCoin = coin;
+
+        document.getElementById('modalCoinName').innerText = coin.fullName;
+        document.getElementById('modalPrice').innerText = formatPrice(coin.price, coin.symbol);
+        document.getElementById('modalMarketCap').innerText = formatMarketCap(coin.marketCap);
+        
+        const changeClass = coin.change24h >= 0 ? 'change-positive' : 'change-negative';
+        const changeSymbol = coin.change24h >= 0 ? '+' : '';
+        document.getElementById('modalChange').innerHTML = `<span class="${changeClass}">${changeSymbol}${coin.change24h}%</span>`;
+        
+        document.getElementById('modalHigh').innerText = formatPrice(coin.high24h, coin.symbol);
+        document.getElementById('modalLow').innerText = formatPrice(coin.low24h, coin.symbol);
+        document.getElementById('modalVolume').innerText = formatMarketCap(coin.volume24h);
+
+        document.getElementById('coinModal').style.display = 'flex';
+    }
+
+    // Quick trade from modal
+    function quickTrade(action) {
+        if (!currentSelectedCoin) return;
+        
+        closeModal();
+        
+        // Store selected coin in localStorage to pre-fill on dashboard
+        localStorage.setItem('selectedCrypto', JSON.stringify({
+            symbol: currentSelectedCoin.symbol,
+            name: currentSelectedCoin.name,
+            price: currentSelectedCoin.price
+        }));
+        
+        // Redirect to dashboard
+        window.location.href = 'dashboard.html';
+        
+        // Show alert with info
+        setTimeout(() => {
+            alert(`${action.toUpperCase()} ${currentSelectedCoin.name}\n\nPrice: ${formatPrice(currentSelectedCoin.price, currentSelectedCoin.symbol)}\n\nYou will be redirected to the trading dashboard.`);
+        }, 100);
+    }
+
+    // Close modal
+    function closeModal() {
+        document.getElementById('coinModal').style.display = 'none';
+        currentSelectedCoin = null;
+    }
+
+    // Update stats with real-time data
+    function updateStats() {
+        const totalMarketCap = cryptocurrencies.reduce((sum, coin) => sum + coin.marketCap, 0);
+        const totalVolume = cryptocurrencies.reduce((sum, coin) => sum + coin.volume24h, 0);
+        const btcMarketCap = cryptocurrencies.find(c => c.symbol === 'BTC')?.marketCap || 0;
+        const btcDominance = (btcMarketCap / totalMarketCap) * 100;
+        
+        document.getElementById('totalMarketCap').innerText = formatMarketCap(totalMarketCap);
+        document.getElementById('totalVolume').innerText = formatMarketCap(totalVolume);
+        document.getElementById('btcDominance').innerText = btcDominance.toFixed(1) + '%';
+        document.getElementById('activeCoins').innerText = cryptocurrencies.length;
+    }
+
+    // Simulate price updates
+    function startPriceUpdates() {
+        setInterval(() => {
+            cryptocurrencies.forEach(coin => {
+                const change = (Math.random() - 0.5) * 100;
+                let newPrice = coin.price + change;
+                if (newPrice < 0.01) newPrice = 0.01;
+                coin.price = parseFloat(newPrice.toFixed(4));
+                
+                // Update market cap
+                coin.marketCap = coin.marketCap * (1 + (change / coin.price));
+                
+                // Update 24h change
+                coin.change24h = parseFloat((coin.change24h + (Math.random() - 0.5) * 0.5).toFixed(1));
+            });
+            
+            // Re-render with current search filter
+            const searchInput = document.getElementById('searchInput');
+            renderMarketList(searchInput.value);
+            updateStats();
+        }, 5000);
+    }
+
+    // Get username
+    function getUserName() {
+        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+        if (savedUser) {
+            try {
+                const user = JSON.parse(savedUser);
+                if (user.fullName) {
+                    document.getElementById('displayUsername').innerText = user.fullName.split(' ')[0];
+                } else {
+                    document.getElementById('displayUsername').innerText = user.email.split('@')[0];
+                }
+            } catch(e) {}
+        }
+    }
+
+    // Logout
+    function logout() {
+        localStorage.removeItem('lunoUser');
+        sessionStorage.removeItem('lunoUser');
+        window.location.href = 'index.html';
+    }
+
+    // Check authentication
+    function checkAuth() {
+        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+        if (!savedUser) {
+            window.location.href = 'index.html';
+        }
+    }
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        renderMarketList(e.target.value);
+    });
+
+    // Close modal on outside click
+    window.onclick = function(event) {
+        const modal = document.getElementById('coinModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+
+    // Initialize
+    checkAuth();
+    getUserName();
+    renderMarketList();
+    updateStats();
+    startPriceUpdates();
+</script>
+
+</body>
+</html>
