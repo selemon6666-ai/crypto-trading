@@ -149,6 +149,36 @@
             background: rgba(0, 212, 255, 0.2);
         }
 
+        /* Crypto Selector */
+        .crypto-selector {
+            margin: 0 25px 20px 25px;
+        }
+
+        .crypto-selector select {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .crypto-selector select:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .crypto-selector select option {
+            background: #1a1a3e;
+        }
+
+        .crypto-selector select optgroup {
+            background: #0f0c29;
+            color: #00d4ff;
+        }
+
         /* Coin Info */
         .coin-info {
             background: rgba(0, 0, 0, 0.2);
@@ -186,7 +216,7 @@
             font-size: 0.85rem;
         }
 
-        .form-group input, .form-group select {
+        .form-group input {
             width: 100%;
             padding: 14px;
             background: rgba(0, 0, 0, 0.3);
@@ -196,7 +226,7 @@
             font-size: 1rem;
         }
 
-        .form-group input:focus, .form-group select:focus {
+        .form-group input:focus {
             outline: none;
             border-color: #00d4ff;
         }
@@ -396,6 +426,44 @@
             <div class="trade-type-btn sell" onclick="setTradeType('sell')">SELL</div>
         </div>
 
+        <!-- Cryptocurrency Selector -->
+        <div class="crypto-selector">
+            <select id="cryptoSelect" onchange="changeCrypto()">
+                <optgroup label="💰 Large Cap">
+                    <option value="BTC">Bitcoin (BTC)</option>
+                    <option value="ETH">Ethereum (ETH)</option>
+                    <option value="USDT">Tether (USDT)</option>
+                    <option value="BNB">Binance Coin (BNB)</option>
+                    <option value="XRP">XRP (XRP)</option>
+                    <option value="SOL">Solana (SOL)</option>
+                    <option value="ADA">Cardano (ADA)</option>
+                    <option value="AVAX">Avalanche (AVAX)</option>
+                </optgroup>
+                <optgroup label="📊 Mid Cap">
+                    <option value="DOGE">Dogecoin (DOGE)</option>
+                    <option value="DOT">Polkadot (DOT)</option>
+                    <option value="LINK">Chainlink (LINK)</option>
+                    <option value="MATIC">Polygon (MATIC)</option>
+                    <option value="ATOM">Cosmos (ATOM)</option>
+                    <option value="FIL">Filecoin (FIL)</option>
+                    <option value="VET">VeChain (VET)</option>
+                </optgroup>
+                <optgroup label="🔷 DeFi">
+                    <option value="UNI">Uniswap (UNI)</option>
+                    <option value="AAVE">Aave (AAVE)</option>
+                    <option value="CRV">Curve DAO (CRV)</option>
+                    <option value="MKR">Maker (MKR)</option>
+                    <option value="COMP">Compound (COMP)</option>
+                </optgroup>
+                <optgroup label="🎭 Meme Coins">
+                    <option value="SHIB">Shiba Inu (SHIB)</option>
+                    <option value="PEPE">Pepe (PEPE)</option>
+                    <option value="FLOKI">Floki (FLOKI)</option>
+                    <option value="BONK">Bonk (BONK)</option>
+                </optgroup>
+            </select>
+        </div>
+
         <!-- Coin Info -->
         <div class="coin-info">
             <div>
@@ -491,8 +559,9 @@
     let currentCoin = 'BTC';
     let currentCoinPrice = 75875;
     
-    // Coin prices (matching dashboard)
+    // All 24 Cryptocurrencies prices (matching dashboard)
     const coinPrices = {
+        // Large Cap
         BTC: 75875,
         ETH: 2363.69,
         USDT: 1.00,
@@ -501,6 +570,7 @@
         SOL: 142.30,
         ADA: 0.348,
         AVAX: 28.45,
+        // Mid Cap
         DOGE: 0.158,
         DOT: 6.85,
         LINK: 14.20,
@@ -508,11 +578,13 @@
         ATOM: 8.15,
         FIL: 5.42,
         VET: 0.028,
+        // DeFi
         UNI: 7.85,
         AAVE: 92.50,
         CRV: 0.42,
         MKR: 1150.00,
         COMP: 45.30,
+        // Meme Coins
         SHIB: 0.000018,
         PEPE: 0.0000095,
         FLOKI: 0.000185,
@@ -539,7 +611,7 @@
                 }
             } catch(e) {}
         }
-        document.getElementById('availableAmount').innerText = userBalance.toFixed(2) + ' USDT';
+        document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
     }
     
     // Save user balance
@@ -552,19 +624,20 @@
                 localStorage.setItem('lunoProfile', JSON.stringify(profile));
             } catch(e) {}
         }
-        // Also update the dashboard balance in localStorage
-        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-        if (savedUser) {
-            try {
-                const user = JSON.parse(savedUser);
-                user.balance = userBalance;
-                if (localStorage.getItem('lunoUser')) {
-                    localStorage.setItem('lunoUser', JSON.stringify(user));
-                } else {
-                    sessionStorage.setItem('lunoUser', JSON.stringify(user));
-                }
-            } catch(e) {}
-        }
+    }
+    
+    // Change cryptocurrency
+    function changeCrypto() {
+        const select = document.getElementById('cryptoSelect');
+        currentCoin = select.value;
+        currentCoinPrice = coinPrices[currentCoin];
+        
+        // Update UI
+        document.getElementById('coinName').innerHTML = `${coinNames[currentCoin]} (${currentCoin})`;
+        document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
+        
+        // Recalculate return with new price
+        calculateReturn();
     }
     
     // Get selected coin from URL or localStorage
@@ -576,6 +649,12 @@
                 currentCoin = crypto.symbol;
                 currentCoinPrice = crypto.price;
                 localStorage.removeItem('selectedCrypto');
+                
+                // Update dropdown to match selected coin
+                const select = document.getElementById('cryptoSelect');
+                if (select) {
+                    select.value = currentCoin;
+                }
             } catch(e) {}
         }
         
@@ -709,7 +788,7 @@
             saveUserBalance();
             
             // Show success modal
-            const modalMessage = `You successfully ${tradeType.toUpperCase()} with ${selectedDuration}s duration!\n\nAmount: $${amount.toFixed(2)} USDT\nReturn: +${selectedRate}% ($${(amount * selectedRate / 100).toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT\n\nYour trade will complete in ${selectedDuration} seconds.`;
+            const modalMessage = `You successfully ${tradeType.toUpperCase()} ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration!\n\nAmount: $${amount.toFixed(2)} USDT\nReturn: +${selectedRate}% ($${(amount * selectedRate / 100).toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT\n\nYour trade will complete in ${selectedDuration} seconds.`;
             document.getElementById('modalMessage').innerHTML = modalMessage.replace(/\n/g, '<br>');
             document.getElementById('successModal').style.display = 'flex';
             
@@ -723,7 +802,7 @@
                 userBalance += amount + profit;
                 saveUserBalance();
                 document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
-                alert(`✅ Trade completed!\n\nYour ${selectedDuration}s trade has finished.\nYou invested: $${amount.toFixed(2)} USDT\nYou earned: $${profit.toFixed(2)} USDT\nTotal returned: $${(amount + profit).toFixed(2)} USDT`);
+                alert(`✅ Trade completed!\n\nYour ${selectedDuration}s trade on ${coinNames[currentCoin]} (${currentCoin}) has finished.\nYou invested: $${amount.toFixed(2)} USDT\nYou earned: $${profit.toFixed(2)} USDT\nTotal returned: $${(amount + profit).toFixed(2)} USDT`);
             }, selectedDuration * 1000);
         } else {
             alert('Sell feature coming soon!');
