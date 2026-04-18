@@ -18,25 +18,65 @@
             overflow-x: hidden;
         }
 
-        /* Video Background */
-        .video-background {
+        /* Animated Gradient Background (No video needed!) */
+        body::before {
+            content: '';
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -2;
-            object-fit: cover;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
         }
 
-        .overlay {
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Optional: Moving particles overlay */
+        .particles {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.65);
             z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
         }
 
         /* Navigation Bar */
@@ -402,14 +442,8 @@
 </head>
 <body>
 
-<!-- Video Background - Using YouTube embed as fallback -->
-<iframe class="video-background" 
-        src="https://www.youtube.com/embed/QX_oy-7wUaI?autoplay=1&mute=1&controls=0&loop=1&playlist=QX_oy-7wUaI&modestbranding=1&showinfo=0&rel=0"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen>
-</iframe>
-<div class="overlay"></div>
+<!-- Animated Particles -->
+<div class="particles" id="particles"></div>
 
 <!-- Navigation -->
 <nav class="navbar">
@@ -494,6 +528,22 @@
 </div>
 
 <script>
+    // Create animated particles
+    function createParticles() {
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 60; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            const size = Math.random() * 6 + 2;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDuration = Math.random() * 20 + 10 + 's';
+            particle.style.animationDelay = Math.random() * 10 + 's';
+            particlesContainer.appendChild(particle);
+        }
+    }
+
     let balance = 10000;
     let portfolio = {};
     let tradingActive = false;
@@ -682,6 +732,7 @@
     
     document.getElementById('cryptoSelect').addEventListener('change', updatePriceDisplay);
     
+    createParticles();
     checkAuth();
     getUserName();
 </script>
