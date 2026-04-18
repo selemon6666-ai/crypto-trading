@@ -287,6 +287,19 @@
             font-size: 1rem;
         }
 
+        .trade-inputs select {
+            cursor: pointer;
+        }
+
+        .trade-inputs select option {
+            background: #1a1a3e;
+        }
+
+        .trade-inputs select optgroup {
+            background: #0f0c29;
+            color: #00d4ff;
+        }
+
         .trade-inputs select:focus,
         .trade-inputs input:focus {
             outline: none;
@@ -460,11 +473,38 @@
                 <h3>🔄 Quick Trade</h3>
                 <div class="trade-inputs">
                     <select id="cryptoSelect">
-                        <option value="BTC">Bitcoin (BTC)</option>
-                        <option value="ETH">Ethereum (ETH)</option>
-                        <option value="BNB">Binance Coin (BNB)</option>
-                        <option value="SOL">Solana (SOL)</option>
-                        <option value="DOGE">Dogecoin (DOGE)</option>
+                        <optgroup label="💰 Large Cap">
+                            <option value="BTC">Bitcoin (BTC)</option>
+                            <option value="ETH">Ethereum (ETH)</option>
+                            <option value="USDT">Tether (USDT)</option>
+                            <option value="BNB">Binance Coin (BNB)</option>
+                            <option value="XRP">XRP (XRP)</option>
+                            <option value="SOL">Solana (SOL)</option>
+                            <option value="ADA">Cardano (ADA)</option>
+                            <option value="AVAX">Avalanche (AVAX)</option>
+                        </optgroup>
+                        <optgroup label="📊 Mid Cap">
+                            <option value="DOGE">Dogecoin (DOGE)</option>
+                            <option value="DOT">Polkadot (DOT)</option>
+                            <option value="LINK">Chainlink (LINK)</option>
+                            <option value="MATIC">Polygon (MATIC)</option>
+                            <option value="ATOM">Cosmos (ATOM)</option>
+                            <option value="FIL">Filecoin (FIL)</option>
+                            <option value="VET">VeChain (VET)</option>
+                        </optgroup>
+                        <optgroup label="🔷 DeFi">
+                            <option value="UNI">Uniswap (UNI)</option>
+                            <option value="AAVE">Aave (AAVE)</option>
+                            <option value="CRV">Curve DAO (CRV)</option>
+                            <option value="MKR">Maker (MKR)</option>
+                            <option value="COMP">Compound (COMP)</option>
+                        </optgroup>
+                        <optgroup label="🎭 Meme Coins">
+                            <option value="SHIB">Shiba Inu (SHIB)</option>
+                            <option value="PEPE">Pepe (PEPE)</option>
+                            <option value="FLOKI">Floki (FLOKI)</option>
+                            <option value="BONK">Bonk (BONK)</option>
+                        </optgroup>
                     </select>
                     <input type="number" id="tradeAmount" placeholder="Amount to trade">
                 </div>
@@ -638,21 +678,57 @@
     let tradingActive = false;
     let priceInterval;
     
+    // 20+ Cryptocurrencies prices
     let marketPrices = {
-        BTC: 52000,
-        ETH: 3200,
-        BNB: 420,
-        SOL: 110,
-        DOGE: 0.18
+        // Large Cap
+        BTC: 75875,
+        ETH: 2363.69,
+        USDT: 1.00,
+        BNB: 580.50,
+        XRP: 1.43,
+        SOL: 142.30,
+        ADA: 0.348,
+        AVAX: 28.45,
+        // Mid Cap
+        DOGE: 0.158,
+        DOT: 6.85,
+        LINK: 14.20,
+        MATIC: 0.52,
+        ATOM: 8.15,
+        FIL: 5.42,
+        VET: 0.028,
+        // DeFi
+        UNI: 7.85,
+        AAVE: 92.50,
+        CRV: 0.42,
+        MKR: 1150.00,
+        COMP: 45.30,
+        // Meme Coins
+        SHIB: 0.000018,
+        PEPE: 0.0000095,
+        FLOKI: 0.000185,
+        BONK: 0.000022
     };
     
     const cryptoNames = {
-        BTC: 'Bitcoin',
-        ETH: 'Ethereum',
-        BNB: 'Binance Coin',
-        SOL: 'Solana',
-        DOGE: 'Dogecoin'
+        BTC: 'Bitcoin', ETH: 'Ethereum', USDT: 'Tether', BNB: 'Binance Coin',
+        XRP: 'XRP', SOL: 'Solana', ADA: 'Cardano', AVAX: 'Avalanche',
+        DOGE: 'Dogecoin', DOT: 'Polkadot', LINK: 'Chainlink', MATIC: 'Polygon',
+        ATOM: 'Cosmos', FIL: 'Filecoin', VET: 'VeChain', UNI: 'Uniswap',
+        AAVE: 'Aave', CRV: 'Curve DAO', MKR: 'Maker', COMP: 'Compound',
+        SHIB: 'Shiba Inu', PEPE: 'Pepe', FLOKI: 'Floki', BONK: 'Bonk'
     };
+    
+    // Format price helper
+    function formatPrice(price, symbol) {
+        if (symbol === 'SHIB' || symbol === 'PEPE' || symbol === 'FLOKI' || symbol === 'BONK') {
+            return price.toExponential(4);
+        }
+        if (price < 0.01) return price.toFixed(6);
+        if (price < 1) return price.toFixed(4);
+        if (price < 10) return price.toFixed(2);
+        return price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
     
     // Check for selected crypto from markets page
     function checkSelectedCrypto() {
@@ -711,7 +787,8 @@
     
     function updatePriceDisplay() {
         const selected = document.getElementById('cryptoSelect').value;
-        document.getElementById('currentPrice').innerText = marketPrices[selected].toFixed(2);
+        const price = marketPrices[selected];
+        document.getElementById('currentPrice').innerText = formatPrice(price, selected);
     }
     
     function updateUI() {
@@ -768,7 +845,7 @@
         portfolio[symbol] += amount;
         
         updateUI();
-        alert(`✅ Bought ${amount} ${symbol} for $${cost.toFixed(2)}`);
+        alert(`✅ Bought ${amount} ${cryptoNames[symbol]} (${symbol}) for $${cost.toFixed(2)}`);
         document.getElementById('tradeAmount').value = '';
     }
     
@@ -783,7 +860,7 @@
         }
         
         if (!portfolio[symbol] || portfolio[symbol] < amount) {
-            alert(`You don't have enough ${symbol}!`);
+            alert(`You don't have enough ${cryptoNames[symbol]}!`);
             return;
         }
         
@@ -796,22 +873,22 @@
         }
         
         updateUI();
-        alert(`✅ Sold ${amount} ${symbol} for $${revenue.toFixed(2)}`);
+        alert(`✅ Sold ${amount} ${cryptoNames[symbol]} (${symbol}) for $${revenue.toFixed(2)}`);
         document.getElementById('tradeAmount').value = '';
     }
     
     function simulatePriceChanges() {
         priceInterval = setInterval(() => {
             for (let crypto in marketPrices) {
-                const change = (Math.random() - 0.5) * 200;
+                const change = (Math.random() - 0.5) * (marketPrices[crypto] * 0.02);
                 let newPrice = marketPrices[crypto] + change;
-                if (newPrice < 1) newPrice = 1;
-                marketPrices[crypto] = parseFloat(newPrice.toFixed(2));
+                if (newPrice < 0.000001) newPrice = 0.000001;
+                marketPrices[crypto] = parseFloat(newPrice.toFixed(marketPrices[crypto] < 0.01 ? 8 : 2));
             }
             updatePriceDisplay();
             updateUI();
             updateChart();
-        }, 3000);
+        }, 5000);
     }
     
     function logout() {
