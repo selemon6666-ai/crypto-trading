@@ -220,19 +220,16 @@
             color: rgba(255, 255, 255, 0.5);
         }
 
-        /* Price */
         .coin-price {
             font-weight: 600;
             font-size: 1rem;
         }
 
-        /* Market Cap */
         .market-cap {
             color: rgba(255, 255, 255, 0.8);
             font-size: 0.9rem;
         }
 
-        /* Change Percent */
         .change-positive {
             color: #00ff88;
             font-weight: 600;
@@ -243,7 +240,6 @@
             font-weight: 600;
         }
 
-        /* Details Button */
         .details-btn {
             background: rgba(0, 212, 255, 0.2);
             border: 1px solid rgba(0, 212, 255, 0.3);
@@ -287,7 +283,7 @@
             font-weight: bold;
         }
 
-        /* Modal */
+        /* Modal with Graph */
         .modal {
             display: none;
             position: fixed;
@@ -295,7 +291,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -305,7 +301,10 @@
             background: linear-gradient(135deg, #1a1a3e, #0a0e27);
             padding: 30px;
             border-radius: 20px;
-            width: 450px;
+            width: 650px;
+            max-width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -314,6 +313,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .modal-header h2 {
@@ -321,32 +322,83 @@
         }
 
         .close-modal {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             cursor: pointer;
             color: rgba(255, 255, 255, 0.6);
+            transition: 0.3s;
         }
 
         .close-modal:hover {
             color: white;
         }
 
-        .modal-info {
+        /* Chart Container */
+        .chart-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
             margin-bottom: 20px;
         }
 
-        .modal-row {
+        .chart-canvas {
+            width: 100%;
+            height: 300px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        /* Timeframe Buttons */
+        .timeframe-buttons {
             display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
-        .modal-label {
-            color: rgba(255, 255, 255, 0.6);
+        .timeframe-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            color: white;
+            font-size: 0.8rem;
+            transition: 0.3s;
         }
 
-        .modal-value {
-            font-weight: 600;
+        .timeframe-btn:hover, .timeframe-btn.active {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border-color: transparent;
+        }
+
+        /* Modal Info */
+        .modal-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-info-item {
+            text-align: center;
+        }
+
+        .modal-info-label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 5px;
+        }
+
+        .modal-info-value {
+            font-size: 1.1rem;
+            font-weight: bold;
         }
 
         .modal-buttons {
@@ -407,6 +459,13 @@
             }
             .stats-cards {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            .modal-info {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -486,39 +545,57 @@
     </div>
 </div>
 
-<!-- Coin Details Modal -->
+<!-- Coin Details Modal with Graph -->
 <div id="coinModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2 id="modalCoinName">Bitcoin (BTC)</h2>
             <span class="close-modal" onclick="closeModal()">&times;</span>
         </div>
+        
+        <!-- Timeframe Selector -->
+        <div class="timeframe-buttons">
+            <button class="timeframe-btn active" data-timeframe="1h" onclick="changeTimeframe('1h')">1H</button>
+            <button class="timeframe-btn" data-timeframe="24h" onclick="changeTimeframe('24h')">24H</button>
+            <button class="timeframe-btn" data-timeframe="7d" onclick="changeTimeframe('7d')">7D</button>
+            <button class="timeframe-btn" data-timeframe="30d" onclick="changeTimeframe('30d')">30D</button>
+            <button class="timeframe-btn" data-timeframe="1y" onclick="changeTimeframe('1y')">1Y</button>
+        </div>
+        
+        <!-- Chart Container -->
+        <div class="chart-container">
+            <canvas id="priceChart" width="600" height="300" style="width:100%; height:300px;"></canvas>
+        </div>
+        
+        <!-- Coin Info -->
         <div class="modal-info">
-            <div class="modal-row">
-                <span class="modal-label">Current Price:</span>
-                <span class="modal-value" id="modalPrice">$0</span>
+            <div class="modal-info-item">
+                <div class="modal-info-label">Current Price</div>
+                <div class="modal-info-value" id="modalPrice">$0</div>
             </div>
-            <div class="modal-row">
-                <span class="modal-label">Market Cap:</span>
-                <span class="modal-value" id="modalMarketCap">$0</span>
+            <div class="modal-info-item">
+                <div class="modal-info-label">24h Change</div>
+                <div class="modal-info-value" id="modalChange">0%</div>
             </div>
-            <div class="modal-row">
-                <span class="modal-label">24h Change:</span>
-                <span class="modal-value" id="modalChange">0%</span>
+            <div class="modal-info-item">
+                <div class="modal-info-label">24h High</div>
+                <div class="modal-info-value" id="modalHigh">$0</div>
             </div>
-            <div class="modal-row">
-                <span class="modal-label">24h High:</span>
-                <span class="modal-value" id="modalHigh">$0</span>
+            <div class="modal-info-item">
+                <div class="modal-info-label">24h Low</div>
+                <div class="modal-info-value" id="modalLow">$0</div>
             </div>
-            <div class="modal-row">
-                <span class="modal-label">24h Low:</span>
-                <span class="modal-value" id="modalLow">$0</span>
+            <div class="modal-info-item">
+                <div class="modal-info-label">Market Cap</div>
+                <div class="modal-info-value" id="modalMarketCap">$0</div>
             </div>
-            <div class="modal-row">
-                <span class="modal-label">Volume (24h):</span>
-                <span class="modal-value" id="modalVolume">$0</span>
+            <div class="modal-info-item">
+                <div class="modal-info-label">Volume (24h)</div>
+                <div class="modal-info-value" id="modalVolume">$0</div>
             </div>
         </div>
+        
+        <!-- Action Buttons -->
         <div class="modal-buttons">
             <button class="modal-buy" onclick="quickTrade('buy')">Buy</button>
             <button class="modal-sell" onclick="quickTrade('sell')">Sell</button>
@@ -527,11 +604,8 @@
 </div>
 
 <script>
-    // ============================================
-    // 24+ CRYPTOCURRENCIES DATA
-    // ============================================
+    // Cryptocurrency data with historical price data
     const cryptocurrencies = [
-        // Large Cap
         { symbol: 'BTC', name: 'Bitcoin', fullName: 'Bitcoin (BTC)', price: 75875, marketCap: 1519025675788, volume24h: 32500000000, high24h: 76500, low24h: 75000, change24h: 2.5, category: 'large' },
         { symbol: 'ETH', name: 'Ethereum', fullName: 'Ethereum (ETH)', price: 2363.69, marketCap: 285249946479, volume24h: 18500000000, high24h: 2400, low24h: 2320, change24h: 1.8, category: 'large' },
         { symbol: 'USDT', name: 'Tether', fullName: 'Tether (USDT)', price: 1.00, marketCap: 186639389287, volume24h: 42000000000, high24h: 1.01, low24h: 0.99, change24h: 0.05, category: 'large' },
@@ -540,8 +614,6 @@
         { symbol: 'SOL', name: 'Solana', fullName: 'Solana (SOL)', price: 142.30, marketCap: 63200000000, volume24h: 2100000000, high24h: 148, low24h: 138, change24h: 3.2, category: 'large' },
         { symbol: 'ADA', name: 'Cardano', fullName: 'Cardano (ADA)', price: 0.348, marketCap: 12400000000, volume24h: 320000000, high24h: 0.355, low24h: 0.342, change24h: -0.5, category: 'large' },
         { symbol: 'AVAX', name: 'Avalanche', fullName: 'Avalanche (AVAX)', price: 28.45, marketCap: 11200000000, volume24h: 280000000, high24h: 29.20, low24h: 27.80, change24h: 1.2, category: 'large' },
-        
-        // Mid Cap
         { symbol: 'DOGE', name: 'Dogecoin', fullName: 'Dogecoin (DOGE)', price: 0.158, marketCap: 22800000000, volume24h: 850000000, high24h: 0.162, low24h: 0.154, change24h: 1.5, category: 'meme' },
         { symbol: 'DOT', name: 'Polkadot', fullName: 'Polkadot (DOT)', price: 6.85, marketCap: 9800000000, volume24h: 180000000, high24h: 7.02, low24h: 6.75, change24h: -0.8, category: 'mid' },
         { symbol: 'LINK', name: 'Chainlink', fullName: 'Chainlink (LINK)', price: 14.20, marketCap: 8500000000, volume24h: 220000000, high24h: 14.65, low24h: 13.90, change24h: 2.1, category: 'mid' },
@@ -549,15 +621,11 @@
         { symbol: 'ATOM', name: 'Cosmos', fullName: 'Cosmos (ATOM)', price: 8.15, marketCap: 3200000000, volume24h: 95000000, high24h: 8.35, low24h: 8.00, change24h: -1.1, category: 'mid' },
         { symbol: 'FIL', name: 'Filecoin', fullName: 'Filecoin (FIL)', price: 5.42, marketCap: 2800000000, volume24h: 88000000, high24h: 5.58, low24h: 5.30, change24h: 0.9, category: 'mid' },
         { symbol: 'VET', name: 'VeChain', fullName: 'VeChain (VET)', price: 0.028, marketCap: 2200000000, volume24h: 45000000, high24h: 0.029, low24h: 0.0275, change24h: -0.4, category: 'mid' },
-        
-        // DeFi
         { symbol: 'UNI', name: 'Uniswap', fullName: 'Uniswap (UNI)', price: 7.85, marketCap: 5900000000, volume24h: 120000000, high24h: 8.05, low24h: 7.70, change24h: 1.8, category: 'defi' },
         { symbol: 'AAVE', name: 'Aave', fullName: 'Aave (AAVE)', price: 92.50, marketCap: 1380000000, volume24h: 68000000, high24h: 95.20, low24h: 90.80, change24h: 2.5, category: 'defi' },
         { symbol: 'CRV', name: 'Curve DAO', fullName: 'Curve DAO (CRV)', price: 0.42, marketCap: 480000000, volume24h: 35000000, high24h: 0.44, low24h: 0.41, change24h: -1.2, category: 'defi' },
         { symbol: 'MKR', name: 'Maker', fullName: 'Maker (MKR)', price: 1150.00, marketCap: 1050000000, volume24h: 42000000, high24h: 1180, low24h: 1130, change24h: 0.7, category: 'defi' },
         { symbol: 'COMP', name: 'Compound', fullName: 'Compound (COMP)', price: 45.30, marketCap: 380000000, volume24h: 28000000, high24h: 46.80, low24h: 44.50, change24h: -0.9, category: 'defi' },
-        
-        // Meme Coins
         { symbol: 'SHIB', name: 'Shiba Inu', fullName: 'Shiba Inu (SHIB)', price: 0.000018, marketCap: 10600000000, volume24h: 420000000, high24h: 0.000019, low24h: 0.0000175, change24h: 5.2, category: 'meme' },
         { symbol: 'PEPE', name: 'Pepe', fullName: 'Pepe (PEPE)', price: 0.0000095, marketCap: 4000000000, volume24h: 280000000, high24h: 0.00001, low24h: 0.000009, change24h: 8.5, category: 'meme' },
         { symbol: 'FLOKI', name: 'Floki', fullName: 'Floki (FLOKI)', price: 0.000185, marketCap: 1800000000, volume24h: 95000000, high24h: 0.000192, low24h: 0.000178, change24h: 3.2, category: 'meme' },
@@ -567,6 +635,137 @@
     let currentSelectedCoin = null;
     let currentCategory = 'all';
     let currentSearch = '';
+    let currentTimeframe = '1h';
+    let chart = null;
+
+    // Generate historical price data based on timeframe
+    function generateHistoricalData(coin, timeframe) {
+        const basePrice = coin.price;
+        const volatility = basePrice * 0.05;
+        let dataPoints = [];
+        let points = 0;
+        
+        switch(timeframe) {
+            case '1h': points = 12; break;
+            case '24h': points = 24; break;
+            case '7d': points = 7; break;
+            case '30d': points = 30; break;
+            case '1y': points = 12; break;
+            default: points = 12;
+        }
+        
+        let currentPrice = basePrice;
+        for (let i = points; i >= 0; i--) {
+            const change = (Math.random() - 0.5) * volatility;
+            currentPrice = basePrice + (change * (i / points));
+            if (currentPrice < 0.01) currentPrice = 0.01;
+            dataPoints.push(currentPrice);
+        }
+        
+        return dataPoints;
+    }
+
+    // Draw chart
+    function drawChart(coin, timeframe) {
+        const canvas = document.getElementById('priceChart');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const data = generateHistoricalData(coin, timeframe);
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Set dimensions
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+        canvas.width = width;
+        canvas.height = height;
+        
+        if (width === 0) return;
+        
+        const padding = 40;
+        const chartWidth = width - padding * 2;
+        const chartHeight = height - padding * 2;
+        
+        const maxPrice = Math.max(...data);
+        const minPrice = Math.min(...data);
+        const priceRange = maxPrice - minPrice;
+        
+        // Draw grid lines
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+            const y = padding + (chartHeight / 4) * i;
+            ctx.beginPath();
+            ctx.moveTo(padding, y);
+            ctx.lineTo(width - padding, y);
+            ctx.stroke();
+        }
+        
+        // Draw price line
+        ctx.beginPath();
+        ctx.strokeStyle = '#00d4ff';
+        ctx.lineWidth = 2;
+        
+        const step = chartWidth / (data.length - 1);
+        
+        for (let i = 0; i < data.length; i++) {
+            const x = padding + i * step;
+            const y = padding + chartHeight - ((data[i] - minPrice) / priceRange) * chartHeight;
+            
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        ctx.stroke();
+        
+        // Draw gradient fill
+        ctx.lineTo(width - padding, height - padding);
+        ctx.lineTo(padding, height - padding);
+        ctx.fillStyle = 'rgba(0, 212, 255, 0.1)';
+        ctx.fill();
+        
+        // Draw data points
+        for (let i = 0; i < data.length; i++) {
+            const x = padding + i * step;
+            const y = padding + chartHeight - ((data[i] - minPrice) / priceRange) * chartHeight;
+            
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#00d4ff';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+        }
+        
+        // Draw labels
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.font = '10px Arial';
+        ctx.fillText(`$${maxPrice.toFixed(2)}`, width - padding - 50, padding - 5);
+        ctx.fillText(`$${minPrice.toFixed(2)}`, width - padding - 50, height - padding + 15);
+    }
+
+    // Change timeframe
+    function changeTimeframe(timeframe) {
+        currentTimeframe = timeframe;
+        
+        // Update active button
+        document.querySelectorAll('.timeframe-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-timeframe') === timeframe) {
+                btn.classList.add('active');
+            }
+        });
+        
+        if (currentSelectedCoin) {
+            drawChart(currentSelectedCoin, timeframe);
+        }
+    }
 
     // Format market cap
     function formatMarketCap(cap) {
@@ -596,12 +795,10 @@
         
         let filteredCoins = cryptocurrencies;
         
-        // Apply category filter
         if (currentCategory !== 'all') {
             filteredCoins = filteredCoins.filter(coin => coin.category === currentCategory);
         }
         
-        // Apply search filter
         if (currentSearch) {
             filteredCoins = filteredCoins.filter(coin => 
                 coin.name.toLowerCase().includes(currentSearch.toLowerCase()) ||
@@ -618,7 +815,7 @@
             const changeClass = coin.change24h >= 0 ? 'change-positive' : 'change-negative';
             const changeSymbol = coin.change24h >= 0 ? '+' : '';
             return `
-            <div class="market-row" onclick="showCoinDetails('${coin.symbol}')">
+            <div class="market-row">
                 <div class="coin-info">
                     <div class="coin-icon">${getCoinIcon(coin.symbol)}</div>
                     <div>
@@ -630,13 +827,13 @@
                 <div class="${changeClass}">${changeSymbol}${coin.change24h}%</div>
                 <div class="market-cap">${formatMarketCap(coin.marketCap)}</div>
                 <div>
-                    <button class="details-btn" onclick="event.stopPropagation(); showCoinDetails('${coin.symbol}')">Details</button>
+                    <button class="details-btn" onclick="showCoinDetails('${coin.symbol}')">Details</button>
                 </div>
             </div>
         `}).join('');
     }
 
-    // Show coin details modal
+    // Show coin details with graph
     function showCoinDetails(symbol) {
         const coin = cryptocurrencies.find(c => c.symbol === symbol);
         if (!coin) return;
@@ -646,15 +843,18 @@
         document.getElementById('modalCoinName').innerText = coin.fullName;
         document.getElementById('modalPrice').innerText = formatPrice(coin.price, coin.symbol);
         document.getElementById('modalMarketCap').innerText = formatMarketCap(coin.marketCap);
+        document.getElementById('modalHigh').innerText = formatPrice(coin.high24h, coin.symbol);
+        document.getElementById('modalLow').innerText = formatPrice(coin.low24h, coin.symbol);
+        document.getElementById('modalVolume').innerText = formatMarketCap(coin.volume24h);
         
         const changeClass = coin.change24h >= 0 ? 'change-positive' : 'change-negative';
         const changeSymbol = coin.change24h >= 0 ? '+' : '';
         document.getElementById('modalChange').innerHTML = `<span class="${changeClass}">${changeSymbol}${coin.change24h}%</span>`;
         
-        document.getElementById('modalHigh').innerText = formatPrice(coin.high24h, coin.symbol);
-        document.getElementById('modalLow').innerText = formatPrice(coin.low24h, coin.symbol);
-        document.getElementById('modalVolume').innerText = formatMarketCap(coin.volume24h);
-
+        // Draw chart
+        currentTimeframe = '1h';
+        drawChart(coin, '1h');
+        
         document.getElementById('coinModal').style.display = 'flex';
     }
 
@@ -664,14 +864,12 @@
         
         closeModal();
         
-        // Store selected coin in localStorage
         localStorage.setItem('selectedCrypto', JSON.stringify({
             symbol: currentSelectedCoin.symbol,
             name: currentSelectedCoin.name,
             price: currentSelectedCoin.price
         }));
         
-        // Redirect to trade page
         window.location.href = 'trade.html';
     }
 
@@ -681,7 +879,7 @@
         currentSelectedCoin = null;
     }
 
-    // Update stats with real-time data
+    // Update stats
     function updateStats() {
         const totalMarketCap = cryptocurrencies.reduce((sum, coin) => sum + coin.marketCap, 0);
         const totalVolume = cryptocurrencies.reduce((sum, coin) => sum + coin.volume24h, 0);
@@ -711,6 +909,18 @@
             
             renderMarketList();
             updateStats();
+            
+            // Update modal if open
+            if (currentSelectedCoin) {
+                const updatedCoin = cryptocurrencies.find(c => c.symbol === currentSelectedCoin.symbol);
+                if (updatedCoin) {
+                    document.getElementById('modalPrice').innerText = formatPrice(updatedCoin.price, updatedCoin.symbol);
+                    const changeClass = updatedCoin.change24h >= 0 ? 'change-positive' : 'change-negative';
+                    const changeSymbol = updatedCoin.change24h >= 0 ? '+' : '';
+                    document.getElementById('modalChange').innerHTML = `<span class="${changeClass}">${changeSymbol}${updatedCoin.change24h}%</span>`;
+                    drawChart(updatedCoin, currentTimeframe);
+                }
+            }
         }, 5000);
     }
 
@@ -763,6 +973,13 @@
             closeModal();
         }
     }
+
+    // Handle window resize for chart
+    window.addEventListener('resize', () => {
+        if (currentSelectedCoin) {
+            drawChart(currentSelectedCoin, currentTimeframe);
+        }
+    });
 
     // Initialize
     checkAuth();
