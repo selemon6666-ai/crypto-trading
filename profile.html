@@ -264,7 +264,7 @@
             transform: translateY(-2px);
         }
 
-        /* Form Styles for Update Profile */
+        /* Form Styles */
         .form-group {
             margin-bottom: 20px;
         }
@@ -301,14 +301,6 @@
             color: white;
         }
 
-        /* KYC Status Card */
-        .kyc-status {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
         .kyc-badge {
             padding: 5px 15px;
             border-radius: 20px;
@@ -322,12 +314,6 @@
             border: 1px solid rgba(255, 170, 0, 0.3);
         }
 
-        .kyc-badge.verified {
-            background: rgba(0, 255, 136, 0.2);
-            color: #00ff88;
-            border: 1px solid rgba(0, 255, 136, 0.3);
-        }
-
         .btn-verify {
             background: rgba(0, 212, 255, 0.2);
             border: 1px solid rgba(0, 212, 255, 0.3);
@@ -337,7 +323,6 @@
             color: #00d4ff;
         }
 
-        /* Customer Support */
         .support-item {
             padding: 15px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -417,8 +402,17 @@
             color: white;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            .nav-links {
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
             .sidebar {
                 width: 80px;
             }
@@ -448,8 +442,8 @@
     <div class="logo">📈 Luno Trading</div>
     <div class="nav-links">
         <a href="dashboard.html">Home</a>
-        <a href="#">Markets</a>
-        <a href="#">Trades</a>
+        <a href="markets.html">Markets</a>
+        <a href="trade.html">Trades</a>
         <a href="profile.html" style="color: #00d4ff;">My Profile</a>
     </div>
     <div class="user-info">
@@ -549,7 +543,7 @@
             </div>
         </div>
 
-        <!-- KYC Page (Hidden by default) -->
+        <!-- KYC Page -->
         <div id="kycPage" class="page-content" style="display: none;">
             <div class="page-header">
                 <h1>KYC Verification</h1>
@@ -580,15 +574,11 @@
                     <label>ID Number</label>
                     <input type="text" id="idNumber" placeholder="Enter your ID number">
                 </div>
-                <div class="form-group">
-                    <label>Upload ID Document (Demo)</label>
-                    <input type="file" id="idDocument" accept="image/*">
-                </div>
                 <button class="btn-save" onclick="submitKYC()">Submit Verification</button>
             </div>
         </div>
 
-        <!-- Update Profile Page (Hidden by default) -->
+        <!-- Update Profile Page -->
         <div id="updatePage" class="page-content" style="display: none;">
             <div class="page-header">
                 <h1>Update Profile</h1>
@@ -623,7 +613,7 @@
             </div>
         </div>
 
-        <!-- Customer Support Page (Hidden by default) -->
+        <!-- Customer Support Page -->
         <div id="supportPage" class="page-content" style="display: none;">
             <div class="page-header">
                 <h1>Customer Support</h1>
@@ -714,6 +704,7 @@
                     const profile = JSON.parse(savedProfile);
                     userData.phoneNumber = profile.phoneNumber || '';
                     userData.kycStatus = profile.kycStatus || 'pending';
+                    userData.balance = profile.balance || 10000;
                 }
                 
                 updateUI();
@@ -738,6 +729,27 @@
         document.getElementById('updateFullName').value = userData.fullName;
         document.getElementById('phoneNumber').value = userData.phoneNumber || '';
         document.getElementById('kycFullName').value = userData.fullName;
+    }
+    
+    // Save user data
+    function saveUserData() {
+        localStorage.setItem('lunoProfile', JSON.stringify({
+            phoneNumber: userData.phoneNumber,
+            kycStatus: userData.kycStatus,
+            balance: userData.balance
+        }));
+        
+        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+        if (savedUser) {
+            const user = JSON.parse(savedUser);
+            user.fullName = userData.fullName;
+            user.balance = userData.balance;
+            if (localStorage.getItem('lunoUser')) {
+                localStorage.setItem('lunoUser', JSON.stringify(user));
+            } else {
+                sessionStorage.setItem('lunoUser', JSON.stringify(user));
+            }
+        }
     }
     
     // Sidebar navigation
@@ -779,12 +791,7 @@
         userData.kycStatus = 'pending';
         userData.fullName = fullName;
         
-        // Save to localStorage
-        localStorage.setItem('lunoProfile', JSON.stringify({
-            phoneNumber: userData.phoneNumber,
-            kycStatus: userData.kycStatus
-        }));
-        
+        saveUserData();
         updateUI();
         
         // Switch back to profile page
@@ -813,24 +820,7 @@
             alert('Password changed successfully!');
         }
         
-        // Save to localStorage
-        localStorage.setItem('lunoProfile', JSON.stringify({
-            phoneNumber: userData.phoneNumber,
-            kycStatus: userData.kycStatus
-        }));
-        
-        // Update user in login storage
-        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-        if (savedUser) {
-            const user = JSON.parse(savedUser);
-            user.fullName = userData.fullName;
-            if (localStorage.getItem('lunoUser')) {
-                localStorage.setItem('lunoUser', JSON.stringify(user));
-            } else {
-                sessionStorage.setItem('lunoUser', JSON.stringify(user));
-            }
-        }
-        
+        saveUserData();
         updateUI();
         alert('Profile updated successfully!');
         
@@ -878,6 +868,7 @@
             alert(`✅ Successfully withdrew $${amount.toFixed(2)}!`);
         }
         
+        saveUserData();
         updateUI();
         closeModal();
     }
