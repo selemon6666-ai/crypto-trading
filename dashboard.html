@@ -18,7 +18,7 @@
             overflow-x: hidden;
         }
 
-        /* Video Background - Using Coverr.co reliable videos */
+        /* Video Background - Using LOCAL file from your repository */
         .video-background {
             position: fixed;
             top: 0;
@@ -29,14 +29,13 @@
             object-fit: cover;
         }
 
-        /* Dark overlay for better text visibility */
         .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.55);
+            background: rgba(0, 0, 0, 0.6);
             z-index: -1;
         }
 
@@ -403,14 +402,9 @@
 </head>
 <body>
 
-<!-- Crypto/Finance Video Background - Multiple reliable sources -->
+<!-- LOCAL Video Background - From your GitHub repository -->
 <video class="video-background" autoplay muted loop playsinline id="bgVideo">
-    <!-- Source 1: Crypto trading animation (most reliable) -->
-    <source src="https://videos.pexels.com/video-files/8449032/8449032-uhd_2560_1440_25fps.mp4" type="video/mp4">
-    <!-- Source 2: Bitcoin animation fallback -->
-    <source src="https://videos.pexels.com/video-files/7568734/7568734-uhd_2560_1440_30fps.mp4" type="video/mp4">
-    <!-- Source 3: Stock market fallback -->
-    <source src="https://videos.pexels.com/video-files/7693938/7693938-uhd_2560_1440_25fps.mp4" type="video/mp4">
+    <source src="background.mp4" type="video/mp4">
     Your browser does not support the video tag.
 </video>
 <div class="overlay"></div>
@@ -499,15 +493,12 @@
 
 <script>
     // Force video to play
-    document.addEventListener('DOMContentLoaded', function() {
-        const video = document.getElementById('bgVideo');
-        video.play().catch(function(error) {
-            console.log("Video autoplay failed:", error);
-            // Try again with user interaction
-            document.body.addEventListener('click', function() {
-                video.play();
-            }, { once: true });
-        });
+    const video = document.getElementById('bgVideo');
+    video.play().catch(function(error) {
+        console.log("Video autoplay failed, trying on click");
+        document.body.addEventListener('click', function() {
+            video.play();
+        }, { once: true });
     });
 
     let balance = 10000;
