@@ -561,34 +561,12 @@
     
     // All 24 Cryptocurrencies prices (matching dashboard)
     const coinPrices = {
-        // Large Cap
-        BTC: 75875,
-        ETH: 2363.69,
-        USDT: 1.00,
-        BNB: 580.50,
-        XRP: 1.43,
-        SOL: 142.30,
-        ADA: 0.348,
-        AVAX: 28.45,
-        // Mid Cap
-        DOGE: 0.158,
-        DOT: 6.85,
-        LINK: 14.20,
-        MATIC: 0.52,
-        ATOM: 8.15,
-        FIL: 5.42,
-        VET: 0.028,
-        // DeFi
-        UNI: 7.85,
-        AAVE: 92.50,
-        CRV: 0.42,
-        MKR: 1150.00,
-        COMP: 45.30,
-        // Meme Coins
-        SHIB: 0.000018,
-        PEPE: 0.0000095,
-        FLOKI: 0.000185,
-        BONK: 0.000022
+        BTC: 75875, ETH: 2363.69, USDT: 1.00, BNB: 580.50,
+        XRP: 1.43, SOL: 142.30, ADA: 0.348, AVAX: 28.45,
+        DOGE: 0.158, DOT: 6.85, LINK: 14.20, MATIC: 0.52,
+        ATOM: 8.15, FIL: 5.42, VET: 0.028, UNI: 7.85,
+        AAVE: 92.50, CRV: 0.42, MKR: 1150.00, COMP: 45.30,
+        SHIB: 0.000018, PEPE: 0.0000095, FLOKI: 0.000185, BONK: 0.000022
     };
     
     const coinNames = {
@@ -624,6 +602,33 @@
                 localStorage.setItem('lunoProfile', JSON.stringify(profile));
             } catch(e) {}
         }
+        // Also update the global function if available
+        if (window.updateUserBalance) {
+            window.updateUserBalance(userBalance);
+        }
+    }
+    
+    // Save trade to history
+    function saveTradeToHistory(tradeRecord) {
+        // Get existing history
+        let history = [];
+        const savedHistory = localStorage.getItem('lunoTradeHistory');
+        if (savedHistory) {
+            try {
+                history = JSON.parse(savedHistory);
+            } catch(e) {}
+        }
+        
+        // Add new trade to beginning
+        history.unshift(tradeRecord);
+        
+        // Save back to localStorage
+        localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
+        
+        // Also call the global function if available
+        if (window.addTradeToHistory) {
+            window.addTradeToHistory(tradeRecord);
+        }
     }
     
     // Change cryptocurrency
@@ -632,11 +637,9 @@
         currentCoin = select.value;
         currentCoinPrice = coinPrices[currentCoin];
         
-        // Update UI
         document.getElementById('coinName').innerHTML = `${coinNames[currentCoin]} (${currentCoin})`;
         document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
         
-        // Recalculate return with new price
         calculateReturn();
     }
     
@@ -650,7 +653,6 @@
                 currentCoinPrice = crypto.price;
                 localStorage.removeItem('selectedCrypto');
                 
-                // Update dropdown to match selected coin
                 const select = document.getElementById('cryptoSelect');
                 if (select) {
                     select.value = currentCoin;
@@ -658,7 +660,6 @@
             } catch(e) {}
         }
         
-        // Update UI
         document.getElementById('coinName').innerHTML = `${coinNames[currentCoin]} (${currentCoin})`;
         document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
     }
@@ -690,7 +691,6 @@
     }
     
     function selectDuration(element) {
-        // Remove selected class from all
         document.querySelectorAll('.return-option').forEach(opt => {
             opt.classList.remove('selected');
         });
@@ -715,14 +715,12 @@
             return;
         }
         
-        // Check if duration is selected
         if (!selectedDuration) {
             warningMsg.style.display = 'block';
             warningMsg.innerHTML = '⚠️ Please select a duration first!';
             return;
         }
         
-        // Check minimum amount requirement
         if (amount < selectedMinAmount) {
             warningMsg.style.display = 'block';
             warningMsg.innerHTML = `⚠️ Minimum amount for ${selectedDuration}s is $${selectedMinAmount.toLocaleString()} USDT. You need $${(selectedMinAmount - amount).toLocaleString()} more.`;
@@ -734,9 +732,8 @@
         
         warningMsg.style.display = 'none';
         
-        // Calculate return
         const expectedReturnAmount = amount * (selectedRate / 100);
-        const transactionFee = amount * 0.02; // 2% fee
+        const transactionFee = amount * 0.02;
         const totalPayAmount = amount + transactionFee;
         
         document.getElementById('expectedReturn').innerHTML = `${expectedReturnAmount.toFixed(2)} USDT`;
@@ -777,6 +774,7 @@
         if (tradeType === 'buy') {
             const transactionFee = amount * 0.02;
             const totalPay = amount + transactionFee;
+            const expectedReturnAmount = amount * (selectedRate / 100);
             
             if (totalPay > userBalance) {
                 alert(`Insufficient balance! You need $${totalPay.toFixed(2)} USDT but only have $${userBalance.toFixed(2)} USDT`);
@@ -787,8 +785,25 @@
             userBalance -= totalPay;
             saveUserBalance();
             
+            // Create trade record for history
+            const tradeRecord = {
+                id: Date.now(),
+                date: new Date().toLocaleString(),
+                coin: currentCoin,
+                tradeType: tradeType,
+                amount: amount,
+                duration: selectedDuration,
+                rate: selectedRate,
+                profit: expectedReturnAmount,
+                status: 'completed',
+                fee: transactionFee
+            };
+            
+            // Save to trade history
+            saveTradeToHistory(tradeRecord);
+            
             // Show success modal
-            const modalMessage = `You successfully ${tradeType.toUpperCase()} ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration!\n\nAmount: $${amount.toFixed(2)} USDT\nReturn: +${selectedRate}% ($${(amount * selectedRate / 100).toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT\n\nYour trade will complete in ${selectedDuration} seconds.`;
+            const modalMessage = `You successfully ${tradeType.toUpperCase()} ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration!\n\nAmount: $${amount.toFixed(2)} USDT\nReturn: +${selectedRate}% ($${expectedReturnAmount.toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT\n\nYour trade will complete in ${selectedDuration} seconds.`;
             document.getElementById('modalMessage').innerHTML = modalMessage.replace(/\n/g, '<br>');
             document.getElementById('successModal').style.display = 'flex';
             
@@ -802,6 +817,16 @@
                 userBalance += amount + profit;
                 saveUserBalance();
                 document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
+                
+                // Update trade status to completed with actual profit
+                const updatedHistory = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
+                const tradeIndex = updatedHistory.findIndex(t => t.id === tradeRecord.id);
+                if (tradeIndex !== -1) {
+                    updatedHistory[tradeIndex].profit = profit;
+                    updatedHistory[tradeIndex].status = 'completed';
+                    localStorage.setItem('lunoTradeHistory', JSON.stringify(updatedHistory));
+                }
+                
                 alert(`✅ Trade completed!\n\nYour ${selectedDuration}s trade on ${coinNames[currentCoin]} (${currentCoin}) has finished.\nYou invested: $${amount.toFixed(2)} USDT\nYou earned: $${profit.toFixed(2)} USDT\nTotal returned: $${(amount + profit).toFixed(2)} USDT`);
             }, selectedDuration * 1000);
         } else {
