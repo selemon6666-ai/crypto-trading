@@ -410,7 +410,7 @@
     <div class="logo">📈 Luno Trading</div>
     <div class="nav-links">
         <a href="dashboard.html">Home</a>
-        <a href="#">Markets</a>
+        <a href="markets.html">Markets</a>
         <a href="#">Trades</a>
         <a href="profile.html">My Profile</a>
     </div>
@@ -654,6 +654,22 @@
         DOGE: 'Dogecoin'
     };
     
+    // Check for selected crypto from markets page
+    function checkSelectedCrypto() {
+        const selected = localStorage.getItem('selectedCrypto');
+        if (selected) {
+            try {
+                const crypto = JSON.parse(selected);
+                const selectElement = document.getElementById('cryptoSelect');
+                if (selectElement && crypto.symbol) {
+                    selectElement.value = crypto.symbol;
+                    updatePriceDisplay();
+                }
+                localStorage.removeItem('selectedCrypto');
+            } catch(e) {}
+        }
+    }
+    
     function getUserName() {
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
         if (savedUser) {
@@ -834,6 +850,7 @@
     
     checkAuth();
     getUserName();
+    checkSelectedCrypto();
 </script>
 
 </body>
