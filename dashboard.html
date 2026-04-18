@@ -18,65 +18,26 @@
             overflow-x: hidden;
         }
 
-        /* Animated Gradient Background (No video needed!) */
-        body::before {
-            content: '';
+        /* Video Background - Using Coverr.co reliable videos */
+        .video-background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -2;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            object-fit: cover;
         }
 
-        @keyframes gradientShift {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        /* Optional: Moving particles overlay */
-        .particles {
+        /* Dark overlay for better text visibility */
+        .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background: rgba(0, 0, 0, 0.55);
             z-index: -1;
-            overflow: hidden;
-        }
-
-        .particle {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-            animation: float 20s infinite linear;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100vh) rotate(360deg);
-                opacity: 0;
-            }
         }
 
         /* Navigation Bar */
@@ -442,8 +403,17 @@
 </head>
 <body>
 
-<!-- Animated Particles -->
-<div class="particles" id="particles"></div>
+<!-- Crypto/Finance Video Background - Multiple reliable sources -->
+<video class="video-background" autoplay muted loop playsinline id="bgVideo">
+    <!-- Source 1: Crypto trading animation (most reliable) -->
+    <source src="https://videos.pexels.com/video-files/8449032/8449032-uhd_2560_1440_25fps.mp4" type="video/mp4">
+    <!-- Source 2: Bitcoin animation fallback -->
+    <source src="https://videos.pexels.com/video-files/7568734/7568734-uhd_2560_1440_30fps.mp4" type="video/mp4">
+    <!-- Source 3: Stock market fallback -->
+    <source src="https://videos.pexels.com/video-files/7693938/7693938-uhd_2560_1440_25fps.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+<div class="overlay"></div>
 
 <!-- Navigation -->
 <nav class="navbar">
@@ -528,21 +498,17 @@
 </div>
 
 <script>
-    // Create animated particles
-    function createParticles() {
-        const particlesContainer = document.getElementById('particles');
-        for (let i = 0; i < 60; i++) {
-            const particle = document.createElement('div');
-            particle.classList.add('particle');
-            const size = Math.random() * 6 + 2;
-            particle.style.width = size + 'px';
-            particle.style.height = size + 'px';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDuration = Math.random() * 20 + 10 + 's';
-            particle.style.animationDelay = Math.random() * 10 + 's';
-            particlesContainer.appendChild(particle);
-        }
-    }
+    // Force video to play
+    document.addEventListener('DOMContentLoaded', function() {
+        const video = document.getElementById('bgVideo');
+        video.play().catch(function(error) {
+            console.log("Video autoplay failed:", error);
+            // Try again with user interaction
+            document.body.addEventListener('click', function() {
+                video.play();
+            }, { once: true });
+        });
+    });
 
     let balance = 10000;
     let portfolio = {};
@@ -732,7 +698,6 @@
     
     document.getElementById('cryptoSelect').addEventListener('change', updatePriceDisplay);
     
-    createParticles();
     checkAuth();
     getUserName();
 </script>
