@@ -15,19 +15,18 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
             color: white;
-            position: relative;
             overflow-x: hidden;
         }
 
         /* Video Background */
-        #video-background {
+        .video-background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
             z-index: -2;
+            object-fit: cover;
         }
 
         .overlay {
@@ -45,12 +44,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 50px;
+            padding: 20px 60px;
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            z-index: 1;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
         }
 
         .logo {
@@ -64,7 +66,7 @@
 
         .nav-links {
             display: flex;
-            gap: 30px;
+            gap: 40px;
         }
 
         .nav-links a {
@@ -72,6 +74,7 @@
             text-decoration: none;
             transition: 0.3s;
             font-weight: 500;
+            font-size: 1rem;
         }
 
         .nav-links a:hover {
@@ -81,64 +84,58 @@
         .user-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
         }
 
         .username {
             color: #00d4ff;
+            font-weight: 500;
         }
 
         .logout-btn {
             background: rgba(255, 255, 255, 0.1);
-            padding: 8px 20px;
-            border-radius: 25px;
+            padding: 8px 24px;
+            border-radius: 30px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             text-decoration: none;
             color: white;
             cursor: pointer;
             transition: 0.3s;
+            font-size: 0.9rem;
         }
 
         .logout-btn:hover {
-            background: rgba(255, 0, 0, 0.2);
-            border-color: rgba(255, 0, 0, 0.5);
+            background: rgba(255, 68, 68, 0.3);
+            border-color: rgba(255, 68, 68, 0.5);
         }
 
-        /* Main Container */
-        .main-container {
-            display: flex;
-            min-height: calc(100vh - 80px);
-            padding: 40px 50px;
-            gap: 40px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Left Content */
-        .left-content {
-            flex: 1;
+        /* Main Content */
+        .main-content {
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 100px 20px 60px;
         }
 
         .badge {
-            background: rgba(0, 212, 255, 0.2);
+            background: rgba(0, 212, 255, 0.15);
             display: inline-block;
-            padding: 8px 20px;
+            padding: 8px 24px;
             border-radius: 50px;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            width: fit-content;
+            font-size: 0.85rem;
+            margin-bottom: 30px;
             border: 1px solid rgba(0, 212, 255, 0.3);
             backdrop-filter: blur(5px);
         }
 
         h1 {
-            font-size: 4rem;
+            font-size: 5rem;
             margin-bottom: 20px;
             line-height: 1.2;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: 700;
         }
 
         .gradient-text {
@@ -150,57 +147,75 @@
 
         .subtitle {
             font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 40px;
             line-height: 1.6;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            max-width: 600px;
         }
 
         .start-btn {
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             border: none;
-            padding: 15px 40px;
+            padding: 14px 48px;
             font-size: 1.1rem;
             font-weight: bold;
             border-radius: 50px;
             color: white;
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
-            width: fit-content;
         }
 
         .start-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 212, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 212, 255, 0.3);
         }
 
-        /* Right Panel */
-        .right-panel {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.05);
+        /* Trading Panel (Hidden until Start Trading clicked) */
+        .trading-panel {
+            display: none;
+            max-width: 1200px;
+            width: 100%;
+            margin-top: 60px;
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 20px;
+            padding: 30px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .trading-panel.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .panel-title {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
         }
 
-        .panel-stats {
+        .stats {
             display: flex;
-            gap: 20px;
+            gap: 40px;
         }
 
         .stat {
@@ -209,24 +224,35 @@
 
         .stat-label {
             font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.6);
         }
 
         .stat-value {
-            font-size: 1.1rem;
+            font-size: 1.5rem;
             font-weight: bold;
+            color: #00ff88;
         }
 
-        /* Chart */
-        .chart-container {
+        /* Trading Grid */
+        .trading-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        /* Chart Section */
+        .chart-section {
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 20px;
-            margin-bottom: 20px;
+        }
+
+        .chart-container {
             height: 250px;
             display: flex;
             align-items: flex-end;
             gap: 5px;
+            margin-top: 20px;
         }
 
         .candle {
@@ -236,165 +262,213 @@
             transition: height 0.5s;
         }
 
-        /* Trading Form */
-        .trade-form {
+        /* Trade Form */
+        .trade-section {
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 20px;
         }
 
-        .trade-form h4 {
-            margin-bottom: 15px;
+        .trade-section h3 {
+            margin-bottom: 20px;
         }
 
         .trade-inputs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
-        .trade-inputs select, .trade-inputs input {
+        .trade-inputs select, 
+        .trade-inputs input {
             flex: 1;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             background: rgba(0, 0, 0, 0.5);
             color: white;
+            font-size: 1rem;
         }
 
-        .trade-inputs select option {
-            background: #1a1a3e;
+        .trade-inputs select:focus,
+        .trade-inputs input:focus {
+            outline: none;
+            border-color: #00d4ff;
         }
 
         .trade-buttons {
             display: flex;
-            gap: 10px;
+            gap: 15px;
         }
 
         .btn-buy {
             flex: 1;
-            background: #00ff88;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
             border: none;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 1rem;
             transition: 0.3s;
-        }
-
-        .btn-buy:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
         }
 
         .btn-sell {
             flex: 1;
-            background: #ff4444;
+            background: linear-gradient(135deg, #ff4444, #cc0000);
             border: none;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 1rem;
             transition: 0.3s;
         }
 
-        .btn-sell:hover {
+        .btn-buy:hover, .btn-sell:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 68, 68, 0.3);
         }
 
         .current-price {
-            margin-top: 15px;
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.5);
+            margin-top: 20px;
             text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
         }
 
+        /* Portfolio Section */
+        .portfolio-section {
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .portfolio-section h3 {
+            margin-bottom: 15px;
+        }
+
+        .portfolio-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .portfolio-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .portfolio-symbol {
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .portfolio-amount {
+            color: white;
+        }
+
+        .portfolio-value {
+            color: #00ff88;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .main-container {
-                flex-direction: column;
-                padding: 20px;
-            }
-            h1 {
-                font-size: 2rem;
-            }
             .navbar {
+                padding: 15px 20px;
                 flex-direction: column;
                 gap: 15px;
-                padding: 15px;
             }
             .nav-links {
+                gap: 20px;
                 flex-wrap: wrap;
                 justify-content: center;
+            }
+            h1 {
+                font-size: 2.5rem;
+            }
+            .trading-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .trade-inputs {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Video Background -->
-    <video autoplay muted loop id="video-background">
-        <source src="https://cdn.pixabay.com/video/2023/06/20/168373-835839674_tiny.mp4" type="video/mp4">
-        <!-- Fallback video if the above doesn't work -->
-        <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-currency-graph-going-up-40456-large.mp4" type="video/mp4">
-    </video>
-    <div class="overlay"></div>
+<!-- Video Background -->
+<video class="video-background" autoplay muted loop id="bgVideo">
+    <source src="https://assets.mixkit.co/videos/preview/mixkit-stock-market-charts-and-graphs-3771-large.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+<div class="overlay"></div>
 
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="logo">📈 Luno Trading</div>
-        <div class="nav-links">
-            <a href="#">Home</a>
-            <a href="#">Markets</a>
-            <a href="#">Trades</a>
-            <a href="#">My Profile</a>
-        </div>
-        <div class="user-info">
-            <span class="username" id="displayUsername">Trader</span>
-            <a href="#" class="logout-btn" onclick="logout()">Logout</a>
-        </div>
-    </nav>
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="logo">📈 Luno Trading</div>
+    <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">Markets</a>
+        <a href="#">Trades</a>
+        <a href="#">My Profile</a>
+    </div>
+    <div class="user-info">
+        <span class="username" id="displayUsername">Trader</span>
+        <a href="#" class="logout-btn" onclick="logout()">Logout</a>
+    </div>
+</nav>
 
-    <!-- Main Content -->
-    <div class="main-container">
-        <!-- Left Side -->
-        <div class="left-content">
-            <div class="badge">⚡ Live Trading Platform</div>
-            <h1>
-                Trade <span class="gradient-text">Smarter,</span><br>
-                Trade Better
-            </h1>
-            <p class="subtitle">
-                Empower your trading journey with real-time insights<br>
-                and expert analysis. Start trading with $10,000 virtual capital.
-            </p>
-            <button class="start-btn" onclick="scrollToTrade()">🚀 Start Trading</button>
+<!-- Main Content -->
+<div class="main-content">
+    <div class="badge">⚡ Welcome to Luno Trading</div>
+    <h1>
+        Trade <span class="gradient-text">Smarter,</span><br>
+        Trade Better
+    </h1>
+    <p class="subtitle">
+        Empower your trading journey with real-time insights and expert analysis.
+    </p>
+    <button class="start-btn" onclick="startTrading()">🚀 Start Trading</button>
+
+    <!-- Trading Panel (Hidden initially) -->
+    <div id="tradingPanel" class="trading-panel">
+        <div class="panel-header">
+            <div class="panel-title">📊 Trading Dashboard</div>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label">Balance</div>
+                    <div class="stat-value" id="balance">$10,000</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Net Worth</div>
+                    <div class="stat-value" id="netWorth">$10,000</div>
+                </div>
+            </div>
         </div>
 
-        <!-- Right Panel - Trading -->
-        <div class="right-panel">
-            <div class="panel-header">
-                <div class="panel-title">📊 iPanel_TREND</div>
-                <div class="panel-stats">
-                    <div class="stat">
-                        <div class="stat-label">Balance</div>
-                        <div class="stat-value" id="balance">$10,000</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-label">Net Worth</div>
-                        <div class="stat-value" id="netWorth">$10,000</div>
-                    </div>
+        <div class="trading-grid">
+            <!-- Chart Section -->
+            <div class="chart-section">
+                <h3>📈 Live Chart</h3>
+                <div class="chart-container" id="chartContainer">
+                    <!-- Dynamic candles -->
                 </div>
             </div>
 
-            <!-- Chart -->
-            <div class="chart-container" id="chartContainer">
-                <!-- Dynamic candles -->
-            </div>
-
-            <!-- Trading Form -->
-            <div class="trade-form">
-                <h4>🔄 Quick Trade</h4>
+            <!-- Trade Section -->
+            <div class="trade-section">
+                <h3>🔄 Quick Trade</h3>
                 <div class="trade-inputs">
                     <select id="cryptoSelect">
                         <option value="BTC">Bitcoin (BTC)</option>
@@ -403,7 +477,7 @@
                         <option value="SOL">Solana (SOL)</option>
                         <option value="DOGE">Dogecoin (DOGE)</option>
                     </select>
-                    <input type="number" id="tradeAmount" placeholder="Amount">
+                    <input type="number" id="tradeAmount" placeholder="Amount to trade">
                 </div>
                 <div class="trade-buttons">
                     <button class="btn-buy" onclick="buy()">BUY</button>
@@ -414,183 +488,236 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <script>
-        // Trading data
-        let balance = 10000;
-        let portfolio = {};
-        
-        // Market prices
-        let marketPrices = {
-            BTC: 52000,
-            ETH: 3200,
-            BNB: 420,
-            SOL: 110,
-            DOGE: 0.18
-        };
-        
-        const cryptoNames = {
-            BTC: 'Bitcoin',
-            ETH: 'Ethereum',
-            BNB: 'Binance Coin',
-            SOL: 'Solana',
-            DOGE: 'Dogecoin'
-        };
-        
-        // Get username from login
-        function getUserName() {
-            const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-            if (savedUser) {
-                try {
-                    const user = JSON.parse(savedUser);
-                    if (user.fullName) {
-                        document.getElementById('displayUsername').innerText = user.fullName.split(' ')[0];
-                    } else {
-                        document.getElementById('displayUsername').innerText = user.email.split('@')[0];
-                    }
-                } catch(e) {}
-            }
-        }
-        
-        // Scroll to trade section
-        function scrollToTrade() {
-            document.querySelector('.right-panel').scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        // Update chart
-        function updateChart() {
-            const chartContainer = document.getElementById('chartContainer');
-            chartContainer.innerHTML = '';
-            for (let i = 0; i < 20; i++) {
-                const height = 30 + Math.random() * 200;
-                const candle = document.createElement('div');
-                candle.className = 'candle';
-                candle.style.height = height + 'px';
-                chartContainer.appendChild(candle);
-            }
-        }
-        
-        // Update price display
-        function updatePriceDisplay() {
-            const selected = document.getElementById('cryptoSelect').value;
-            document.getElementById('currentPrice').innerText = marketPrices[selected].toFixed(2);
-        }
-        
-        // Update UI
-        function updateUI() {
-            document.getElementById('balance').innerText = `$${balance.toFixed(2)}`;
-            
-            let holdingsValue = 0;
-            for (let [symbol, amount] of Object.entries(portfolio)) {
-                holdingsValue += amount * marketPrices[symbol];
-            }
-            const netWorth = balance + holdingsValue;
-            document.getElementById('netWorth').innerText = `$${netWorth.toFixed(2)}`;
-        }
-        
-        // Buy function
-        function buy() {
-            const symbol = document.getElementById('cryptoSelect').value;
-            const price = marketPrices[symbol];
-            const amount = parseFloat(document.getElementById('tradeAmount').value);
-            
-            if (isNaN(amount) || amount <= 0) {
-                alert('Please enter a valid amount');
-                return;
-            }
-            
-            const cost = price * amount;
-            
-            if (cost > balance) {
-                alert(`Insufficient balance! Need $${cost.toFixed(2)}`);
-                return;
-            }
-            
-            balance -= cost;
-            
-            if (!portfolio[symbol]) {
-                portfolio[symbol] = 0;
-            }
-            portfolio[symbol] += amount;
-            
-            updateUI();
-            alert(`✅ Bought ${amount} ${symbol} for $${cost.toFixed(2)}`);
-            document.getElementById('tradeAmount').value = '';
-        }
-        
-        // Sell function
-        function sell() {
-            const symbol = document.getElementById('cryptoSelect').value;
-            const price = marketPrices[symbol];
-            const amount = parseFloat(document.getElementById('tradeAmount').value);
-            
-            if (isNaN(amount) || amount <= 0) {
-                alert('Please enter a valid amount');
-                return;
-            }
-            
-            if (!portfolio[symbol] || portfolio[symbol] < amount) {
-                alert(`You don't have enough ${symbol}!`);
-                return;
-            }
-            
-            const revenue = price * amount;
-            balance += revenue;
-            
-            portfolio[symbol] -= amount;
-            if (portfolio[symbol] === 0) {
-                delete portfolio[symbol];
-            }
-            
-            updateUI();
-            alert(`✅ Sold ${amount} ${symbol} for $${revenue.toFixed(2)}`);
-            document.getElementById('tradeAmount').value = '';
-        }
-        
-        // Simulate price changes
-        function simulatePriceChanges() {
-            setInterval(() => {
-                for (let crypto in marketPrices) {
-                    const change = (Math.random() - 0.5) * (crypto === 'DOGE' ? 0.02 : 200);
-                    let newPrice = marketPrices[crypto] + change;
-                    if (newPrice < (crypto === 'DOGE' ? 0.01 : 1)) newPrice = crypto === 'DOGE' ? 0.01 : 1;
-                    marketPrices[crypto] = parseFloat(newPrice.toFixed(crypto === 'DOGE' ? 4 : 2));
+        <!-- Portfolio Section -->
+        <div class="portfolio-section">
+            <h3>📊 Your Portfolio</h3>
+            <div id="portfolioList" class="portfolio-list">
+                <p style="color: rgba(255,255,255,0.5);">No holdings yet. Start trading!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Trading data
+    let balance = 10000;
+    let portfolio = {};
+    let tradingActive = false;
+    
+    // Market prices
+    let marketPrices = {
+        BTC: 52000,
+        ETH: 3200,
+        BNB: 420,
+        SOL: 110,
+        DOGE: 0.18
+    };
+    
+    const cryptoNames = {
+        BTC: 'Bitcoin',
+        ETH: 'Ethereum',
+        BNB: 'Binance Coin',
+        SOL: 'Solana',
+        DOGE: 'Dogecoin'
+    };
+    
+    let priceInterval;
+    
+    // Get username
+    function getUserName() {
+        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+        if (savedUser) {
+            try {
+                const user = JSON.parse(savedUser);
+                if (user.fullName) {
+                    document.getElementById('displayUsername').innerText = user.fullName.split(' ')[0];
+                } else {
+                    document.getElementById('displayUsername').innerText = user.email.split('@')[0];
                 }
-                updatePriceDisplay();
-                updateUI();
-                updateChart();
-            }, 3000);
+            } catch(e) {}
+        }
+    }
+    
+    // Start trading - show panel and initialize
+    function startTrading() {
+        const panel = document.getElementById('tradingPanel');
+        panel.classList.add('show');
+        
+        if (!tradingActive) {
+            initTrading();
+            tradingActive = true;
         }
         
-        // Logout function
-        function logout() {
-            localStorage.removeItem('lunoUser');
-            sessionStorage.removeItem('lunoUser');
-            window.location.href = 'index.html';
+        // Smooth scroll to panel
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // Update chart
+    function updateChart() {
+        const chartContainer = document.getElementById('chartContainer');
+        if (!chartContainer) return;
+        chartContainer.innerHTML = '';
+        for (let i = 0; i < 20; i++) {
+            const height = 30 + Math.random() * 200;
+            const candle = document.createElement('div');
+            candle.className = 'candle';
+            candle.style.height = height + 'px';
+            chartContainer.appendChild(candle);
         }
+    }
+    
+    // Update price display
+    function updatePriceDisplay() {
+        const selected = document.getElementById('cryptoSelect').value;
+        document.getElementById('currentPrice').innerText = marketPrices[selected].toFixed(2);
+    }
+    
+    // Update UI
+    function updateUI() {
+        document.getElementById('balance').innerText = `$${balance.toFixed(2)}`;
         
-        // Check if user is logged in
-        function checkAuth() {
-            const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-            if (!savedUser) {
-                window.location.href = 'index.html';
+        let holdingsValue = 0;
+        for (let [symbol, amount] of Object.entries(portfolio)) {
+            holdingsValue += amount * marketPrices[symbol];
+        }
+        const netWorth = balance + holdingsValue;
+        document.getElementById('netWorth').innerText = `$${netWorth.toFixed(2)}`;
+        
+        // Update portfolio display
+        const portfolioDiv = document.getElementById('portfolioList');
+        if (Object.keys(portfolio).length === 0) {
+            portfolioDiv.innerHTML = '<p style="color: rgba(255,255,255,0.5);">No holdings yet. Start trading!</p>';
+        } else {
+            portfolioDiv.innerHTML = '';
+            for (let [symbol, amount] of Object.entries(portfolio)) {
+                const value = (amount * marketPrices[symbol]).toFixed(2);
+                const item = document.createElement('div');
+                item.className = 'portfolio-item';
+                item.innerHTML = `
+                    <span class="portfolio-symbol">${cryptoNames[symbol]} (${symbol})</span>
+                    <span class="portfolio-amount">${amount} coins</span>
+                    <span class="portfolio-value">$${value}</span>
+                `;
+                portfolioDiv.appendChild(item);
             }
         }
+    }
+    
+    // Buy function
+    function buy() {
+        const symbol = document.getElementById('cryptoSelect').value;
+        const price = marketPrices[symbol];
+        const amount = parseFloat(document.getElementById('tradeAmount').value);
         
-        // Initialize
-        function init() {
-            checkAuth();
-            getUserName();
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+        
+        const cost = price * amount;
+        
+        if (cost > balance) {
+            alert(`Insufficient balance! Need $${cost.toFixed(2)}`);
+            return;
+        }
+        
+        balance -= cost;
+        
+        if (!portfolio[symbol]) {
+            portfolio[symbol] = 0;
+        }
+        portfolio[symbol] += amount;
+        
+        updateUI();
+        alert(`✅ Bought ${amount} ${symbol} for $${cost.toFixed(2)}`);
+        document.getElementById('tradeAmount').value = '';
+    }
+    
+    // Sell function
+    function sell() {
+        const symbol = document.getElementById('cryptoSelect').value;
+        const price = marketPrices[symbol];
+        const amount = parseFloat(document.getElementById('tradeAmount').value);
+        
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+        
+        if (!portfolio[symbol] || portfolio[symbol] < amount) {
+            alert(`You don't have enough ${symbol}!`);
+            return;
+        }
+        
+        const revenue = price * amount;
+        balance += revenue;
+        
+        portfolio[symbol] -= amount;
+        if (portfolio[symbol] === 0) {
+            delete portfolio[symbol];
+        }
+        
+        updateUI();
+        alert(`✅ Sold ${amount} ${symbol} for $${revenue.toFixed(2)}`);
+        document.getElementById('tradeAmount').value = '';
+    }
+    
+    // Simulate price changes
+    function simulatePriceChanges() {
+        priceInterval = setInterval(() => {
+            for (let crypto in marketPrices) {
+                const change = (Math.random() - 0.5) * 200;
+                let newPrice = marketPrices[crypto] + change;
+                if (newPrice < 1) newPrice = 1;
+                marketPrices[crypto] = parseFloat(newPrice.toFixed(2));
+            }
             updatePriceDisplay();
             updateUI();
             updateChart();
-            simulatePriceChanges();
+        }, 3000);
+    }
+    
+    // Logout function
+    function logout() {
+        if (priceInterval) clearInterval(priceInterval);
+        localStorage.removeItem('lunoUser');
+        sessionStorage.removeItem('lunoUser');
+        window.location.href = 'index.html';
+    }
+    
+    // Check if user is logged in
+    function checkAuth() {
+        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+        if (!savedUser) {
+            window.location.href = 'index.html';
         }
-        
-        document.getElementById('cryptoSelect').addEventListener('change', updatePriceDisplay);
-        
-        init();
-    </script>
+    }
+    
+    // Initialize trading (without auto-showing)
+    function initTrading() {
+        updatePriceDisplay();
+        updateUI();
+        updateChart();
+        simulatePriceChanges();
+    }
+    
+    // Handle video fallback
+    function setupVideo() {
+        const video = document.getElementById('bgVideo');
+        video.play().catch(e => {
+            console.log('Video autoplay prevented, using fallback');
+        });
+    }
+    
+    // Event listener
+    document.getElementById('cryptoSelect').addEventListener('change', updatePriceDisplay);
+    
+    // Initialize
+    checkAuth();
+    getUserName();
+    setupVideo();
+</script>
+
 </body>
 </html>
