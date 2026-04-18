@@ -18,7 +18,6 @@
             color: white;
         }
 
-        /* Navigation Bar */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -84,14 +83,12 @@
             background: rgba(255, 68, 68, 0.3);
         }
 
-        /* Main Container */
         .main-container {
             display: flex;
             margin-top: 70px;
             min-height: calc(100vh - 70px);
         }
 
-        /* Sidebar */
         .sidebar {
             width: 280px;
             background: rgba(0, 0, 0, 0.3);
@@ -132,14 +129,12 @@
             font-size: 1.2rem;
         }
 
-        /* Content Area */
         .content-area {
             flex: 1;
             margin-left: 280px;
             padding: 30px 40px;
         }
 
-        /* Page Header */
         .page-header {
             margin-bottom: 30px;
         }
@@ -154,7 +149,6 @@
             margin-top: 5px;
         }
 
-        /* Profile Cards */
         .profile-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -184,7 +178,6 @@
             gap: 10px;
         }
 
-        /* Info Row */
         .info-row {
             display: flex;
             justify-content: space-between;
@@ -205,11 +198,6 @@
             color: #ffaa00;
         }
 
-        .info-value.verified {
-            color: #00ff88;
-        }
-
-        /* Balance Display */
         .balance-amount {
             font-size: 2.5rem;
             font-weight: bold;
@@ -229,7 +217,6 @@
             color: #ff4444;
         }
 
-        /* Buttons */
         .action-buttons {
             display: flex;
             gap: 15px;
@@ -264,7 +251,6 @@
             transform: translateY(-2px);
         }
 
-        /* Form Styles */
         .form-group {
             margin-bottom: 20px;
         }
@@ -350,7 +336,6 @@
             font-size: 0.8rem;
         }
 
-        /* Trade History Table */
         .history-table {
             width: 100%;
             overflow-x: auto;
@@ -366,7 +351,6 @@
             padding: 12px;
             color: rgba(255, 255, 255, 0.7);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-weight: 600;
         }
 
         .history-table td {
@@ -378,16 +362,8 @@
             color: #00ff88;
         }
 
-        .history-status-pending {
-            color: #ffaa00;
-        }
-
         .history-profit {
             color: #00ff88;
-        }
-
-        .history-loss {
-            color: #ff4444;
         }
 
         .clear-history-btn {
@@ -398,7 +374,7 @@
             cursor: pointer;
             color: #ff6666;
             font-size: 0.8rem;
-            margin-top: 15px;
+            margin-left: auto;
         }
 
         .no-history {
@@ -407,7 +383,6 @@
             color: rgba(255, 255, 255, 0.5);
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -500,7 +475,6 @@
 </head>
 <body>
 
-<!-- Navigation -->
 <nav class="navbar">
     <div class="logo">📈 Luno Trading</div>
     <div class="nav-links">
@@ -515,9 +489,7 @@
     </div>
 </nav>
 
-<!-- Main Container -->
 <div class="main-container">
-    <!-- Sidebar -->
     <div class="sidebar">
         <ul class="sidebar-menu">
             <li class="sidebar-item active" data-page="profile">
@@ -543,7 +515,6 @@
         </ul>
     </div>
 
-    <!-- Content Area -->
     <div class="content-area">
         <!-- Profile Page -->
         <div id="profilePage" class="page-content">
@@ -551,200 +522,77 @@
                 <h1>Profile</h1>
                 <p>View your personal information and account status</p>
             </div>
-
             <div class="profile-grid">
                 <div class="profile-card">
-                    <div class="card-title">
-                        <span>👤</span> Personal Information
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Full Name:</span>
-                        <span class="info-value" id="fullName">Loading...</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Email:</span>
-                        <span class="info-value" id="email">Loading...</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Member Since:</span>
-                        <span class="info-value" id="memberSince">Loading...</span>
-                    </div>
+                    <div class="card-title"><span>👤</span> Personal Information</div>
+                    <div class="info-row"><span class="info-label">Full Name:</span><span class="info-value" id="fullName">Loading...</span></div>
+                    <div class="info-row"><span class="info-label">Email:</span><span class="info-value" id="email">Loading...</span></div>
+                    <div class="info-row"><span class="info-label">Member Since:</span><span class="info-value" id="memberSince">Loading...</span></div>
                 </div>
-
                 <div class="profile-card">
-                    <div class="card-title">
-                        <span>💰</span> Account Balance
-                    </div>
+                    <div class="card-title"><span>💰</span> Account Balance</div>
                     <div class="balance-amount" id="balance">$0</div>
-                    <div class="info-row">
-                        <span class="info-label">KYC Status:</span>
-                        <span class="info-value pending" id="kycStatus">pending</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Daily Profit/Loss:</span>
-                        <span class="profit-loss positive" id="dailyPL">+0.00 USDT</span>
-                    </div>
+                    <div class="info-row"><span class="info-label">KYC Status:</span><span class="info-value pending" id="kycStatus">pending</span></div>
+                    <div class="info-row"><span class="info-label">Daily Profit/Loss:</span><span class="profit-loss positive" id="dailyPL">+0.00 USDT</span></div>
                     <div class="action-buttons">
                         <button class="btn-deposit" onclick="openDepositModal()">💰 Deposit</button>
                         <button class="btn-withdraw" onclick="openWithdrawModal()">💸 Withdraw Funds</button>
                     </div>
                 </div>
-
                 <div class="profile-card full-width">
-                    <div class="card-title">
-                        <span>📊</span> Trading Statistics
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Total Trades:</span>
-                        <span class="info-value" id="totalTrades">0</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Win Rate:</span>
-                        <span class="info-value" id="winRate">0%</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Total Volume:</span>
-                        <span class="info-value" id="totalVolume">$0</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Total Profit:</span>
-                        <span class="info-value" id="totalProfit">$0</span>
-                    </div>
+                    <div class="card-title"><span>📊</span> Trading Statistics</div>
+                    <div class="info-row"><span class="info-label">Total Trades:</span><span class="info-value" id="totalTrades">0</span></div>
+                    <div class="info-row"><span class="info-label">Win Rate:</span><span class="info-value" id="winRate">0%</span></div>
+                    <div class="info-row"><span class="info-label">Total Volume:</span><span class="info-value" id="totalVolume">$0</span></div>
+                    <div class="info-row"><span class="info-label">Total Profit:</span><span class="info-value" id="totalProfit">$0</span></div>
                 </div>
             </div>
         </div>
 
         <!-- Trade History Page -->
         <div id="historyPage" class="page-content" style="display: none;">
-            <div class="page-header">
-                <h1>Trade History</h1>
-                <p>View all your past trades and transactions</p>
-            </div>
-
+            <div class="page-header"><h1>Trade History</h1><p>View all your past trades</p></div>
             <div class="profile-card full-width">
-                <div class="card-title">
-                    <span>📜</span> All Trades
-                    <button class="clear-history-btn" onclick="clearHistory()" style="margin-left: auto;">Clear All</button>
-                </div>
-                <div class="history-table" id="historyTable">
-                    <!-- Trade history will be loaded here -->
-                </div>
+                <div class="card-title"><span>📜</span> All Trades<button class="clear-history-btn" onclick="clearHistory()">Clear All</button></div>
+                <div class="history-table" id="historyTable"></div>
             </div>
         </div>
 
         <!-- KYC Page -->
         <div id="kycPage" class="page-content" style="display: none;">
-            <div class="page-header">
-                <h1>KYC Verification</h1>
-                <p>Verify your identity to unlock full trading features</p>
-            </div>
-
+            <div class="page-header"><h1>KYC Verification</h1><p>Verify your identity</p></div>
             <div class="profile-card">
-                <div class="card-title">
-                    <span>✅</span> Identity Verification
-                </div>
-                <div class="kyc-status">
-                    <span>Current Status:</span>
-                    <span class="kyc-badge pending" id="kycStatusBadge">Pending</span>
-                </div>
-                <div class="form-group">
-                    <label>Full Name (as on ID)</label>
-                    <input type="text" id="kycFullName" placeholder="Enter your full name">
-                </div>
-                <div class="form-group">
-                    <label>ID Type</label>
-                    <select id="idType">
-                        <option value="passport">Passport</option>
-                        <option value="drivers">Driver's License</option>
-                        <option value="national">National ID</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>ID Number</label>
-                    <input type="text" id="idNumber" placeholder="Enter your ID number">
-                </div>
+                <div class="card-title"><span>✅</span> Identity Verification</div>
+                <div class="kyc-status"><span>Current Status:</span><span class="kyc-badge pending" id="kycStatusBadge">Pending</span></div>
+                <div class="form-group"><label>Full Name</label><input type="text" id="kycFullName" placeholder="Enter your full name"></div>
+                <div class="form-group"><label>ID Type</label><select id="idType"><option value="passport">Passport</option><option value="drivers">Driver's License</option><option value="national">National ID</option></select></div>
+                <div class="form-group"><label>ID Number</label><input type="text" id="idNumber" placeholder="Enter your ID number"></div>
                 <button class="btn-save" onclick="submitKYC()">Submit Verification</button>
             </div>
         </div>
 
         <!-- Update Profile Page -->
         <div id="updatePage" class="page-content" style="display: none;">
-            <div class="page-header">
-                <h1>Update Profile</h1>
-                <p>Update your personal information</p>
-            </div>
-
+            <div class="page-header"><h1>Update Profile</h1><p>Update your information</p></div>
             <div class="profile-card">
-                <div class="card-title">
-                    <span>✏️</span> Edit Information
-                </div>
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="updateFullName" placeholder="Enter your full name">
-                </div>
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="tel" id="phoneNumber" placeholder="Enter your phone number">
-                </div>
-                <div class="form-group">
-                    <label>Current Password</label>
-                    <input type="password" id="currentPassword" placeholder="Enter current password">
-                </div>
-                <div class="form-group">
-                    <label>New Password</label>
-                    <input type="password" id="newPassword" placeholder="Enter new password">
-                </div>
-                <div class="form-group">
-                    <label>Confirm New Password</label>
-                    <input type="password" id="confirmPassword" placeholder="Confirm new password">
-                </div>
+                <div class="card-title"><span>✏️</span> Edit Information</div>
+                <div class="form-group"><label>Full Name</label><input type="text" id="updateFullName" placeholder="Enter your full name"></div>
+                <div class="form-group"><label>Phone Number</label><input type="tel" id="phoneNumber" placeholder="Enter your phone number"></div>
+                <div class="form-group"><label>Current Password</label><input type="password" id="currentPassword" placeholder="Enter current password"></div>
+                <div class="form-group"><label>New Password</label><input type="password" id="newPassword" placeholder="Enter new password"></div>
+                <div class="form-group"><label>Confirm New Password</label><input type="password" id="confirmPassword" placeholder="Confirm new password"></div>
                 <button class="btn-save" onclick="updateProfile()">Save Changes</button>
             </div>
         </div>
 
-        <!-- Customer Support Page -->
+        <!-- Support Page -->
         <div id="supportPage" class="page-content" style="display: none;">
-            <div class="page-header">
-                <h1>Customer Support</h1>
-                <p>Get help with your account</p>
-            </div>
-
+            <div class="page-header"><h1>Customer Support</h1><p>Get help</p></div>
             <div class="profile-card">
-                <div class="card-title">
-                    <span>💬</span> Contact Support
-                </div>
-                <div class="support-item">
-                    <div class="support-icon">📧</div>
-                    <div class="support-text">
-                        <h4>Email Support</h4>
-                        <p>support@lunotrading.com</p>
-                        <p>Response within 24 hours</p>
-                    </div>
-                </div>
-                <div class="support-item">
-                    <div class="support-icon">💬</div>
-                    <div class="support-text">
-                        <h4>Live Chat</h4>
-                        <p>Available 24/7</p>
-                        <button class="btn-verify" onclick="startChat()">Start Chat</button>
-                    </div>
-                </div>
-                <div class="support-item">
-                    <div class="support-icon">📞</div>
-                    <div class="support-text">
-                        <h4>Phone Support</h4>
-                        <p>+1 (800) 123-4567</p>
-                        <p>Mon-Fri, 9AM - 6PM EST</p>
-                    </div>
-                </div>
-                <div class="support-item">
-                    <div class="support-icon">❓</div>
-                    <div class="support-text">
-                        <h4>FAQ</h4>
-                        <p>Frequently asked questions</p>
-                        <button class="btn-verify" onclick="viewFAQ()">View FAQ</button>
-                    </div>
-                </div>
+                <div class="card-title"><span>💬</span> Contact Support</div>
+                <div class="support-item"><div class="support-icon">📧</div><div><h4>Email Support</h4><p>support@lunotrading.com</p></div></div>
+                <div class="support-item"><div class="support-icon">💬</div><div><h4>Live Chat</h4><button class="btn-verify" onclick="startChat()">Start Chat</button></div></div>
+                <div class="support-item"><div class="support-icon">📞</div><div><h4>Phone Support</h4><p>+1 (800) 123-4567</p></div></div>
             </div>
         </div>
     </div>
@@ -763,34 +611,31 @@
 </div>
 
 <script>
-    // Coin names mapping
-    const coinNames = {
-        BTC: 'Bitcoin', ETH: 'Ethereum', USDT: 'Tether', BNB: 'Binance Coin',
-        XRP: 'XRP', SOL: 'Solana', ADA: 'Cardano', AVAX: 'Avalanche',
-        DOGE: 'Dogecoin', DOT: 'Polkadot', LINK: 'Chainlink', MATIC: 'Polygon',
-        ATOM: 'Cosmos', FIL: 'Filecoin', VET: 'VeChain', UNI: 'Uniswap',
-        AAVE: 'Aave', CRV: 'Curve DAO', MKR: 'Maker', COMP: 'Compound',
-        SHIB: 'Shiba Inu', PEPE: 'Pepe', FLOKI: 'Floki', BONK: 'Bonk'
-    };
+    const coinNames = { BTC: 'Bitcoin', ETH: 'Ethereum', USDT: 'Tether', BNB: 'Binance Coin', XRP: 'XRP', SOL: 'Solana', ADA: 'Cardano', AVAX: 'Avalanche', DOGE: 'Dogecoin', DOT: 'Polkadot', LINK: 'Chainlink', MATIC: 'Polygon', ATOM: 'Cosmos', FIL: 'Filecoin', VET: 'VeChain', UNI: 'Uniswap', AAVE: 'Aave', CRV: 'Curve DAO', MKR: 'Maker', COMP: 'Compound', SHIB: 'Shiba Inu', PEPE: 'Pepe', FLOKI: 'Floki', BONK: 'Bonk' };
 
-    // User data
-    let userData = {
-        fullName: '',
-        email: '',
-        memberSince: new Date().toLocaleDateString(),
-        balance: 10000,
-        kycStatus: 'pending',
-        totalTrades: 0,
-        winRate: 0,
-        totalVolume: 0,
-        totalProfit: 0,
-        phoneNumber: '',
-        tradeHistory: []
-    };
-    
+    let userData = { fullName: '', email: '', memberSince: new Date().toLocaleDateString(), balance: 10000, kycStatus: 'pending', totalTrades: 0, winRate: 0, totalVolume: 0, totalProfit: 0, phoneNumber: '', tradeHistory: [] };
     let currentTransactionType = '';
-    
-    // Load trade history from localStorage
+
+    function loadUserData() {
+        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+        if (savedUser) {
+            try {
+                const user = JSON.parse(savedUser);
+                userData.fullName = user.fullName || 'Trader';
+                userData.email = user.email || 'user@luno.com';
+                const savedProfile = localStorage.getItem('lunoProfile');
+                if (savedProfile) {
+                    const profile = JSON.parse(savedProfile);
+                    userData.phoneNumber = profile.phoneNumber || '';
+                    userData.kycStatus = profile.kycStatus || 'pending';
+                    userData.balance = profile.balance || 10000;
+                }
+                updateUI();
+            } catch(e) {}
+        }
+        loadTradeHistory();
+    }
+
     function loadTradeHistory() {
         const savedHistory = localStorage.getItem('lunoTradeHistory');
         if (savedHistory) {
@@ -801,351 +646,163 @@
         }
         renderTradeHistory();
     }
-    
-    // Save trade history to localStorage
-    function saveTradeHistory() {
-        localStorage.setItem('lunoTradeHistory', JSON.stringify(userData.tradeHistory));
-        updateTradeStats();
-    }
-    
-    // Update trade statistics
+
     function updateTradeStats() {
         const completedTrades = userData.tradeHistory.filter(t => t.status === 'completed');
         userData.totalTrades = completedTrades.length;
-        
-        let totalProfit = 0;
-        let winningTrades = 0;
-        
-        completedTrades.forEach(trade => {
-            totalProfit += trade.profit || 0;
-            if (trade.profit > 0) winningTrades++;
-        });
-        
+        let totalProfit = 0, winningTrades = 0;
+        completedTrades.forEach(trade => { totalProfit += trade.profit || 0; if (trade.profit > 0) winningTrades++; });
         userData.totalProfit = totalProfit;
         userData.winRate = userData.totalTrades > 0 ? (winningTrades / userData.totalTrades * 100).toFixed(1) : 0;
         userData.totalVolume = userData.tradeHistory.reduce((sum, t) => sum + t.amount, 0);
-        
-        const totalTradesElem = document.getElementById('totalTrades');
-        const winRateElem = document.getElementById('winRate');
-        const totalVolumeElem = document.getElementById('totalVolume');
-        const totalProfitElem = document.getElementById('totalProfit');
-        
-        if (totalTradesElem) totalTradesElem.innerText = userData.totalTrades;
-        if (winRateElem) winRateElem.innerText = userData.winRate + '%';
-        if (totalVolumeElem) totalVolumeElem.innerText = `$${userData.totalVolume.toFixed(2)}`;
-        if (totalProfitElem) {
-            totalProfitElem.innerText = `$${userData.totalProfit.toFixed(2)}`;
-            totalProfitElem.style.color = userData.totalProfit >= 0 ? '#00ff88' : '#ff4444';
-        }
+        updateUI();
     }
-    
-    // Render trade history table
+
     function renderTradeHistory() {
-        const historyContainer = document.getElementById('historyTable');
-        if (!historyContainer) return;
-        
-        if (userData.tradeHistory.length === 0) {
-            historyContainer.innerHTML = '<div class="no-history">📭 No trades yet. Start trading to see your history!</div>';
-            return;
-        }
-        
-        let html = `
-            <table>
-                <thead>
-                    <tr><th>Date & Time</th><th>Coin</th><th>Type</th><th>Amount</th><th>Duration</th><th>Return Rate</th><th>Profit</th><th>Status</th></tr>
-                </thead>
-                <tbody>
-        `;
-        
-        userData.tradeHistory.forEach(trade => {
-            const profitClass = trade.profit >= 0 ? 'history-profit' : 'history-loss';
-            const statusClass = trade.status === 'completed' ? 'history-status-completed' : 'history-status-pending';
-            const typeClass = trade.tradeType === 'buy' ? '💰 BUY' : '💸 SELL';
-            
-            html += `
-                <tr>
-                    <td>${trade.date}</td>
-                    <td>${coinNames[trade.coin] || trade.coin} (${trade.coin})</td>
-                    <td>${typeClass}</td>
-                    <td>$${trade.amount.toFixed(2)}</td>
-                    <td>${trade.duration}s</td>
-                    <td>+${trade.rate}%</td>
-                    <td class="${profitClass}">${trade.profit >= 0 ? '+' : ''}$${trade.profit.toFixed(2)}</td>
-                    <td class="${statusClass}">${trade.status}</td>
-                </tr>
-            `;
+        const container = document.getElementById('historyTable');
+        if (!container) return;
+        if (userData.tradeHistory.length === 0) { container.innerHTML = '<div class="no-history">📭 No trades yet.</div>'; return; }
+        let html = `<table><thead><tr><th>Date</th><th>Coin</th><th>Type</th><th>Amount</th><th>Duration</th><th>Return</th><th>Profit</th><th>Status</th></tr></thead><tbody>`;
+        userData.tradeHistory.forEach(t => {
+            html += `<tr><td>${t.date}</td><td>${coinNames[t.coin] || t.coin}</td><td>💰 BUY</td><td>$${t.amount.toFixed(2)}</td><td>${t.duration}s</td><td>+${t.rate}%</td><td class="history-profit">+$${t.profit.toFixed(2)}</td><td class="history-status-completed">completed</td></tr>`;
         });
-        
         html += `</tbody></table>`;
-        historyContainer.innerHTML = html;
+        container.innerHTML = html;
     }
-    
-    // Clear trade history
+
     function clearHistory() {
-        if (confirm('Are you sure you want to clear all trade history? This action cannot be undone.')) {
+        if (confirm('Clear all trade history?')) {
             userData.tradeHistory = [];
-            saveTradeHistory();
+            localStorage.setItem('lunoTradeHistory', JSON.stringify([]));
+            updateTradeStats();
             renderTradeHistory();
-            alert('✅ Trade history cleared successfully!');
         }
     }
-    
-    // Load user data from localStorage
-    function loadUserData() {
-        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-        if (savedUser) {
-            try {
-                const user = JSON.parse(savedUser);
-                userData.fullName = user.fullName || 'Trader';
-                userData.email = user.email || 'user@luno.com';
-                
-                const savedProfile = localStorage.getItem('lunoProfile');
-                if (savedProfile) {
-                    const profile = JSON.parse(savedProfile);
-                    userData.phoneNumber = profile.phoneNumber || '';
-                    userData.kycStatus = profile.kycStatus || 'pending';
-                    userData.balance = profile.balance || 10000;
-                }
-                
-                updateUI();
-            } catch(e) {}
-        }
-    }
-    
-    // Update UI with user data
+
     function updateUI() {
         document.getElementById('fullName').innerText = userData.fullName;
         document.getElementById('email').innerText = userData.email;
         document.getElementById('memberSince').innerText = userData.memberSince;
         document.getElementById('balance').innerText = `$${userData.balance.toFixed(2)}`;
         document.getElementById('kycStatus').innerText = userData.kycStatus;
-        document.getElementById('kycStatusBadge').innerText = userData.kycStatus.charAt(0).toUpperCase() + userData.kycStatus.slice(1);
+        document.getElementById('kycStatusBadge').innerText = userData.kycStatus;
+        document.getElementById('totalTrades').innerText = userData.totalTrades;
+        document.getElementById('winRate').innerText = userData.winRate + '%';
+        document.getElementById('totalVolume').innerText = `$${userData.totalVolume.toFixed(2)}`;
+        document.getElementById('totalProfit').innerText = `$${userData.totalProfit.toFixed(2)}`;
         document.getElementById('displayUsername').innerText = userData.fullName.split(' ')[0];
-        
         document.getElementById('updateFullName').value = userData.fullName;
         document.getElementById('phoneNumber').value = userData.phoneNumber || '';
         document.getElementById('kycFullName').value = userData.fullName;
-        
-        // Update badge class
-        const badge = document.getElementById('kycStatusBadge');
-        if (userData.kycStatus === 'verified') {
-            badge.className = 'kyc-badge verified';
-        } else {
-            badge.className = 'kyc-badge pending';
-        }
     }
-    
-    // Save user data
+
     function saveUserData() {
-        localStorage.setItem('lunoProfile', JSON.stringify({
-            phoneNumber: userData.phoneNumber,
-            kycStatus: userData.kycStatus,
-            balance: userData.balance
-        }));
-        
+        localStorage.setItem('lunoProfile', JSON.stringify({ phoneNumber: userData.phoneNumber, kycStatus: userData.kycStatus, balance: userData.balance }));
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
         if (savedUser) {
             const user = JSON.parse(savedUser);
             user.fullName = userData.fullName;
             user.balance = userData.balance;
-            if (localStorage.getItem('lunoUser')) {
-                localStorage.setItem('lunoUser', JSON.stringify(user));
-            } else {
-                sessionStorage.setItem('lunoUser', JSON.stringify(user));
-            }
+            if (localStorage.getItem('lunoUser')) localStorage.setItem('lunoUser', JSON.stringify(user));
+            else sessionStorage.setItem('lunoUser', JSON.stringify(user));
         }
     }
-    
-    // Submit KYC request to admin
+
+    // KYC Submission - sends to admin
     function submitKYC() {
         const fullName = document.getElementById('kycFullName').value;
         const idType = document.getElementById('idType').value;
         const idNumber = document.getElementById('idNumber').value;
-        const email = userData.email;
-        
-        if (!fullName || !idNumber) {
-            alert('Please fill in all fields');
-            return;
-        }
-        
-        // Save KYC request to admin
+        if (!fullName || !idNumber) { alert('Fill all fields'); return; }
         const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
-        kycRequests.push({
-            email: email,
-            fullName: fullName,
-            idType: idType,
-            idNumber: idNumber,
-            date: new Date().toLocaleString()
-        });
+        kycRequests.push({ email: userData.email, fullName, idType, idNumber, date: new Date().toLocaleString() });
         localStorage.setItem('kycRequests', JSON.stringify(kycRequests));
-        
-        alert('✅ KYC verification submitted! Admin will review your request.');
-        
-        // Clear form
-        document.getElementById('kycFullName').value = '';
-        document.getElementById('idNumber').value = '';
+        alert('✅ KYC submitted! Admin will review.');
     }
-    
-    // Sidebar navigation
-    document.querySelectorAll('.sidebar-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const page = item.getAttribute('data-page');
-            
-            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
-            
-            document.getElementById('profilePage').style.display = 'none';
-            document.getElementById('historyPage').style.display = 'none';
-            document.getElementById('kycPage').style.display = 'none';
-            document.getElementById('updatePage').style.display = 'none';
-            document.getElementById('supportPage').style.display = 'none';
-            
-            if (page === 'profile') document.getElementById('profilePage').style.display = 'block';
-            if (page === 'history') {
-                document.getElementById('historyPage').style.display = 'block';
-                renderTradeHistory();
-            }
-            if (page === 'kyc') document.getElementById('kycPage').style.display = 'block';
-            if (page === 'update') document.getElementById('updatePage').style.display = 'block';
-            if (page === 'support') document.getElementById('supportPage').style.display = 'block';
-        });
-    });
-    
-    // Update Profile
+
     function updateProfile() {
         const newName = document.getElementById('updateFullName').value;
         const phone = document.getElementById('phoneNumber').value;
-        const newPass = document.getElementById('newPassword').value;
-        const confirmPass = document.getElementById('confirmPassword').value;
-        
-        if (newName) {
-            userData.fullName = newName;
-        }
-        
+        if (newName) userData.fullName = newName;
         userData.phoneNumber = phone;
-        
-        if (newPass) {
-            if (newPass !== confirmPass) {
-                alert('New passwords do not match!');
-                return;
-            }
-            alert('Password changed successfully!');
-        }
-        
         saveUserData();
         updateUI();
-        alert('Profile updated successfully!');
-        
+        alert('Profile updated!');
         document.getElementById('currentPassword').value = '';
         document.getElementById('newPassword').value = '';
         document.getElementById('confirmPassword').value = '';
     }
-    
-    // Deposit/Withdraw Modals - Send requests to admin
+
+    // Deposit/Withdraw - sends requests to admin
     function openDepositModal() {
         currentTransactionType = 'deposit';
         document.getElementById('modalTitle').innerText = 'Deposit Funds';
         document.getElementById('transactionModal').style.display = 'flex';
     }
-    
+
     function openWithdrawModal() {
         currentTransactionType = 'withdraw';
         document.getElementById('modalTitle').innerText = 'Withdraw Funds';
         document.getElementById('transactionModal').style.display = 'flex';
     }
-    
+
     function closeModal() {
         document.getElementById('transactionModal').style.display = 'none';
         document.getElementById('transactionAmount').value = '';
     }
-    
+
     function processTransaction() {
         const amount = parseFloat(document.getElementById('transactionAmount').value);
-        
-        if (isNaN(amount) || amount <= 0) {
-            alert('Please enter a valid amount');
-            return;
-        }
+        if (isNaN(amount) || amount <= 0) { alert('Enter valid amount'); return; }
         
         if (currentTransactionType === 'deposit') {
-            // Send deposit request to admin
             const depositRequests = JSON.parse(localStorage.getItem('depositRequests') || '[]');
-            depositRequests.push({
-                email: userData.email,
-                amount: amount,
-                date: new Date().toLocaleString()
-            });
+            depositRequests.push({ email: userData.email, amount: amount, date: new Date().toLocaleString() });
             localStorage.setItem('depositRequests', JSON.stringify(depositRequests));
             alert(`✅ Deposit request of $${amount.toFixed(2)} submitted! Admin will approve it.`);
         } else if (currentTransactionType === 'withdraw') {
-            // Send withdrawal request to admin
+            if (amount > userData.balance) { alert(`Insufficient balance! You have $${userData.balance.toFixed(2)}`); return; }
             const withdrawalRequests = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
-            withdrawalRequests.push({
-                email: userData.email,
-                amount: amount,
-                address: 'User Wallet Address',
-                date: new Date().toLocaleString()
-            });
+            withdrawalRequests.push({ email: userData.email, amount: amount, address: 'User Wallet Address', date: new Date().toLocaleString() });
             localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawalRequests));
             alert(`✅ Withdrawal request of $${amount.toFixed(2)} submitted! Admin will approve it.`);
         }
-        
         closeModal();
     }
-    
-    // Support functions
-    function startChat() {
-        window.open('admin.html', '_blank');
-        alert('Live chat will open in admin panel. Please wait for admin response.');
-    }
-    
-    function viewFAQ() {
-        alert('FAQ page would open here. For demo, please visit our help center.');
-    }
-    
-    // Logout
-    function logout() {
-        localStorage.removeItem('lunoUser');
-        sessionStorage.removeItem('lunoUser');
-        window.location.href = 'index.html';
-    }
-    
-    // Check authentication
-    function checkAuth() {
-        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-        if (!savedUser) {
-            window.location.href = 'index.html';
-        }
-    }
-    
-    // Generate random daily P/L
+
+    function startChat() { window.open('admin.html', '_blank'); alert('Live chat will open in admin panel'); }
+
+    function logout() { localStorage.clear(); sessionStorage.clear(); window.location.href = 'index.html'; }
+
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const page = item.getAttribute('data-page');
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            document.getElementById('profilePage').style.display = 'none';
+            document.getElementById('historyPage').style.display = 'none';
+            document.getElementById('kycPage').style.display = 'none';
+            document.getElementById('updatePage').style.display = 'none';
+            document.getElementById('supportPage').style.display = 'none';
+            if (page === 'profile') document.getElementById('profilePage').style.display = 'block';
+            if (page === 'history') { document.getElementById('historyPage').style.display = 'block'; renderTradeHistory(); }
+            if (page === 'kyc') document.getElementById('kycPage').style.display = 'block';
+            if (page === 'update') document.getElementById('updatePage').style.display = 'block';
+            if (page === 'support') document.getElementById('supportPage').style.display = 'block';
+        });
+    });
+
     function updateDailyPL() {
         const pl = (Math.random() - 0.5) * 500;
-        const plElement = document.getElementById('dailyPL');
-        if (plElement) {
-            if (pl >= 0) {
-                plElement.innerHTML = `+${pl.toFixed(2)} USDT`;
-                plElement.className = 'profit-loss positive';
-            } else {
-                plElement.innerHTML = `${pl.toFixed(2)} USDT`;
-                plElement.className = 'profit-loss negative';
-            }
-        }
+        const el = document.getElementById('dailyPL');
+        if (el) { el.innerHTML = `${pl >= 0 ? '+' : ''}${pl.toFixed(2)} USDT`; el.className = `profit-loss ${pl >= 0 ? 'positive' : 'negative'}`; }
     }
-    
-    // Initialize
-    checkAuth();
+
+    window.onclick = function(e) { if (e.target === document.getElementById('transactionModal')) closeModal(); };
+
     loadUserData();
-    loadTradeHistory();
     updateDailyPL();
     setInterval(updateDailyPL, 30000);
-    
-    window.onclick = function(event) {
-        const modal = document.getElementById('transactionModal');
-        if (event.target === modal) {
-            closeModal();
-        }
-    }
 </script>
 
 </body>
