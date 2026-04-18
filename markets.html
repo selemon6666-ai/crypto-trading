@@ -419,7 +419,7 @@
     <div class="nav-links">
         <a href="dashboard.html">Home</a>
         <a href="markets.html" style="color: #00d4ff;">Markets</a>
-        <a href="#">Trades</a>
+        <a href="trade.html">Trades</a>
         <a href="profile.html">My Profile</a>
     </div>
     <div class="user-info">
@@ -451,7 +451,7 @@
         </div>
         <div class="stat-card">
             <div class="stat-label">Active Coins</div>
-            <div class="stat-value" id="activeCoins">20</div>
+            <div class="stat-value" id="activeCoins">24</div>
         </div>
     </div>
 
@@ -528,7 +528,7 @@
 
 <script>
     // ============================================
-    // 20+ CRYPTOCURRENCIES DATA
+    // 24+ CRYPTOCURRENCIES DATA
     // ============================================
     const cryptocurrencies = [
         // Large Cap
@@ -664,13 +664,15 @@
         
         closeModal();
         
+        // Store selected coin in localStorage
         localStorage.setItem('selectedCrypto', JSON.stringify({
             symbol: currentSelectedCoin.symbol,
             name: currentSelectedCoin.name,
             price: currentSelectedCoin.price
         }));
         
-        window.location.href = 'dashboard.html';
+        // Redirect to trade page
+        window.location.href = 'trade.html';
     }
 
     // Close modal
