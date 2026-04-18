@@ -138,6 +138,29 @@
             color: rgba(255, 255, 255, 0.4);
         }
 
+        /* Category Filters */
+        .category-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            color: white;
+            transition: 0.3s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border-color: transparent;
+        }
+
         /* Market Table */
         .market-table {
             background: rgba(255, 255, 255, 0.05);
@@ -149,7 +172,7 @@
 
         .table-header {
             display: grid;
-            grid-template-columns: 2fr 1.5fr 2fr 1fr;
+            grid-template-columns: 2fr 1.2fr 1.5fr 1.2fr 1fr;
             padding: 18px 24px;
             background: rgba(0, 0, 0, 0.3);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -159,7 +182,7 @@
 
         .market-row {
             display: grid;
-            grid-template-columns: 2fr 1.5fr 2fr 1fr;
+            grid-template-columns: 2fr 1.2fr 1.5fr 1.2fr 1fr;
             padding: 18px 24px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             transition: background 0.3s;
@@ -200,21 +223,24 @@
         /* Price */
         .coin-price {
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         /* Market Cap */
         .market-cap {
             color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
         }
 
         /* Change Percent */
         .change-positive {
             color: #00ff88;
+            font-weight: 600;
         }
 
         .change-negative {
             color: #ff4444;
+            font-weight: 600;
         }
 
         /* Details Button */
@@ -261,7 +287,7 @@
             font-weight: bold;
         }
 
-        /* Modal for Details */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -351,21 +377,12 @@
             color: white;
         }
 
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* No Results */
         .no-results {
             text-align: center;
             padding: 40px;
             color: rgba(255, 255, 255, 0.6);
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .navbar {
                 padding: 15px 20px;
@@ -422,26 +439,35 @@
     <div class="stats-cards">
         <div class="stat-card">
             <div class="stat-label">Total Market Cap</div>
-            <div class="stat-value" id="totalMarketCap">$2.45T</div>
+            <div class="stat-value" id="totalMarketCap">$3.12T</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">24h Volume</div>
-            <div class="stat-value" id="totalVolume">$68.5B</div>
+            <div class="stat-value" id="totalVolume">$98.5B</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">BTC Dominance</div>
-            <div class="stat-value" id="btcDominance">52.3%</div>
+            <div class="stat-value" id="btcDominance">48.7%</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">Active Coins</div>
-            <div class="stat-value" id="activeCoins">5</div>
+            <div class="stat-value" id="activeCoins">20</div>
         </div>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="category-filters">
+        <button class="filter-btn active" data-category="all">All Coins</button>
+        <button class="filter-btn" data-category="large">Large Cap</button>
+        <button class="filter-btn" data-category="mid">Mid Cap</button>
+        <button class="filter-btn" data-category="defi">DeFi</button>
+        <button class="filter-btn" data-category="meme">Meme Coins</button>
     </div>
 
     <!-- Search Bar -->
     <div class="search-section">
         <div class="search-bar">
-            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search cryptocurrency... (BTC, ETH, etc.)">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search cryptocurrency... (BTC, ETH, DOGE, etc.)">
         </div>
     </div>
 
@@ -450,6 +476,7 @@
         <div class="table-header">
             <div>Coin</div>
             <div>Price</div>
+            <div>24h Change</div>
             <div>Market Cap</div>
             <div>Action</div>
         </div>
@@ -500,99 +527,46 @@
 </div>
 
 <script>
-    // Cryptocurrency data
+    // ============================================
+    // 20+ CRYPTOCURRENCIES DATA
+    // ============================================
     const cryptocurrencies = [
-        {
-            symbol: 'BTC',
-            name: 'Bitcoin',
-            fullName: 'Bitcoin (BTC)',
-            price: 75875,
-            marketCap: 1519025675788,
-            volume24h: 32500000000,
-            high24h: 76500,
-            low24h: 75000,
-            change24h: 2.5
-        },
-        {
-            symbol: 'ETH',
-            name: 'Ethereum',
-            fullName: 'Ethereum (ETH)',
-            price: 2363.69,
-            marketCap: 285249946479,
-            volume24h: 18500000000,
-            high24h: 2400,
-            low24h: 2320,
-            change24h: 1.8
-        },
-        {
-            symbol: 'USDT',
-            name: 'Tether',
-            fullName: 'Tether (USDT)',
-            price: 1.00,
-            marketCap: 186639389287,
-            volume24h: 42000000000,
-            high24h: 1.01,
-            low24h: 0.99,
-            change24h: 0.05
-        },
-        {
-            symbol: 'XRP',
-            name: 'XRP',
-            fullName: 'XRP (XRP)',
-            price: 1.43,
-            marketCap: 88256758366,
-            volume24h: 3200000000,
-            high24h: 1.48,
-            low24h: 1.38,
-            change24h: -1.2
-        },
-        {
-            symbol: 'BNB',
-            name: 'Binance Coin',
-            fullName: 'Binance Coin (BNB)',
-            price: 580.50,
-            marketCap: 88500000000,
-            volume24h: 1500000000,
-            high24h: 590,
-            low24h: 575,
-            change24h: 0.8
-        },
-        {
-            symbol: 'SOL',
-            name: 'Solana',
-            fullName: 'Solana (SOL)',
-            price: 142.30,
-            marketCap: 63200000000,
-            volume24h: 2100000000,
-            high24h: 148,
-            low24h: 138,
-            change24h: 3.2
-        },
-        {
-            symbol: 'DOGE',
-            name: 'Dogecoin',
-            fullName: 'Dogecoin (DOGE)',
-            price: 0.158,
-            marketCap: 22800000000,
-            volume24h: 850000000,
-            high24h: 0.162,
-            low24h: 0.154,
-            change24h: 1.5
-        },
-        {
-            symbol: 'ADA',
-            name: 'Cardano',
-            fullName: 'Cardano (ADA)',
-            price: 0.348,
-            marketCap: 12400000000,
-            volume24h: 320000000,
-            high24h: 0.355,
-            low24h: 0.342,
-            change24h: -0.5
-        }
+        // Large Cap
+        { symbol: 'BTC', name: 'Bitcoin', fullName: 'Bitcoin (BTC)', price: 75875, marketCap: 1519025675788, volume24h: 32500000000, high24h: 76500, low24h: 75000, change24h: 2.5, category: 'large' },
+        { symbol: 'ETH', name: 'Ethereum', fullName: 'Ethereum (ETH)', price: 2363.69, marketCap: 285249946479, volume24h: 18500000000, high24h: 2400, low24h: 2320, change24h: 1.8, category: 'large' },
+        { symbol: 'USDT', name: 'Tether', fullName: 'Tether (USDT)', price: 1.00, marketCap: 186639389287, volume24h: 42000000000, high24h: 1.01, low24h: 0.99, change24h: 0.05, category: 'large' },
+        { symbol: 'BNB', name: 'Binance Coin', fullName: 'Binance Coin (BNB)', price: 580.50, marketCap: 88500000000, volume24h: 1500000000, high24h: 590, low24h: 575, change24h: 0.8, category: 'large' },
+        { symbol: 'XRP', name: 'XRP', fullName: 'XRP (XRP)', price: 1.43, marketCap: 88256758366, volume24h: 3200000000, high24h: 1.48, low24h: 1.38, change24h: -1.2, category: 'large' },
+        { symbol: 'SOL', name: 'Solana', fullName: 'Solana (SOL)', price: 142.30, marketCap: 63200000000, volume24h: 2100000000, high24h: 148, low24h: 138, change24h: 3.2, category: 'large' },
+        { symbol: 'ADA', name: 'Cardano', fullName: 'Cardano (ADA)', price: 0.348, marketCap: 12400000000, volume24h: 320000000, high24h: 0.355, low24h: 0.342, change24h: -0.5, category: 'large' },
+        { symbol: 'AVAX', name: 'Avalanche', fullName: 'Avalanche (AVAX)', price: 28.45, marketCap: 11200000000, volume24h: 280000000, high24h: 29.20, low24h: 27.80, change24h: 1.2, category: 'large' },
+        
+        // Mid Cap
+        { symbol: 'DOGE', name: 'Dogecoin', fullName: 'Dogecoin (DOGE)', price: 0.158, marketCap: 22800000000, volume24h: 850000000, high24h: 0.162, low24h: 0.154, change24h: 1.5, category: 'meme' },
+        { symbol: 'DOT', name: 'Polkadot', fullName: 'Polkadot (DOT)', price: 6.85, marketCap: 9800000000, volume24h: 180000000, high24h: 7.02, low24h: 6.75, change24h: -0.8, category: 'mid' },
+        { symbol: 'LINK', name: 'Chainlink', fullName: 'Chainlink (LINK)', price: 14.20, marketCap: 8500000000, volume24h: 220000000, high24h: 14.65, low24h: 13.90, change24h: 2.1, category: 'mid' },
+        { symbol: 'MATIC', name: 'Polygon', fullName: 'Polygon (MATIC)', price: 0.52, marketCap: 5200000000, volume24h: 150000000, high24h: 0.54, low24h: 0.51, change24h: 0.3, category: 'mid' },
+        { symbol: 'ATOM', name: 'Cosmos', fullName: 'Cosmos (ATOM)', price: 8.15, marketCap: 3200000000, volume24h: 95000000, high24h: 8.35, low24h: 8.00, change24h: -1.1, category: 'mid' },
+        { symbol: 'FIL', name: 'Filecoin', fullName: 'Filecoin (FIL)', price: 5.42, marketCap: 2800000000, volume24h: 88000000, high24h: 5.58, low24h: 5.30, change24h: 0.9, category: 'mid' },
+        { symbol: 'VET', name: 'VeChain', fullName: 'VeChain (VET)', price: 0.028, marketCap: 2200000000, volume24h: 45000000, high24h: 0.029, low24h: 0.0275, change24h: -0.4, category: 'mid' },
+        
+        // DeFi
+        { symbol: 'UNI', name: 'Uniswap', fullName: 'Uniswap (UNI)', price: 7.85, marketCap: 5900000000, volume24h: 120000000, high24h: 8.05, low24h: 7.70, change24h: 1.8, category: 'defi' },
+        { symbol: 'AAVE', name: 'Aave', fullName: 'Aave (AAVE)', price: 92.50, marketCap: 1380000000, volume24h: 68000000, high24h: 95.20, low24h: 90.80, change24h: 2.5, category: 'defi' },
+        { symbol: 'CRV', name: 'Curve DAO', fullName: 'Curve DAO (CRV)', price: 0.42, marketCap: 480000000, volume24h: 35000000, high24h: 0.44, low24h: 0.41, change24h: -1.2, category: 'defi' },
+        { symbol: 'MKR', name: 'Maker', fullName: 'Maker (MKR)', price: 1150.00, marketCap: 1050000000, volume24h: 42000000, high24h: 1180, low24h: 1130, change24h: 0.7, category: 'defi' },
+        { symbol: 'COMP', name: 'Compound', fullName: 'Compound (COMP)', price: 45.30, marketCap: 380000000, volume24h: 28000000, high24h: 46.80, low24h: 44.50, change24h: -0.9, category: 'defi' },
+        
+        // Meme Coins
+        { symbol: 'SHIB', name: 'Shiba Inu', fullName: 'Shiba Inu (SHIB)', price: 0.000018, marketCap: 10600000000, volume24h: 420000000, high24h: 0.000019, low24h: 0.0000175, change24h: 5.2, category: 'meme' },
+        { symbol: 'PEPE', name: 'Pepe', fullName: 'Pepe (PEPE)', price: 0.0000095, marketCap: 4000000000, volume24h: 280000000, high24h: 0.00001, low24h: 0.000009, change24h: 8.5, category: 'meme' },
+        { symbol: 'FLOKI', name: 'Floki', fullName: 'Floki (FLOKI)', price: 0.000185, marketCap: 1800000000, volume24h: 95000000, high24h: 0.000192, low24h: 0.000178, change24h: 3.2, category: 'meme' },
+        { symbol: 'BONK', name: 'Bonk', fullName: 'Bonk (BONK)', price: 0.000022, marketCap: 850000000, volume24h: 62000000, high24h: 0.000023, low24h: 0.000021, change24h: 4.1, category: 'meme' }
     ];
 
     let currentSelectedCoin = null;
+    let currentCategory = 'all';
+    let currentSearch = '';
 
     // Format market cap
     function formatMarketCap(cap) {
@@ -604,7 +578,8 @@
 
     // Format price
     function formatPrice(price, symbol) {
-        if (symbol === 'DOGE' || symbol === 'ADA') return `$${price.toFixed(4)}`;
+        if (symbol === 'SHIB' || symbol === 'PEPE' || symbol === 'FLOKI' || symbol === 'BONK') return `$${price.toExponential(4)}`;
+        if (price < 0.01) return `$${price.toFixed(6)}`;
         if (price < 1) return `$${price.toFixed(4)}`;
         if (price < 10) return `$${price.toFixed(2)}`;
         return `$${price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
@@ -616,19 +591,33 @@
     }
 
     // Render market list
-    function renderMarketList(filter = '') {
+    function renderMarketList() {
         const marketList = document.getElementById('marketList');
-        const filteredCoins = cryptocurrencies.filter(coin => 
-            coin.name.toLowerCase().includes(filter.toLowerCase()) ||
-            coin.symbol.toLowerCase().includes(filter.toLowerCase())
-        );
+        
+        let filteredCoins = cryptocurrencies;
+        
+        // Apply category filter
+        if (currentCategory !== 'all') {
+            filteredCoins = filteredCoins.filter(coin => coin.category === currentCategory);
+        }
+        
+        // Apply search filter
+        if (currentSearch) {
+            filteredCoins = filteredCoins.filter(coin => 
+                coin.name.toLowerCase().includes(currentSearch.toLowerCase()) ||
+                coin.symbol.toLowerCase().includes(currentSearch.toLowerCase())
+            );
+        }
 
         if (filteredCoins.length === 0) {
             marketList.innerHTML = '<div class="no-results">No cryptocurrencies found. Try a different search.</div>';
             return;
         }
 
-        marketList.innerHTML = filteredCoins.map(coin => `
+        marketList.innerHTML = filteredCoins.map(coin => {
+            const changeClass = coin.change24h >= 0 ? 'change-positive' : 'change-negative';
+            const changeSymbol = coin.change24h >= 0 ? '+' : '';
+            return `
             <div class="market-row" onclick="showCoinDetails('${coin.symbol}')">
                 <div class="coin-info">
                     <div class="coin-icon">${getCoinIcon(coin.symbol)}</div>
@@ -638,12 +627,13 @@
                     </div>
                 </div>
                 <div class="coin-price">${formatPrice(coin.price, coin.symbol)}</div>
+                <div class="${changeClass}">${changeSymbol}${coin.change24h}%</div>
                 <div class="market-cap">${formatMarketCap(coin.marketCap)}</div>
                 <div>
                     <button class="details-btn" onclick="event.stopPropagation(); showCoinDetails('${coin.symbol}')">Details</button>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
     }
 
     // Show coin details modal
@@ -674,20 +664,13 @@
         
         closeModal();
         
-        // Store selected coin in localStorage to pre-fill on dashboard
         localStorage.setItem('selectedCrypto', JSON.stringify({
             symbol: currentSelectedCoin.symbol,
             name: currentSelectedCoin.name,
             price: currentSelectedCoin.price
         }));
         
-        // Redirect to dashboard
         window.location.href = 'dashboard.html';
-        
-        // Show alert with info
-        setTimeout(() => {
-            alert(`${action.toUpperCase()} ${currentSelectedCoin.name}\n\nPrice: ${formatPrice(currentSelectedCoin.price, currentSelectedCoin.symbol)}\n\nYou will be redirected to the trading dashboard.`);
-        }, 100);
     }
 
     // Close modal
@@ -713,21 +696,18 @@
     function startPriceUpdates() {
         setInterval(() => {
             cryptocurrencies.forEach(coin => {
-                const change = (Math.random() - 0.5) * 100;
+                const change = (Math.random() - 0.5) * (coin.price * 0.02);
                 let newPrice = coin.price + change;
-                if (newPrice < 0.01) newPrice = 0.01;
-                coin.price = parseFloat(newPrice.toFixed(4));
+                if (newPrice < 0.000001) newPrice = 0.000001;
+                coin.price = parseFloat(newPrice.toFixed(coin.price < 0.01 ? 8 : 2));
                 
-                // Update market cap
                 coin.marketCap = coin.marketCap * (1 + (change / coin.price));
-                
-                // Update 24h change
                 coin.change24h = parseFloat((coin.change24h + (Math.random() - 0.5) * 0.5).toFixed(1));
+                if (coin.change24h > 15) coin.change24h = 15;
+                if (coin.change24h < -15) coin.change24h = -15;
             });
             
-            // Re-render with current search filter
-            const searchInput = document.getElementById('searchInput');
-            renderMarketList(searchInput.value);
+            renderMarketList();
             updateStats();
         }, 5000);
     }
@@ -738,11 +718,7 @@
         if (savedUser) {
             try {
                 const user = JSON.parse(savedUser);
-                if (user.fullName) {
-                    document.getElementById('displayUsername').innerText = user.fullName.split(' ')[0];
-                } else {
-                    document.getElementById('displayUsername').innerText = user.email.split('@')[0];
-                }
+                document.getElementById('displayUsername').innerText = user.fullName?.split(' ')[0] || user.email?.split('@')[0] || 'Trader';
             } catch(e) {}
         }
     }
@@ -762,9 +738,20 @@
         }
     }
 
+    // Category filter event listeners
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentCategory = btn.getAttribute('data-category');
+            renderMarketList();
+        });
+    });
+
     // Search functionality
     document.getElementById('searchInput').addEventListener('input', (e) => {
-        renderMarketList(e.target.value);
+        currentSearch = e.target.value;
+        renderMarketList();
     });
 
     // Close modal on outside click
