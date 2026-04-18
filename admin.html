@@ -18,7 +18,6 @@
             color: white;
         }
 
-        /* Navigation */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -80,14 +79,12 @@
             background: rgba(255, 68, 68, 0.3);
         }
 
-        /* Main Container */
         .main-container {
             display: flex;
             margin-top: 70px;
             min-height: calc(100vh - 70px);
         }
 
-        /* Sidebar */
         .sidebar {
             width: 280px;
             background: rgba(0, 0, 0, 0.3);
@@ -119,7 +116,6 @@
             border-left: 3px solid #00d4ff;
         }
 
-        /* Content */
         .content-area {
             flex: 1;
             margin-left: 280px;
@@ -134,7 +130,6 @@
             font-size: 2rem;
         }
 
-        /* Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -155,7 +150,6 @@
             color: #00d4ff;
         }
 
-        /* Tables */
         .table-container {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 16px;
@@ -182,11 +176,11 @@
             color: #ffaa00;
         }
 
-        .status-approved {
+        .status-approved, .status-won {
             color: #00ff88;
         }
 
-        .status-rejected {
+        .status-rejected, .status-lost {
             color: #ff4444;
         }
 
@@ -209,7 +203,25 @@
             color: #ff4444;
         }
 
-        /* Chat Section */
+        .btn-win {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #00ff88;
+            margin-right: 5px;
+        }
+
+        .btn-lose {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #ff4444;
+        }
+
         .chat-container {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 16px;
@@ -271,46 +283,11 @@
             color: white;
         }
 
-        /* Win/Lose Controls */
-        .trade-control {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .btn-win {
-            background: rgba(0, 255, 136, 0.2);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            padding: 8px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: #00ff88;
-        }
-
-        .btn-lose {
-            background: rgba(255, 68, 68, 0.2);
-            border: 1px solid rgba(255, 68, 68, 0.3);
-            padding: 8px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: #ff4444;
-        }
-
         @media (max-width: 768px) {
-            .sidebar {
-                width: 80px;
-            }
-            .sidebar-item span:last-child {
-                display: none;
-            }
-            .content-area {
-                margin-left: 80px;
-                padding: 20px;
-            }
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .sidebar { width: 80px; }
+            .sidebar-item span:last-child { display: none; }
+            .content-area { margin-left: 80px; padding: 20px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -342,16 +319,15 @@
         <div class="sidebar-item" data-page="withdrawals">
             <span>💸</span> <span>Withdrawals</span>
         </div>
-        <div class="sidebar-item" data-page="chat">
-            <span>💬</span> <span>Live Chat</span>
-        </div>
         <div class="sidebar-item" data-page="trades">
             <span>📊</span> <span>Trade Control</span>
+        </div>
+        <div class="sidebar-item" data-page="chat">
+            <span>💬</span> <span>Live Chat</span>
         </div>
     </div>
 
     <div class="content-area">
-        <!-- Stats Overview -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number" id="pendingKYC">0</div>
@@ -366,12 +342,12 @@
                 <div>Pending Withdrawals</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="activeChats">0</div>
-                <div>Active Chats</div>
+                <div class="stat-number" id="pendingTradesCount">0</div>
+                <div>Pending Trades</div>
             </div>
         </div>
 
-        <!-- KYC Requests Page -->
+        <!-- KYC Page -->
         <div id="kycPage" class="page-content">
             <div class="page-header">
                 <h1>KYC Verification Requests</h1>
@@ -379,9 +355,7 @@
             </div>
             <div class="table-container">
                 <table id="kycTable">
-                    <thead>
-                        <tr><th>User</th><th>Full Name</th><th>ID Type</th><th>ID Number</th><th>Status</th><th>Action</th></tr>
-                    </thead>
+                    <thead><tr><th>User</th><th>Full Name</th><th>ID Type</th><th>ID Number</th><th>Status</th><th>Action</th></tr></thead>
                     <tbody id="kycList"></tbody>
                 </table>
             </div>
@@ -415,6 +389,20 @@
             </div>
         </div>
 
+        <!-- Trade Control Page -->
+        <div id="tradesPage" class="page-content" style="display: none;">
+            <div class="page-header">
+                <h1>Trade Control</h1>
+                <p>Manually set WIN or LOSE for pending trades</p>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>User</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Expected Return</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody id="pendingTradesList"></tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Live Chat Page -->
         <div id="chatPage" class="page-content" style="display: none;">
             <div class="page-header">
@@ -434,98 +422,130 @@
                 </div>
             </div>
         </div>
-
-        <!-- Trade Control Page -->
-        <div id="tradesPage" class="page-content" style="display: none;">
-            <div class="page-header">
-                <h1>Trade Control</h1>
-                <p>Manually set win/loss for pending trades</p>
-            </div>
-            <div class="table-container">
-                <table>
-                    <thead><tr><th>User</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Expected Return</th><th>Status</th><th>Action</th></tr></thead>
-                    <tbody id="pendingTradesList"></tbody>
-                </table>
-            </div>
-        </div>
     </div>
 </div>
 
 <script>
-    // Load all data from localStorage
-    function loadData() {
-        // Load KYC requests
+    // Load all data
+    function loadAllData() {
+        loadKYC();
+        loadDeposits();
+        loadWithdrawals();
+        loadPendingTrades();
+        updateStats();
+    }
+
+    // Load KYC requests
+    function loadKYC() {
         const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
         const kycList = document.getElementById('kycList');
-        if (kycList) {
-            if (kycRequests.length === 0) {
-                kycList.innerHTML = '<tr><td colspan="6" style="text-align:center;">No pending KYC requests</td></tr>';
-            } else {
-                kycList.innerHTML = kycRequests.map((req, index) => `
-                    <tr>
-                        <td>${req.email}</td>
-                        <td>${req.fullName}</td>
-                        <td>${req.idType}</td>
-                        <td>${req.idNumber}</td>
-                        <td class="status-pending">Pending</td>
-                        <td>
-                            <button class="btn-approve" onclick="approveKYC(${index})">Approve</button>
-                            <button class="btn-reject" onclick="rejectKYC(${index})">Reject</button>
-                        </td>
-                    </tr>
-                `).join('');
-            }
+        
+        if (kycRequests.length === 0) {
+            kycList.innerHTML = '<tr><td colspan="6" style="text-align:center;">No pending KYC requests</td></tr>';
+            return;
         }
+        
+        kycList.innerHTML = kycRequests.map((req, index) => `
+            <tr>
+                <td>${req.email}</td>
+                <td>${req.fullName}</td>
+                <td>${req.idType}</td>
+                <td>${req.idNumber}</td>
+                <td class="status-pending">Pending</td>
+                <td>
+                    <button class="btn-approve" onclick="approveKYC(${index})">Approve</button>
+                    <button class="btn-reject" onclick="rejectKYC(${index})">Reject</button>
+                </td>
+            </tr>
+        `).join('');
+    }
 
-        // Load deposit requests
+    // Load deposit requests
+    function loadDeposits() {
         const depositRequests = JSON.parse(localStorage.getItem('depositRequests') || '[]');
         const depositsList = document.getElementById('depositsList');
-        if (depositsList) {
-            if (depositRequests.length === 0) {
-                depositsList.innerHTML = '<tr><td colspan="5" style="text-align:center;">No pending deposits</td></tr>';
-            } else {
-                depositsList.innerHTML = depositRequests.map((req, index) => `
-                    <tr>
-                        <td>${req.email}</td>
-                        <td>$${req.amount}</td>
-                        <td>${req.date}</td>
-                        <td class="status-pending">Pending</td>
-                        <td>
-                            <button class="btn-approve" onclick="approveDeposit(${index})">Approve</button>
-                            <button class="btn-reject" onclick="rejectDeposit(${index})">Reject</button>
-                        </td>
-                    </tr>
-                `).join('');
-            }
+        
+        if (depositRequests.length === 0) {
+            depositsList.innerHTML = '<tr><td colspan="5" style="text-align:center;">No pending deposits</td></tr>';
+            return;
         }
+        
+        depositsList.innerHTML = depositRequests.map((req, index) => `
+            <tr>
+                <td>${req.email}</td>
+                <td>$${req.amount}</td>
+                <td>${req.date}</td>
+                <td class="status-pending">Pending</td>
+                <td>
+                    <button class="btn-approve" onclick="approveDeposit(${index})">Approve</button>
+                    <button class="btn-reject" onclick="rejectDeposit(${index})">Reject</button>
+                </td>
+            </tr>
+        `).join('');
+    }
 
-        // Load withdrawal requests
+    // Load withdrawal requests
+    function loadWithdrawals() {
         const withdrawalRequests = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
         const withdrawalsList = document.getElementById('withdrawalsList');
-        if (withdrawalsList) {
-            if (withdrawalRequests.length === 0) {
-                withdrawalsList.innerHTML = '<tr><td colspan="6" style="text-align:center;">No pending withdrawals</td></tr>';
-            } else {
-                withdrawalsList.innerHTML = withdrawalRequests.map((req, index) => `
-                    <tr>
-                        <td>${req.email}</td>
-                        <td>$${req.amount}</td>
-                        <td>${req.address}</td>
-                        <td>${req.date}</td>
-                        <td class="status-pending">Pending</td>
-                        <td>
-                            <button class="btn-approve" onclick="approveWithdrawal(${index})">Approve</button>
-                            <button class="btn-reject" onclick="rejectWithdrawal(${index})">Reject</button>
-                        </td>
-                    </tr>
-                `).join('');
-            }
+        
+        if (withdrawalRequests.length === 0) {
+            withdrawalsList.innerHTML = '<tr><td colspan="6" style="text-align:center;">No pending withdrawals</td></tr>';
+            return;
         }
+        
+        withdrawalsList.innerHTML = withdrawalRequests.map((req, index) => `
+            <tr>
+                <td>${req.email}</td>
+                <td>$${req.amount}</td>
+                <td>${req.address || 'Wallet Address'}</td>
+                <td>${req.date}</td>
+                <td class="status-pending">Pending</td>
+                <td>
+                    <button class="btn-approve" onclick="approveWithdrawal(${index})">Approve</button>
+                    <button class="btn-reject" onclick="rejectWithdrawal(${index})">Reject</button>
+                </td>
+            </tr>
+        `).join('');
+    }
 
-        // Update stats
-        document.getElementById('pendingKYC').innerText = kycRequests.length;
-        document.getElementById('pendingDeposits').innerText = depositRequests.length;
-        document.getElementById('pendingWithdrawals').innerText = withdrawalRequests.length;
+    // Load pending trades for admin control
+    function loadPendingTrades() {
+        const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
+        const tradesList = document.getElementById('pendingTradesList');
+        
+        if (pendingTrades.length === 0) {
+            tradesList.innerHTML = '<tr><td colspan="7" style="text-align:center;">No pending trades</td></tr>';
+            return;
+        }
+        
+        tradesList.innerHTML = pendingTrades.map((trade, index) => `
+            <tr>
+                <td>${trade.userEmail}</td>
+                <td>${trade.coinName} (${trade.coin})</td>
+                <td>$${trade.amount.toFixed(2)}</td>
+                <td>${trade.duration}s</td>
+                <td>+${trade.rate}% ($${trade.expectedProfit.toFixed(2)})</td>
+                <td class="status-pending">${trade.status}</td>
+                <td>
+                    <button class="btn-win" onclick="setTradeOutcome(${index}, 'win')">🏆 WIN</button>
+                    <button class="btn-lose" onclick="setTradeOutcome(${index}, 'lose')">💀 LOSE</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Update stats
+    function updateStats() {
+        const kycCount = JSON.parse(localStorage.getItem('kycRequests') || '[]').length;
+        const depositCount = JSON.parse(localStorage.getItem('depositRequests') || '[]').length;
+        const withdrawalCount = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]').length;
+        const tradeCount = JSON.parse(localStorage.getItem('pendingTrades') || '[]').length;
+        
+        document.getElementById('pendingKYC').innerText = kycCount;
+        document.getElementById('pendingDeposits').innerText = depositCount;
+        document.getElementById('pendingWithdrawals').innerText = withdrawalCount;
+        document.getElementById('pendingTradesCount').innerText = tradeCount;
     }
 
     // KYC Functions
@@ -533,25 +553,16 @@
         const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
         const request = kycRequests[index];
         
-        // Update user's KYC status
-        const users = JSON.parse(localStorage.getItem('lunoUsers') || '[]');
-        const userIndex = users.findIndex(u => u.email === request.email);
-        if (userIndex !== -1) {
-            users[userIndex].kycStatus = 'verified';
-            localStorage.setItem('lunoUsers', JSON.stringify(users));
-        }
-        
-        // Also update profile
+        // Update user's KYC status in profile
         const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{}');
         profile.kycStatus = 'verified';
         localStorage.setItem('lunoProfile', JSON.stringify(profile));
         
-        // Remove request
         kycRequests.splice(index, 1);
         localStorage.setItem('kycRequests', JSON.stringify(kycRequests));
         
         alert(`✅ KYC approved for ${request.email}`);
-        loadData();
+        loadAllData();
     }
 
     function rejectKYC(index) {
@@ -559,7 +570,7 @@
         kycRequests.splice(index, 1);
         localStorage.setItem('kycRequests', JSON.stringify(kycRequests));
         alert('❌ KYC rejected');
-        loadData();
+        loadAllData();
     }
 
     // Deposit Functions
@@ -567,7 +578,6 @@
         const depositRequests = JSON.parse(localStorage.getItem('depositRequests') || '[]');
         const request = depositRequests[index];
         
-        // Add to user balance
         const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{}');
         profile.balance = (profile.balance || 10000) + request.amount;
         localStorage.setItem('lunoProfile', JSON.stringify(profile));
@@ -576,7 +586,7 @@
         localStorage.setItem('depositRequests', JSON.stringify(depositRequests));
         
         alert(`✅ Deposit of $${request.amount} approved for ${request.email}`);
-        loadData();
+        loadAllData();
     }
 
     function rejectDeposit(index) {
@@ -584,7 +594,7 @@
         depositRequests.splice(index, 1);
         localStorage.setItem('depositRequests', JSON.stringify(depositRequests));
         alert('❌ Deposit rejected');
-        loadData();
+        loadAllData();
     }
 
     // Withdrawal Functions
@@ -592,10 +602,9 @@
         const withdrawalRequests = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
         const request = withdrawalRequests[index];
         
-        // Deduct from user balance
         const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{}');
-        if (profile.balance >= request.amount) {
-            profile.balance -= request.amount;
+        if ((profile.balance || 10000) >= request.amount) {
+            profile.balance = (profile.balance || 10000) - request.amount;
             localStorage.setItem('lunoProfile', JSON.stringify(profile));
             withdrawalRequests.splice(index, 1);
             localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawalRequests));
@@ -603,7 +612,7 @@
         } else {
             alert('❌ Insufficient balance!');
         }
-        loadData();
+        loadAllData();
     }
 
     function rejectWithdrawal(index) {
@@ -611,7 +620,59 @@
         withdrawalRequests.splice(index, 1);
         localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawalRequests));
         alert('❌ Withdrawal rejected');
-        loadData();
+        loadAllData();
+    }
+
+    // Trade Control Functions - WIN/LOSE
+    function setTradeOutcome(index, outcome) {
+        const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
+        const trade = pendingTrades[index];
+        
+        // Get user profile by email
+        let userProfile = JSON.parse(localStorage.getItem('lunoProfile') || '{}');
+        
+        // Also check if there's a user-specific profile
+        const allUsers = JSON.parse(localStorage.getItem('lunoUsers') || '[]');
+        const userData = allUsers.find(u => u.email === trade.userEmail);
+        
+        if (outcome === 'win') {
+            const profit = trade.expectedProfit;
+            const totalReturn = trade.amount + profit;
+            
+            // Update balance
+            userProfile.balance = (userProfile.balance || 10000) + totalReturn;
+            localStorage.setItem('lunoProfile', JSON.stringify(userProfile));
+            
+            // Update trade history
+            const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
+            const historyTrade = history.find(t => t.id === trade.id);
+            if (historyTrade) {
+                historyTrade.status = 'won';
+                historyTrade.profit = profit;
+                historyTrade.completedDate = new Date().toLocaleString();
+                localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
+            }
+            
+            alert(`✅ TRADE WON!\nUser: ${trade.userEmail}\nAmount: $${trade.amount}\nProfit: +$${profit.toFixed(2)}\nTotal Return: $${totalReturn.toFixed(2)}`);
+        } else {
+            // LOSE - user loses their investment
+            const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
+            const historyTrade = history.find(t => t.id === trade.id);
+            if (historyTrade) {
+                historyTrade.status = 'lost';
+                historyTrade.profit = -trade.amount;
+                historyTrade.completedDate = new Date().toLocaleString();
+                localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
+            }
+            
+            alert(`❌ TRADE LOST!\nUser: ${trade.userEmail}\nAmount: $${trade.amount}\nLoss: -$${trade.amount}`);
+        }
+        
+        // Remove from pending trades
+        pendingTrades.splice(index, 1);
+        localStorage.setItem('pendingTrades', JSON.stringify(pendingTrades));
+        
+        loadAllData();
     }
 
     // Chat Functions
@@ -631,13 +692,11 @@
         input.value = '';
         chatMessages.scrollTop = chatMessages.scrollHeight;
         
-        // Save to localStorage
         const chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
         chatHistory.push({ sender: 'admin', message, time });
         localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
     }
 
-    // Load chat history
     function loadChatHistory() {
         const chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
         const chatMessages = document.getElementById('chatMessages');
@@ -662,17 +721,20 @@
             document.getElementById('kycPage').style.display = 'none';
             document.getElementById('depositsPage').style.display = 'none';
             document.getElementById('withdrawalsPage').style.display = 'none';
-            document.getElementById('chatPage').style.display = 'none';
             document.getElementById('tradesPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'none';
             
             if (page === 'kyc') document.getElementById('kycPage').style.display = 'block';
             if (page === 'deposits') document.getElementById('depositsPage').style.display = 'block';
             if (page === 'withdrawals') document.getElementById('withdrawalsPage').style.display = 'block';
+            if (page === 'trades') {
+                document.getElementById('tradesPage').style.display = 'block';
+                loadPendingTrades();
+            }
             if (page === 'chat') {
                 document.getElementById('chatPage').style.display = 'block';
                 loadChatHistory();
             }
-            if (page === 'trades') document.getElementById('tradesPage').style.display = 'block';
         });
     });
 
@@ -680,8 +742,16 @@
         window.location.href = 'index.html';
     }
 
+    // Auto-refresh every 5 seconds
+    setInterval(() => {
+        if (document.getElementById('tradesPage').style.display !== 'none') {
+            loadPendingTrades();
+        }
+        updateStats();
+    }, 5000);
+
     // Initialize
-    loadData();
+    loadAllData();
 </script>
 
 </body>
