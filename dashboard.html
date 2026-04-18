@@ -18,15 +18,14 @@
             overflow-x: hidden;
         }
 
-        /* Video Background - Using LOCAL file from your repository */
-        .video-background {
+        /* Canvas Background for Animated Finance Effects */
+        #canvas-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -2;
-            object-fit: cover;
         }
 
         .overlay {
@@ -35,7 +34,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.5);
             z-index: -1;
         }
 
@@ -402,11 +401,8 @@
 </head>
 <body>
 
-<!-- LOCAL Video Background - From your GitHub repository -->
-<video class="video-background" autoplay muted loop playsinline id="bgVideo">
-    <source src="background.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-</video>
+<!-- Animated Canvas Background -->
+<canvas id="canvas-bg"></canvas>
 <div class="overlay"></div>
 
 <!-- Navigation -->
@@ -492,15 +488,151 @@
 </div>
 
 <script>
-    // Force video to play
-    const video = document.getElementById('bgVideo');
-    video.play().catch(function(error) {
-        console.log("Video autoplay failed, trying on click");
-        document.body.addEventListener('click', function() {
-            video.play();
-        }, { once: true });
-    });
-
+    // ============================================
+    // ANIMATED CANVAS BACKGROUND (Finance Theme)
+    // ============================================
+    const canvas = document.getElementById('canvas-bg');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let particles = [];
+    let candlesticks = [];
+    let time = 0;
+    
+    function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+    
+    // Create floating particles (data streams)
+    class DataParticle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.size = Math.random() * 3 + 1;
+            this.speedY = Math.random() * 2 + 0.5;
+            this.opacity = Math.random() * 0.5 + 0.2;
+            this.char = Math.random() > 0.7 ? ['$', '€', '£', '¥', '₿', '📈', '📉', '%'][Math.floor(Math.random() * 8)] : '';
+        }
+        
+        update() {
+            this.y += this.speedY;
+            if (this.y > height) {
+                this.y = 0;
+                this.x = Math.random() * width;
+            }
+        }
+        
+        draw() {
+            if (this.char) {
+                ctx.font = `${this.size * 8}px monospace`;
+                ctx.fillStyle = `rgba(0, 212, 255, ${this.opacity})`;
+                ctx.fillText(this.char, this.x, this.y);
+            } else {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(124, 58, 237, ${this.opacity})`;
+                ctx.fill();
+            }
+        }
+    }
+    
+    // Create candlestick chart pattern in background
+    class BGCandle {
+        constructor(x, height) {
+            this.x = x;
+            this.height = height;
+            this.width = 30;
+            this.speed = 0.5;
+        }
+        
+        update() {
+            this.x -= this.speed;
+        }
+        
+        draw() {
+            const isGreen = Math.random() > 0.5;
+            ctx.fillStyle = isGreen ? 'rgba(0, 255, 136, 0.15)' : 'rgba(255, 68, 68, 0.15)';
+            ctx.fillRect(this.x, height - this.height, this.width, this.height);
+            
+            // Wick
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillRect(this.x + this.width/2 - 2, height - this.height - 20, 4, 20);
+        }
+    }
+    
+    function initBackground() {
+        // Create particles
+        for (let i = 0; i < 100; i++) {
+            particles.push(new DataParticle());
+        }
+        
+        // Create background candles
+        for (let i = 0; i < 20; i++) {
+            candlesticks.push(new BGCandle(width + i * 50, Math.random() * 200 + 50));
+        }
+    }
+    
+    function animateBackground() {
+        ctx.clearRect(0, 0, width, height);
+        
+        // Gradient background
+        const gradient = ctx.createLinearGradient(0, 0, width, height);
+        gradient.addColorStop(0, '#0f0c29');
+        gradient.addColorStop(0.5, '#302b63');
+        gradient.addColorStop(1, '#24243e');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+        
+        // Draw grid lines (trading style)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 10; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0, height / 10 * i);
+            ctx.lineTo(width, height / 10 * i);
+            ctx.stroke();
+        }
+        
+        // Update and draw candlesticks
+        for (let i = candlesticks.length - 1; i >= 0; i--) {
+            candlesticks[i].update();
+            candlesticks[i].draw();
+            if (candlesticks[i].x + candlesticks[i].width < 0) {
+                candlesticks.splice(i, 1);
+            }
+        }
+        
+        // Add new candles
+        if (Math.random() < 0.05) {
+            candlesticks.push(new BGCandle(width, Math.random() * 250 + 50));
+        }
+        
+        // Update and draw particles
+        for (let particle of particles) {
+            particle.update();
+            particle.draw();
+        }
+        
+        // Draw floating numbers (stock prices)
+        time++;
+        if (time % 30 === 0) {
+            ctx.font = 'bold 14px monospace';
+            ctx.fillStyle = 'rgba(0, 212, 255, 0.3)';
+            for (let i = 0; i < 5; i++) {
+                const price = (Math.random() * 50000 + 10000).toFixed(2);
+                ctx.fillText(`$${price}`, Math.random() * width, Math.random() * height);
+            }
+        }
+        
+        requestAnimationFrame(animateBackground);
+    }
+    
+    // ============================================
+    // TRADING DASHBOARD CODE
+    // ============================================
     let balance = 10000;
     let portfolio = {};
     let tradingActive = false;
@@ -686,6 +818,17 @@
         updateChart();
         simulatePriceChanges();
     }
+    
+    // Initialize canvas and event listeners
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+        particles = [];
+        initBackground();
+    });
+    
+    resizeCanvas();
+    initBackground();
+    animateBackground();
     
     document.getElementById('cryptoSelect').addEventListener('change', updatePriceDisplay);
     
