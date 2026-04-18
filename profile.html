@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luno Trading - My Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: white;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #00d4ff;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .username {
+            color: #00d4ff;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 68, 68, 0.3);
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 0;
+            position: fixed;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-item {
+            padding: 15px 25px;
+            margin: 5px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1rem;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .sidebar-item.active {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2));
+            border-left: 3px solid #00d4ff;
+        }
+
+        .sidebar-item .icon {
+            font-size: 1.2rem;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px 40px;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .page-header p {
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5px;
+        }
+
+        /* Profile Cards */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .profile-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-card.full-width {
+            grid-column: span 2;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Info Row */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .info-value.pending {
+            color: #ffaa00;
+        }
+
+        .info-value.verified {
+            color: #00ff88;
+        }
+
+        /* Balance Display */
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00ff88;
+            margin: 15px 0;
+        }
+
+        .profit-loss {
+            font-size: 1.2rem;
+        }
+
+        .profit-loss.positive {
+            color: #00ff88;
+        }
+
+        .profit-loss.negative {
+            color: #ff4444;
+        }
+
+        /* Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-deposit {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.3s;
+            color: white;
+        }
+
+        .btn-withdraw {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.3s;
+            color: white;
+        }
+
+        .btn-deposit:hover, .btn-withdraw:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Form Styles for Update Profile */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            color: white;
+        }
+
+        /* KYC Status Card */
+        .kyc-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .kyc-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .kyc-badge.pending {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+            border: 1px solid rgba(255, 170, 0, 0.3);
+        }
+
+        .kyc-badge.verified {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-verify {
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #00d4ff;
+        }
+
+        /* Customer Support */
+        .support-item {
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .support-icon {
+            font-size: 1.5rem;
+        }
+
+        .support-text h4 {
+            margin-bottom: 5px;
+        }
+
+        .support-text p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a3e, #0a0e27);
+            padding: 30px;
+            border-radius: 20px;
+            width: 400px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border: none;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+            .sidebar-item span:last-child {
+                display: none;
+            }
+            .content-area {
+                margin-left: 80px;
+                padding: 20px;
+            }
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+            .profile-card.full-width {
+                grid-column: span 1;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="logo">📈 Luno Trading</div>
+    <div class="nav-links">
+        <a href="dashboard.html">Home</a>
+        <a href="#">Markets</a>
+        <a href="#">Trades</a>
+        <a href="profile.html" style="color: #00d4ff;">My Profile</a>
+    </div>
+    <div class="user-info">
+        <span class="username" id="displayUsername">Trader</span>
+        <a href="#" class="logout-btn" onclick="logout()">Logout</a>
+    </div>
+</nav>
+
+<!-- Main Container -->
+<div class="main-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <li class="sidebar-item active" data-page="profile">
+                <span class="icon">👤</span>
+                <span>User Profile</span>
+            </li>
+            <li class="sidebar-item" data-page="kyc">
+                <span class="icon">✅</span>
+                <span>KYC Verification</span>
+            </li>
+            <li class="sidebar-item" data-page="update">
+                <span class="icon">✏️</span>
+                <span>Update Profile</span>
+            </li>
+            <li class="sidebar-item" data-page="support">
+                <span class="icon">💬</span>
+                <span>Customer Support</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Content Area -->
+    <div class="content-area">
+        <!-- Profile Page -->
+        <div id="profilePage" class="page-content">
+            <div class="page-header">
+                <h1>Profile</h1>
+                <p>View your personal information and account status</p>
+            </div>
+
+            <div class="profile-grid">
+                <div class="profile-card">
+                    <div class="card-title">
+                        <span>👤</span> Personal Information
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Full Name:</span>
+                        <span class="info-value" id="fullName">Loading...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" id="email">Loading...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Member Since:</span>
+                        <span class="info-value" id="memberSince">Loading...</span>
+                    </div>
+                </div>
+
+                <div class="profile-card">
+                    <div class="card-title">
+                        <span>💰</span> Account Balance
+                    </div>
+                    <div class="balance-amount" id="balance">$0</div>
+                    <div class="info-row">
+                        <span class="info-label">KYC Status:</span>
+                        <span class="info-value pending" id="kycStatus">pending</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Daily Profit/Loss:</span>
+                        <span class="profit-loss positive" id="dailyPL">+0.00 USDT</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-deposit" onclick="openDepositModal()">💰 Deposit</button>
+                        <button class="btn-withdraw" onclick="openWithdrawModal()">💸 Withdraw Funds</button>
+                    </div>
+                </div>
+
+                <div class="profile-card full-width">
+                    <div class="card-title">
+                        <span>📊</span> Trading Statistics
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Total Trades:</span>
+                        <span class="info-value" id="totalTrades">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Win Rate:</span>
+                        <span class="info-value" id="winRate">0%</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Total Volume:</span>
+                        <span class="info-value" id="totalVolume">$0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KYC Page (Hidden by default) -->
+        <div id="kycPage" class="page-content" style="display: none;">
+            <div class="page-header">
+                <h1>KYC Verification</h1>
+                <p>Verify your identity to unlock full trading features</p>
+            </div>
+
+            <div class="profile-card">
+                <div class="card-title">
+                    <span>✅</span> Identity Verification
+                </div>
+                <div class="kyc-status">
+                    <span>Current Status:</span>
+                    <span class="kyc-badge pending" id="kycStatusBadge">Pending</span>
+                </div>
+                <div class="form-group">
+                    <label>Full Name (as on ID)</label>
+                    <input type="text" id="kycFullName" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label>ID Type</label>
+                    <select id="idType">
+                        <option value="passport">Passport</option>
+                        <option value="drivers">Driver's License</option>
+                        <option value="national">National ID</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ID Number</label>
+                    <input type="text" id="idNumber" placeholder="Enter your ID number">
+                </div>
+                <div class="form-group">
+                    <label>Upload ID Document (Demo)</label>
+                    <input type="file" id="idDocument" accept="image/*">
+                </div>
+                <button class="btn-save" onclick="submitKYC()">Submit Verification</button>
+            </div>
+        </div>
+
+        <!-- Update Profile Page (Hidden by default) -->
+        <div id="updatePage" class="page-content" style="display: none;">
+            <div class="page-header">
+                <h1>Update Profile</h1>
+                <p>Update your personal information</p>
+            </div>
+
+            <div class="profile-card">
+                <div class="card-title">
+                    <span>✏️</span> Edit Information
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="updateFullName" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="phoneNumber" placeholder="Enter your phone number">
+                </div>
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="currentPassword" placeholder="Enter current password">
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" placeholder="Enter new password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                </div>
+                <button class="btn-save" onclick="updateProfile()">Save Changes</button>
+            </div>
+        </div>
+
+        <!-- Customer Support Page (Hidden by default) -->
+        <div id="supportPage" class="page-content" style="display: none;">
+            <div class="page-header">
+                <h1>Customer Support</h1>
+                <p>Get help with your account</p>
+            </div>
+
+            <div class="profile-card">
+                <div class="card-title">
+                    <span>💬</span> Contact Support
+                </div>
+                <div class="support-item">
+                    <div class="support-icon">📧</div>
+                    <div class="support-text">
+                        <h4>Email Support</h4>
+                        <p>support@lunotrading.com</p>
+                        <p>Response within 24 hours</p>
+                    </div>
+                </div>
+                <div class="support-item">
+                    <div class="support-icon">💬</div>
+                    <div class="support-text">
+                        <h4>Live Chat</h4>
+                        <p>Available 24/7</p>
+                        <button class="btn-verify" onclick="startChat()">Start Chat</button>
+                    </div>
+                </div>
+                <div class="support-item">
+                    <div class="support-icon">📞</div>
+                    <div class="support-text">
+                        <h4>Phone Support</h4>
+                        <p>+1 (800) 123-4567</p>
+                        <p>Mon-Fri, 9AM - 6PM EST</p>
+                    </div>
+                </div>
+                <div class="support-item">
+                    <div class="support-icon">❓</div>
+                    <div class="support-text">
+                        <h4>FAQ</h4>
+                        <p>Frequently asked questions</p>
+                        <button class="btn-verify" onclick="viewFAQ()">View FAQ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Deposit/Withdraw Modal -->
+<div id="transactionModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Deposit Funds</h3>
+        <input type="number" id="transactionAmount" placeholder="Enter amount in USD">
+        <div class="modal-buttons">
+            <button class="btn-confirm" onclick="processTransaction()">Confirm</button>
+            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // User data
+    let userData = {
+        fullName: '',
+        email: '',
+        memberSince: new Date().toLocaleDateString(),
+        balance: 10000,
+        kycStatus: 'pending',
+        totalTrades: 0,
+        winRate: 0,
+        totalVolume: 0,
+        phoneNumber: ''
+    };
+    
+    let currentTransactionType = '';
+    
+    // Load user data from localStorage
+    function loadUserData() {
+        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+        if (savedUser) {
+            try {
+                const user = JSON.parse(savedUser);
+                userData.fullName = user.fullName || 'Trader';
+                userData.email = user.email || 'user@luno.com';
+                
+                // Load saved profile data
+                const savedProfile = localStorage.getItem('lunoProfile');
+                if (savedProfile) {
+                    const profile = JSON.parse(savedProfile);
+                    userData.phoneNumber = profile.phoneNumber || '';
+                    userData.kycStatus = profile.kycStatus || 'pending';
+                }
+                
+                updateUI();
+            } catch(e) {}
+        }
+    }
+    
+    // Update UI with user data
+    function updateUI() {
+        document.getElementById('fullName').innerText = userData.fullName;
+        document.getElementById('email').innerText = userData.email;
+        document.getElementById('memberSince').innerText = userData.memberSince;
+        document.getElementById('balance').innerText = `$${userData.balance.toFixed(2)}`;
+        document.getElementById('kycStatus').innerText = userData.kycStatus;
+        document.getElementById('kycStatusBadge').innerText = userData.kycStatus.charAt(0).toUpperCase() + userData.kycStatus.slice(1);
+        document.getElementById('totalTrades').innerText = userData.totalTrades;
+        document.getElementById('winRate').innerText = userData.winRate + '%';
+        document.getElementById('totalVolume').innerText = `$${userData.totalVolume.toFixed(2)}`;
+        document.getElementById('displayUsername').innerText = userData.fullName.split(' ')[0];
+        
+        // Update form fields
+        document.getElementById('updateFullName').value = userData.fullName;
+        document.getElementById('phoneNumber').value = userData.phoneNumber || '';
+        document.getElementById('kycFullName').value = userData.fullName;
+    }
+    
+    // Sidebar navigation
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const page = item.getAttribute('data-page');
+            
+            // Update active state
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            
+            // Hide all pages
+            document.getElementById('profilePage').style.display = 'none';
+            document.getElementById('kycPage').style.display = 'none';
+            document.getElementById('updatePage').style.display = 'none';
+            document.getElementById('supportPage').style.display = 'none';
+            
+            // Show selected page
+            if (page === 'profile') document.getElementById('profilePage').style.display = 'block';
+            if (page === 'kyc') document.getElementById('kycPage').style.display = 'block';
+            if (page === 'update') document.getElementById('updatePage').style.display = 'block';
+            if (page === 'support') document.getElementById('supportPage').style.display = 'block';
+        });
+    });
+    
+    // KYC Submission
+    function submitKYC() {
+        const fullName = document.getElementById('kycFullName').value;
+        const idType = document.getElementById('idType').value;
+        const idNumber = document.getElementById('idNumber').value;
+        
+        if (!fullName || !idNumber) {
+            alert('Please fill in all fields');
+            return;
+        }
+        
+        alert(`KYC verification submitted!\n\nName: ${fullName}\nID Type: ${idType}\nID Number: ${idNumber}\n\nYour verification is being processed.`);
+        
+        userData.kycStatus = 'pending';
+        userData.fullName = fullName;
+        
+        // Save to localStorage
+        localStorage.setItem('lunoProfile', JSON.stringify({
+            phoneNumber: userData.phoneNumber,
+            kycStatus: userData.kycStatus
+        }));
+        
+        updateUI();
+        
+        // Switch back to profile page
+        document.querySelector('.sidebar-item[data-page="profile"]').click();
+    }
+    
+    // Update Profile
+    function updateProfile() {
+        const newName = document.getElementById('updateFullName').value;
+        const phone = document.getElementById('phoneNumber').value;
+        const currentPass = document.getElementById('currentPassword').value;
+        const newPass = document.getElementById('newPassword').value;
+        const confirmPass = document.getElementById('confirmPassword').value;
+        
+        if (newName) {
+            userData.fullName = newName;
+        }
+        
+        userData.phoneNumber = phone;
+        
+        if (newPass) {
+            if (newPass !== confirmPass) {
+                alert('New passwords do not match!');
+                return;
+            }
+            alert('Password changed successfully!');
+        }
+        
+        // Save to localStorage
+        localStorage.setItem('lunoProfile', JSON.stringify({
+            phoneNumber: userData.phoneNumber,
+            kycStatus: userData.kycStatus
+        }));
+        
+        // Update user in login storage
+        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+        if (savedUser) {
+            const user = JSON.parse(savedUser);
+            user.fullName = userData.fullName;
+            if (localStorage.getItem('lunoUser')) {
+                localStorage.setItem('lunoUser', JSON.stringify(user));
+            } else {
+                sessionStorage.setItem('lunoUser', JSON.stringify(user));
+            }
+        }
+        
+        updateUI();
+        alert('Profile updated successfully!');
+        
+        // Clear password fields
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+    }
+    
+    // Deposit/Withdraw Modals
+    function openDepositModal() {
+        currentTransactionType = 'deposit';
+        document.getElementById('modalTitle').innerText = 'Deposit Funds';
+        document.getElementById('transactionModal').style.display = 'flex';
+    }
+    
+    function openWithdrawModal() {
+        currentTransactionType = 'withdraw';
+        document.getElementById('modalTitle').innerText = 'Withdraw Funds';
+        document.getElementById('transactionModal').style.display = 'flex';
+    }
+    
+    function closeModal() {
+        document.getElementById('transactionModal').style.display = 'none';
+        document.getElementById('transactionAmount').value = '';
+    }
+    
+    function processTransaction() {
+        const amount = parseFloat(document.getElementById('transactionAmount').value);
+        
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+        
+        if (currentTransactionType === 'deposit') {
+            userData.balance += amount;
+            alert(`✅ Successfully deposited $${amount.toFixed(2)}!`);
+        } else if (currentTransactionType === 'withdraw') {
+            if (amount > userData.balance) {
+                alert(`Insufficient balance! You have $${userData.balance.toFixed(2)}`);
+                return;
+            }
+            userData.balance -= amount;
+            alert(`✅ Successfully withdrew $${amount.toFixed(2)}!`);
+        }
+        
+        updateUI();
+        closeModal();
+    }
+    
+    // Support functions
+    function startChat() {
+        alert('Live chat would open here. For demo, please email support@lunotrading.com');
+    }
+    
+    function viewFAQ() {
+        alert('FAQ page would open here. For demo, please visit our help center.');
+    }
+    
+    // Logout
+    function logout() {
+        localStorage.removeItem('lunoUser');
+        sessionStorage.removeItem('lunoUser');
+        window.location.href = 'index.html';
+    }
+    
+    // Check authentication
+    function checkAuth() {
+        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+        if (!savedUser) {
+            window.location.href = 'index.html';
+        }
+    }
+    
+    // Generate random daily P/L
+    function updateDailyPL() {
+        const pl = (Math.random() - 0.5) * 500;
+        const plElement = document.getElementById('dailyPL');
+        if (pl >= 0) {
+            plElement.innerHTML = `+${pl.toFixed(2)} USDT`;
+            plElement.className = 'profit-loss positive';
+        } else {
+            plElement.innerHTML = `${pl.toFixed(2)} USDT`;
+            plElement.className = 'profit-loss negative';
+        }
+    }
+    
+    // Initialize
+    checkAuth();
+    loadUserData();
+    updateDailyPL();
+    setInterval(updateDailyPL, 30000);
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('transactionModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+</script>
+
+</body>
+</html>
