@@ -18,7 +18,6 @@
             color: white;
         }
 
-        /* Navigation Bar */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -84,7 +83,6 @@
             background: rgba(255, 68, 68, 0.3);
         }
 
-        /* Main Content */
         .main-content {
             margin-top: 80px;
             padding: 30px 40px;
@@ -93,7 +91,6 @@
             margin-right: auto;
         }
 
-        /* Trade Card */
         .trade-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -113,12 +110,6 @@
             margin-bottom: 5px;
         }
 
-        .card-header p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
-        }
-
-        /* Buy/Sell Toggle */
         .trade-type {
             display: flex;
             margin: 20px 25px;
@@ -137,19 +128,10 @@
             transition: 0.3s;
         }
 
-        .trade-type-btn.buy {
-            color: #00ff88;
-        }
+        .trade-type-btn.buy { color: #00ff88; }
+        .trade-type-btn.sell { color: #ff4444; }
+        .trade-type-btn.active { background: rgba(0, 212, 255, 0.2); }
 
-        .trade-type-btn.sell {
-            color: #ff4444;
-        }
-
-        .trade-type-btn.active {
-            background: rgba(0, 212, 255, 0.2);
-        }
-
-        /* Crypto Selector */
         .crypto-selector {
             margin: 0 25px 20px 25px;
         }
@@ -165,21 +147,6 @@
             cursor: pointer;
         }
 
-        .crypto-selector select:focus {
-            outline: none;
-            border-color: #00d4ff;
-        }
-
-        .crypto-selector select option {
-            background: #1a1a3e;
-        }
-
-        .crypto-selector select optgroup {
-            background: #0f0c29;
-            color: #00d4ff;
-        }
-
-        /* Coin Info */
         .coin-info {
             background: rgba(0, 0, 0, 0.2);
             margin: 0 25px 20px 25px;
@@ -190,17 +157,9 @@
             align-items: center;
         }
 
-        .coin-name {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
+        .coin-name { font-size: 1.2rem; font-weight: bold; }
+        .coin-price { color: #00ff88; font-weight: bold; }
 
-        .coin-price {
-            color: #00ff88;
-            font-weight: bold;
-        }
-
-        /* Form Section */
         .form-section {
             padding: 0 25px 20px 25px;
         }
@@ -226,12 +185,6 @@
             font-size: 1rem;
         }
 
-        .form-group input:focus {
-            outline: none;
-            border-color: #00d4ff;
-        }
-
-        /* Return Rate Options */
         .return-options {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -249,33 +202,13 @@
             transition: 0.3s;
         }
 
-        .return-option:hover {
-            background: rgba(0, 212, 255, 0.2);
-        }
+        .return-option:hover { background: rgba(0, 212, 255, 0.2); }
+        .return-option.selected { background: linear-gradient(135deg, #00d4ff, #7c3aed); }
 
-        .return-option.selected {
-            background: linear-gradient(135deg, #00d4ff, #7c3aed);
-            border-color: transparent;
-        }
+        .return-time { font-size: 0.8rem; font-weight: bold; }
+        .return-rate { font-size: 0.7rem; color: #00ff88; margin-top: 4px; }
+        .return-min { font-size: 0.65rem; color: rgba(255, 255, 255, 0.5); margin-top: 4px; }
 
-        .return-time {
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .return-rate {
-            font-size: 0.7rem;
-            color: #00ff88;
-            margin-top: 4px;
-        }
-
-        .return-min {
-            font-size: 0.65rem;
-            color: rgba(255, 255, 255, 0.5);
-            margin-top: 4px;
-        }
-
-        /* Info Rows */
         .info-row {
             display: flex;
             justify-content: space-between;
@@ -283,20 +216,10 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .info-label {
-            color: rgba(255, 255, 255, 0.6);
-        }
+        .info-label { color: rgba(255, 255, 255, 0.6); }
+        .info-value { font-weight: 600; }
+        .info-value.highlight { color: #00ff88; font-size: 1.2rem; }
 
-        .info-value {
-            font-weight: 600;
-        }
-
-        .info-value.highlight {
-            color: #00ff88;
-            font-size: 1.2rem;
-        }
-
-        /* Warning Message */
         .warning-message {
             background: rgba(255, 68, 68, 0.2);
             border: 1px solid rgba(255, 68, 68, 0.3);
@@ -304,11 +227,9 @@
             padding: 12px;
             margin-bottom: 20px;
             color: #ff6666;
-            font-size: 0.85rem;
             display: none;
         }
 
-        /* Buttons */
         .action-buttons {
             display: flex;
             gap: 15px;
@@ -321,10 +242,8 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 14px;
             border-radius: 10px;
-            font-weight: bold;
             cursor: pointer;
             color: white;
-            transition: 0.3s;
         }
 
         .btn-confirm {
@@ -333,17 +252,10 @@
             border: none;
             padding: 14px;
             border-radius: 10px;
-            font-weight: bold;
             cursor: pointer;
             color: white;
-            transition: 0.3s;
         }
 
-        .btn-cancel:hover, .btn-confirm:hover {
-            transform: translateY(-2px);
-        }
-
-        /* Success Modal */
         .modal {
             display: none;
             position: fixed;
@@ -363,16 +275,6 @@
             border-radius: 20px;
             width: 350px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .modal-content h3 {
-            margin-bottom: 15px;
-            color: #00ff88;
-        }
-
-        .modal-content p {
-            margin-bottom: 10px;
         }
 
         .modal-btn {
@@ -386,18 +288,13 @@
         }
 
         @media (max-width: 550px) {
-            .return-options {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .main-content {
-                padding: 20px;
-            }
+            .return-options { grid-template-columns: repeat(2, 1fr); }
+            .main-content { padding: 20px; }
         }
     </style>
 </head>
 <body>
 
-<!-- Navigation -->
 <nav class="navbar">
     <div class="logo">📈 Luno Trading</div>
     <div class="nav-links">
@@ -412,7 +309,6 @@
     </div>
 </nav>
 
-<!-- Main Content -->
 <div class="main-content">
     <div class="trade-card">
         <div class="card-header">
@@ -420,13 +316,11 @@
             <p>Review your trade details before confirming</p>
         </div>
 
-        <!-- Buy/Sell Toggle -->
         <div class="trade-type">
             <div class="trade-type-btn buy active" onclick="setTradeType('buy')">BUY</div>
             <div class="trade-type-btn sell" onclick="setTradeType('sell')">SELL</div>
         </div>
 
-        <!-- Cryptocurrency Selector -->
         <div class="crypto-selector">
             <select id="cryptoSelect" onchange="changeCrypto()">
                 <optgroup label="💰 Large Cap">
@@ -464,56 +358,41 @@
             </select>
         </div>
 
-        <!-- Coin Info -->
         <div class="coin-info">
             <div>
                 <div class="coin-name" id="coinName">Bitcoin (BTC)</div>
-                <div class="coin-symbol" style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">Current Price</div>
+                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">Current Price</div>
             </div>
             <div class="coin-price" id="coinPrice">$75,875</div>
         </div>
 
         <div class="form-section">
-            <!-- Amount Input -->
             <div class="form-group">
                 <label>Amount (USDT)</label>
                 <input type="number" id="amount" placeholder="Enter amount to trade" oninput="calculateReturn()">
             </div>
 
-            <!-- Return Rate Options -->
-            <label style="display: block; margin-bottom: 10px; color: rgba(255,255,255,0.7); font-size: 0.85rem;">Select Duration</label>
+            <label style="display: block; margin-bottom: 10px; color: rgba(255,255,255,0.7);">Select Duration</label>
             <div class="return-options">
                 <div class="return-option" data-time="30" data-rate="12" data-min="100" onclick="selectDuration(this)">
-                    <div class="return-time">30s</div>
-                    <div class="return-rate">+12%</div>
-                    <div class="return-min">Min $100</div>
+                    <div class="return-time">30s</div><div class="return-rate">+12%</div><div class="return-min">Min $100</div>
                 </div>
                 <div class="return-option" data-time="60" data-rate="18" data-min="15000" onclick="selectDuration(this)">
-                    <div class="return-time">60s</div>
-                    <div class="return-rate">+18%</div>
-                    <div class="return-min">Min $15K</div>
+                    <div class="return-time">60s</div><div class="return-rate">+18%</div><div class="return-min">Min $15K</div>
                 </div>
                 <div class="return-option" data-time="90" data-rate="25" data-min="60000" onclick="selectDuration(this)">
-                    <div class="return-time">90s</div>
-                    <div class="return-rate">+25%</div>
-                    <div class="return-min">Min $60K</div>
+                    <div class="return-time">90s</div><div class="return-rate">+25%</div><div class="return-min">Min $60K</div>
                 </div>
                 <div class="return-option" data-time="180" data-rate="32" data-min="200000" onclick="selectDuration(this)">
-                    <div class="return-time">180s</div>
-                    <div class="return-rate">+32%</div>
-                    <div class="return-min">Min $200K</div>
+                    <div class="return-time">180s</div><div class="return-rate">+32%</div><div class="return-min">Min $200K</div>
                 </div>
                 <div class="return-option" data-time="300" data-rate="45" data-min="900000" onclick="selectDuration(this)">
-                    <div class="return-time">300s</div>
-                    <div class="return-rate">+45%</div>
-                    <div class="return-min">Min $900K</div>
+                    <div class="return-time">300s</div><div class="return-rate">+45%</div><div class="return-min">Min $900K</div>
                 </div>
             </div>
 
-            <!-- Warning Message -->
             <div id="warningMsg" class="warning-message"></div>
 
-            <!-- Info Rows -->
             <div class="info-row">
                 <span class="info-label">Available Amount:</span>
                 <span class="info-value" id="availableAmount">10,000 USDT</span>
@@ -532,7 +411,6 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
         <div class="action-buttons">
             <button class="btn-cancel" onclick="cancelTrade()">Cancel</button>
             <button class="btn-confirm" onclick="confirmTrade()">Confirm Trade</button>
@@ -540,11 +418,10 @@
     </div>
 </div>
 
-<!-- Success Modal -->
 <div id="successModal" class="modal">
     <div class="modal-content">
-        <h3>✅ Trade Confirmed!</h3>
-        <p id="modalMessage">Your trade has been executed successfully.</p>
+        <h3>✅ Trade Submitted!</h3>
+        <p id="modalMessage">Your trade has been submitted for processing.</p>
         <button class="modal-btn" onclick="closeModal()">OK</button>
     </div>
 </div>
@@ -552,6 +429,7 @@
 <script>
     // Trading data
     let userBalance = 10000;
+    let userEmail = '';
     let tradeType = 'buy';
     let selectedDuration = null;
     let selectedRate = 0;
@@ -559,40 +437,42 @@
     let currentCoin = 'BTC';
     let currentCoinPrice = 75875;
     
-    // All 24 Cryptocurrencies prices (matching dashboard)
     const coinPrices = {
-        BTC: 75875, ETH: 2363.69, USDT: 1.00, BNB: 580.50,
-        XRP: 1.43, SOL: 142.30, ADA: 0.348, AVAX: 28.45,
-        DOGE: 0.158, DOT: 6.85, LINK: 14.20, MATIC: 0.52,
-        ATOM: 8.15, FIL: 5.42, VET: 0.028, UNI: 7.85,
-        AAVE: 92.50, CRV: 0.42, MKR: 1150.00, COMP: 45.30,
-        SHIB: 0.000018, PEPE: 0.0000095, FLOKI: 0.000185, BONK: 0.000022
+        BTC: 75875, ETH: 2363.69, USDT: 1.00, BNB: 580.50, XRP: 1.43, SOL: 142.30,
+        ADA: 0.348, AVAX: 28.45, DOGE: 0.158, DOT: 6.85, LINK: 14.20, MATIC: 0.52,
+        ATOM: 8.15, FIL: 5.42, VET: 0.028, UNI: 7.85, AAVE: 92.50, CRV: 0.42,
+        MKR: 1150.00, COMP: 45.30, SHIB: 0.000018, PEPE: 0.0000095, FLOKI: 0.000185, BONK: 0.000022
     };
     
     const coinNames = {
-        BTC: 'Bitcoin', ETH: 'Ethereum', USDT: 'Tether', BNB: 'Binance Coin',
-        XRP: 'XRP', SOL: 'Solana', ADA: 'Cardano', AVAX: 'Avalanche',
-        DOGE: 'Dogecoin', DOT: 'Polkadot', LINK: 'Chainlink', MATIC: 'Polygon',
-        ATOM: 'Cosmos', FIL: 'Filecoin', VET: 'VeChain', UNI: 'Uniswap',
-        AAVE: 'Aave', CRV: 'Curve DAO', MKR: 'Maker', COMP: 'Compound',
+        BTC: 'Bitcoin', ETH: 'Ethereum', USDT: 'Tether', BNB: 'Binance Coin', XRP: 'XRP',
+        SOL: 'Solana', ADA: 'Cardano', AVAX: 'Avalanche', DOGE: 'Dogecoin', DOT: 'Polkadot',
+        LINK: 'Chainlink', MATIC: 'Polygon', ATOM: 'Cosmos', FIL: 'Filecoin', VET: 'VeChain',
+        UNI: 'Uniswap', AAVE: 'Aave', CRV: 'Curve DAO', MKR: 'Maker', COMP: 'Compound',
         SHIB: 'Shiba Inu', PEPE: 'Pepe', FLOKI: 'Floki', BONK: 'Bonk'
     };
     
-    // Load user balance from localStorage
     function loadUserBalance() {
         const savedProfile = localStorage.getItem('lunoProfile');
         if (savedProfile) {
             try {
                 const profile = JSON.parse(savedProfile);
-                if (profile.balance) {
-                    userBalance = profile.balance;
-                }
+                userBalance = profile.balance || 10000;
             } catch(e) {}
         }
         document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
     }
     
-    // Save user balance
+    function getUserEmail() {
+        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+        if (savedUser) {
+            try {
+                const user = JSON.parse(savedUser);
+                userEmail = user.email || 'user@luno.com';
+            } catch(e) {}
+        }
+    }
+    
     function saveUserBalance() {
         const savedProfile = localStorage.getItem('lunoProfile');
         if (savedProfile) {
@@ -602,66 +482,16 @@
                 localStorage.setItem('lunoProfile', JSON.stringify(profile));
             } catch(e) {}
         }
-        // Also update the global function if available
-        if (window.updateUserBalance) {
-            window.updateUserBalance(userBalance);
-        }
+        if (window.updateUserBalance) window.updateUserBalance(userBalance);
     }
     
-    // Save trade to history
-    function saveTradeToHistory(tradeRecord) {
-        // Get existing history
-        let history = [];
-        const savedHistory = localStorage.getItem('lunoTradeHistory');
-        if (savedHistory) {
-            try {
-                history = JSON.parse(savedHistory);
-            } catch(e) {}
-        }
-        
-        // Add new trade to beginning
-        history.unshift(tradeRecord);
-        
-        // Save back to localStorage
-        localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
-        
-        // Also call the global function if available
-        if (window.addTradeToHistory) {
-            window.addTradeToHistory(tradeRecord);
-        }
-    }
-    
-    // Change cryptocurrency
     function changeCrypto() {
         const select = document.getElementById('cryptoSelect');
         currentCoin = select.value;
         currentCoinPrice = coinPrices[currentCoin];
-        
         document.getElementById('coinName').innerHTML = `${coinNames[currentCoin]} (${currentCoin})`;
         document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
-        
         calculateReturn();
-    }
-    
-    // Get selected coin from URL or localStorage
-    function getSelectedCoin() {
-        const selected = localStorage.getItem('selectedCrypto');
-        if (selected) {
-            try {
-                const crypto = JSON.parse(selected);
-                currentCoin = crypto.symbol;
-                currentCoinPrice = crypto.price;
-                localStorage.removeItem('selectedCrypto');
-                
-                const select = document.getElementById('cryptoSelect');
-                if (select) {
-                    select.value = currentCoin;
-                }
-            } catch(e) {}
-        }
-        
-        document.getElementById('coinName').innerHTML = `${coinNames[currentCoin]} (${currentCoin})`;
-        document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
     }
     
     function formatPrice(price) {
@@ -675,31 +505,24 @@
         tradeType = type;
         const buyBtn = document.querySelector('.trade-type-btn.buy');
         const sellBtn = document.querySelector('.trade-type-btn.sell');
-        
         if (type === 'buy') {
             buyBtn.classList.add('active');
             sellBtn.classList.remove('active');
             document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
-            document.getElementById('availableAmount').style.color = 'white';
         } else {
             sellBtn.classList.add('active');
             buyBtn.classList.remove('active');
             document.getElementById('availableAmount').innerHTML = '0 USDT (Coming Soon)';
-            document.getElementById('availableAmount').style.color = '#ff6666';
         }
         calculateReturn();
     }
     
     function selectDuration(element) {
-        document.querySelectorAll('.return-option').forEach(opt => {
-            opt.classList.remove('selected');
-        });
-        
+        document.querySelectorAll('.return-option').forEach(opt => opt.classList.remove('selected'));
         element.classList.add('selected');
         selectedDuration = parseInt(element.getAttribute('data-time'));
         selectedRate = parseInt(element.getAttribute('data-rate'));
         selectedMinAmount = parseInt(element.getAttribute('data-min'));
-        
         calculateReturn();
     }
     
@@ -731,7 +554,6 @@
         }
         
         warningMsg.style.display = 'none';
-        
         const expectedReturnAmount = amount * (selectedRate / 100);
         const transactionFee = amount * 0.02;
         const totalPayAmount = amount + transactionFee;
@@ -743,9 +565,7 @@
     
     function cancelTrade() {
         document.getElementById('amount').value = '';
-        document.querySelectorAll('.return-option').forEach(opt => {
-            opt.classList.remove('selected');
-        });
+        document.querySelectorAll('.return-option').forEach(opt => opt.classList.remove('selected'));
         selectedDuration = null;
         selectedRate = 0;
         selectedMinAmount = 0;
@@ -786,24 +606,45 @@
             saveUserBalance();
             
             // Create trade record for history
+            const tradeId = Date.now();
             const tradeRecord = {
-                id: Date.now(),
+                id: tradeId,
                 date: new Date().toLocaleString(),
                 coin: currentCoin,
                 tradeType: tradeType,
                 amount: amount,
                 duration: selectedDuration,
                 rate: selectedRate,
-                profit: expectedReturnAmount,
-                status: 'completed',
-                fee: transactionFee
+                expectedProfit: expectedReturnAmount,
+                profit: 0,
+                status: 'pending',
+                fee: transactionFee,
+                userEmail: userEmail
             };
             
             // Save to trade history
-            saveTradeToHistory(tradeRecord);
+            const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
+            history.unshift(tradeRecord);
+            localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
+            
+            // Save to pending trades for admin control
+            const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
+            pendingTrades.push({
+                id: tradeId,
+                userEmail: userEmail,
+                coin: currentCoin,
+                coinName: coinNames[currentCoin],
+                amount: amount,
+                duration: selectedDuration,
+                rate: selectedRate,
+                expectedProfit: expectedReturnAmount,
+                status: 'pending',
+                date: new Date().toLocaleString()
+            });
+            localStorage.setItem('pendingTrades', JSON.stringify(pendingTrades));
             
             // Show success modal
-            const modalMessage = `You successfully ${tradeType.toUpperCase()} ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration!\n\nAmount: $${amount.toFixed(2)} USDT\nReturn: +${selectedRate}% ($${expectedReturnAmount.toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT\n\nYour trade will complete in ${selectedDuration} seconds.`;
+            const modalMessage = `Your ${tradeType.toUpperCase()} trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration has been submitted!\n\nAmount: $${amount.toFixed(2)} USDT\nExpected Return: +${selectedRate}% ($${expectedReturnAmount.toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT\n\nWaiting for admin approval.`;
             document.getElementById('modalMessage').innerHTML = modalMessage.replace(/\n/g, '<br>');
             document.getElementById('successModal').style.display = 'flex';
             
@@ -811,24 +652,8 @@
             cancelTrade();
             document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
             
-            // Simulate trade completion after duration
-            setTimeout(() => {
-                const profit = amount * (selectedRate / 100);
-                userBalance += amount + profit;
-                saveUserBalance();
-                document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
-                
-                // Update trade status to completed with actual profit
-                const updatedHistory = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
-                const tradeIndex = updatedHistory.findIndex(t => t.id === tradeRecord.id);
-                if (tradeIndex !== -1) {
-                    updatedHistory[tradeIndex].profit = profit;
-                    updatedHistory[tradeIndex].status = 'completed';
-                    localStorage.setItem('lunoTradeHistory', JSON.stringify(updatedHistory));
-                }
-                
-                alert(`✅ Trade completed!\n\nYour ${selectedDuration}s trade on ${coinNames[currentCoin]} (${currentCoin}) has finished.\nYou invested: $${amount.toFixed(2)} USDT\nYou earned: $${profit.toFixed(2)} USDT\nTotal returned: $${(amount + profit).toFixed(2)} USDT`);
-            }, selectedDuration * 1000);
+            // Notify admin via localStorage event
+            localStorage.setItem('newTradeAlert', Date.now().toString());
         } else {
             alert('Sell feature coming soon!');
         }
@@ -836,6 +661,7 @@
     
     function closeModal() {
         document.getElementById('successModal').style.display = 'none';
+        window.location.href = 'profile.html';
     }
     
     function getUserName() {
@@ -856,16 +682,15 @@
     
     function checkAuth() {
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-        if (!savedUser) {
-            window.location.href = 'index.html';
-        }
+        if (!savedUser) window.location.href = 'index.html';
     }
     
     // Initialize
     checkAuth();
     getUserName();
+    getUserEmail();
     loadUserBalance();
-    getSelectedCoin();
+    changeCrypto();
 </script>
 
 </body>
