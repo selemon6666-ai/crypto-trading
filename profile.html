@@ -314,6 +314,12 @@
             border: 1px solid rgba(255, 170, 0, 0.3);
         }
 
+        .kyc-badge.verified {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
         .btn-verify {
             background: rgba(0, 212, 255, 0.2);
             border: 1px solid rgba(0, 212, 255, 0.3);
@@ -393,10 +399,6 @@
             color: #ff6666;
             font-size: 0.8rem;
             margin-top: 15px;
-        }
-
-        .clear-history-btn:hover {
-            background: rgba(255, 68, 68, 0.3);
         }
 
         .no-history {
@@ -797,19 +799,13 @@
                 updateTradeStats();
             } catch(e) {}
         }
+        renderTradeHistory();
     }
     
     // Save trade history to localStorage
     function saveTradeHistory() {
         localStorage.setItem('lunoTradeHistory', JSON.stringify(userData.tradeHistory));
         updateTradeStats();
-    }
-    
-    // Add a new trade to history
-    function addTradeToHistory(trade) {
-        userData.tradeHistory.unshift(trade); // Add to beginning (newest first)
-        saveTradeHistory();
-        renderTradeHistory();
     }
     
     // Update trade statistics
@@ -829,7 +825,6 @@
         userData.winRate = userData.totalTrades > 0 ? (winningTrades / userData.totalTrades * 100).toFixed(1) : 0;
         userData.totalVolume = userData.tradeHistory.reduce((sum, t) => sum + t.amount, 0);
         
-        // Update UI if profile page is visible
         const totalTradesElem = document.getElementById('totalTrades');
         const winRateElem = document.getElementById('winRate');
         const totalVolumeElem = document.getElementById('totalVolume');
@@ -904,7 +899,6 @@
                 userData.fullName = user.fullName || 'Trader';
                 userData.email = user.email || 'user@luno.com';
                 
-                // Load saved profile data
                 const savedProfile = localStorage.getItem('lunoProfile');
                 if (savedProfile) {
                     const profile = JSON.parse(savedProfile);
@@ -928,10 +922,17 @@
         document.getElementById('kycStatusBadge').innerText = userData.kycStatus.charAt(0).toUpperCase() + userData.kycStatus.slice(1);
         document.getElementById('displayUsername').innerText = userData.fullName.split(' ')[0];
         
-        // Update form fields
         document.getElementById('updateFullName').value = userData.fullName;
         document.getElementById('phoneNumber').value = userData.phoneNumber || '';
         document.getElementById('kycFullName').value = userData.fullName;
+        
+        // Update badge class
+        const badge = document.getElementById('kycStatusBadge');
+        if (userData.kycStatus === 'verified') {
+            badge.className = 'kyc-badge verified';
+        } else {
+            badge.className = 'kyc-badge pending';
+        }
     }
     
     // Save user data
@@ -955,23 +956,50 @@
         }
     }
     
+    // Submit KYC request to admin
+    function submitKYC() {
+        const fullName = document.getElementById('kycFullName').value;
+        const idType = document.getElementById('idType').value;
+        const idNumber = document.getElementById('idNumber').value;
+        const email = userData.email;
+        
+        if (!fullName || !idNumber) {
+            alert('Please fill in all fields');
+            return;
+        }
+        
+        // Save KYC request to admin
+        const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
+        kycRequests.push({
+            email: email,
+            fullName: fullName,
+            idType: idType,
+            idNumber: idNumber,
+            date: new Date().toLocaleString()
+        });
+        localStorage.setItem('kycRequests', JSON.stringify(kycRequests));
+        
+        alert('✅ KYC verification submitted! Admin will review your request.');
+        
+        // Clear form
+        document.getElementById('kycFullName').value = '';
+        document.getElementById('idNumber').value = '';
+    }
+    
     // Sidebar navigation
     document.querySelectorAll('.sidebar-item').forEach(item => {
         item.addEventListener('click', () => {
             const page = item.getAttribute('data-page');
             
-            // Update active state
             document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
             
-            // Hide all pages
             document.getElementById('profilePage').style.display = 'none';
             document.getElementById('historyPage').style.display = 'none';
             document.getElementById('kycPage').style.display = 'none';
             document.getElementById('updatePage').style.display = 'none';
             document.getElementById('supportPage').style.display = 'none';
             
-            // Show selected page
             if (page === 'profile') document.getElementById('profilePage').style.display = 'block';
             if (page === 'history') {
                 document.getElementById('historyPage').style.display = 'block';
@@ -983,34 +1011,10 @@
         });
     });
     
-    // KYC Submission
-    function submitKYC() {
-        const fullName = document.getElementById('kycFullName').value;
-        const idType = document.getElementById('idType').value;
-        const idNumber = document.getElementById('idNumber').value;
-        
-        if (!fullName || !idNumber) {
-            alert('Please fill in all fields');
-            return;
-        }
-        
-        alert(`KYC verification submitted!\n\nName: ${fullName}\nID Type: ${idType}\nID Number: ${idNumber}\n\nYour verification is being processed.`);
-        
-        userData.kycStatus = 'pending';
-        userData.fullName = fullName;
-        
-        saveUserData();
-        updateUI();
-        
-        // Switch back to profile page
-        document.querySelector('.sidebar-item[data-page="profile"]').click();
-    }
-    
     // Update Profile
     function updateProfile() {
         const newName = document.getElementById('updateFullName').value;
         const phone = document.getElementById('phoneNumber').value;
-        const currentPass = document.getElementById('currentPassword').value;
         const newPass = document.getElementById('newPassword').value;
         const confirmPass = document.getElementById('confirmPassword').value;
         
@@ -1032,13 +1036,12 @@
         updateUI();
         alert('Profile updated successfully!');
         
-        // Clear password fields
         document.getElementById('currentPassword').value = '';
         document.getElementById('newPassword').value = '';
         document.getElementById('confirmPassword').value = '';
     }
     
-    // Deposit/Withdraw Modals
+    // Deposit/Withdraw Modals - Send requests to admin
     function openDepositModal() {
         currentTransactionType = 'deposit';
         document.getElementById('modalTitle').innerText = 'Deposit Funds';
@@ -1065,25 +1068,35 @@
         }
         
         if (currentTransactionType === 'deposit') {
-            userData.balance += amount;
-            alert(`✅ Successfully deposited $${amount.toFixed(2)}!`);
+            // Send deposit request to admin
+            const depositRequests = JSON.parse(localStorage.getItem('depositRequests') || '[]');
+            depositRequests.push({
+                email: userData.email,
+                amount: amount,
+                date: new Date().toLocaleString()
+            });
+            localStorage.setItem('depositRequests', JSON.stringify(depositRequests));
+            alert(`✅ Deposit request of $${amount.toFixed(2)} submitted! Admin will approve it.`);
         } else if (currentTransactionType === 'withdraw') {
-            if (amount > userData.balance) {
-                alert(`Insufficient balance! You have $${userData.balance.toFixed(2)}`);
-                return;
-            }
-            userData.balance -= amount;
-            alert(`✅ Successfully withdrew $${amount.toFixed(2)}!`);
+            // Send withdrawal request to admin
+            const withdrawalRequests = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+            withdrawalRequests.push({
+                email: userData.email,
+                amount: amount,
+                address: 'User Wallet Address',
+                date: new Date().toLocaleString()
+            });
+            localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawalRequests));
+            alert(`✅ Withdrawal request of $${amount.toFixed(2)} submitted! Admin will approve it.`);
         }
         
-        saveUserData();
-        updateUI();
         closeModal();
     }
     
     // Support functions
     function startChat() {
-        alert('Live chat would open here. For demo, please email support@lunotrading.com');
+        window.open('admin.html', '_blank');
+        alert('Live chat will open in admin panel. Please wait for admin response.');
     }
     
     function viewFAQ() {
@@ -1120,15 +1133,6 @@
         }
     }
     
-    // Expose addTradeToHistory to global for trade.html to use
-    window.addTradeToHistory = addTradeToHistory;
-    window.getUserBalance = () => userData.balance;
-    window.updateUserBalance = (newBalance) => {
-        userData.balance = newBalance;
-        saveUserData();
-        updateUI();
-    };
-    
     // Initialize
     checkAuth();
     loadUserData();
@@ -1136,7 +1140,6 @@
     updateDailyPL();
     setInterval(updateDailyPL, 30000);
     
-    // Close modal when clicking outside
     window.onclick = function(event) {
         const modal = document.getElementById('transactionModal');
         if (event.target === modal) {
