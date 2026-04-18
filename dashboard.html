@@ -424,7 +424,7 @@
     <div class="nav-links">
         <a href="dashboard.html">Home</a>
         <a href="markets.html">Markets</a>
-        <a href="#">Trades</a>
+        <a href="trade.html">Trades</a>
         <a href="profile.html">My Profile</a>
     </div>
     <div class="user-info">
@@ -509,8 +509,8 @@
                     <input type="number" id="tradeAmount" placeholder="Amount to trade">
                 </div>
                 <div class="trade-buttons">
-                    <button class="btn-buy" onclick="buy()">BUY</button>
-                    <button class="btn-sell" onclick="sell()">SELL</button>
+                    <button class="btn-buy" onclick="redirectToTrade('buy')">BUY</button>
+                    <button class="btn-sell" onclick="redirectToTrade('sell')">SELL</button>
                 </div>
                 <div class="current-price">
                     Current Price: $<span id="currentPrice">0</span>
@@ -678,7 +678,7 @@
     let tradingActive = false;
     let priceInterval;
     
-    // 20+ Cryptocurrencies prices
+    // 24 Cryptocurrencies prices
     let marketPrices = {
         // Large Cap
         BTC: 75875,
@@ -730,20 +730,22 @@
         return price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
     
-    // Check for selected crypto from markets page
-    function checkSelectedCrypto() {
-        const selected = localStorage.getItem('selectedCrypto');
-        if (selected) {
-            try {
-                const crypto = JSON.parse(selected);
-                const selectElement = document.getElementById('cryptoSelect');
-                if (selectElement && crypto.symbol) {
-                    selectElement.value = crypto.symbol;
-                    updatePriceDisplay();
-                }
-                localStorage.removeItem('selectedCrypto');
-            } catch(e) {}
-        }
+    // Redirect to Trade page with selected crypto
+    function redirectToTrade(action) {
+        const selectedSymbol = document.getElementById('cryptoSelect').value;
+        const selectedPrice = marketPrices[selectedSymbol];
+        const selectedName = cryptoNames[selectedSymbol];
+        
+        // Save selected crypto to localStorage
+        localStorage.setItem('selectedCrypto', JSON.stringify({
+            symbol: selectedSymbol,
+            name: selectedName,
+            price: selectedPrice,
+            action: action
+        }));
+        
+        // Redirect to trade page
+        window.location.href = 'trade.html';
     }
     
     function getUserName() {
@@ -820,63 +822,6 @@
         }
     }
     
-    function buy() {
-        const symbol = document.getElementById('cryptoSelect').value;
-        const price = marketPrices[symbol];
-        const amount = parseFloat(document.getElementById('tradeAmount').value);
-        
-        if (isNaN(amount) || amount <= 0) {
-            alert('Please enter a valid amount');
-            return;
-        }
-        
-        const cost = price * amount;
-        
-        if (cost > balance) {
-            alert(`Insufficient balance! Need $${cost.toFixed(2)}`);
-            return;
-        }
-        
-        balance -= cost;
-        
-        if (!portfolio[symbol]) {
-            portfolio[symbol] = 0;
-        }
-        portfolio[symbol] += amount;
-        
-        updateUI();
-        alert(`✅ Bought ${amount} ${cryptoNames[symbol]} (${symbol}) for $${cost.toFixed(2)}`);
-        document.getElementById('tradeAmount').value = '';
-    }
-    
-    function sell() {
-        const symbol = document.getElementById('cryptoSelect').value;
-        const price = marketPrices[symbol];
-        const amount = parseFloat(document.getElementById('tradeAmount').value);
-        
-        if (isNaN(amount) || amount <= 0) {
-            alert('Please enter a valid amount');
-            return;
-        }
-        
-        if (!portfolio[symbol] || portfolio[symbol] < amount) {
-            alert(`You don't have enough ${cryptoNames[symbol]}!`);
-            return;
-        }
-        
-        const revenue = price * amount;
-        balance += revenue;
-        
-        portfolio[symbol] -= amount;
-        if (portfolio[symbol] === 0) {
-            delete portfolio[symbol];
-        }
-        
-        updateUI();
-        alert(`✅ Sold ${amount} ${cryptoNames[symbol]} (${symbol}) for $${revenue.toFixed(2)}`);
-        document.getElementById('tradeAmount').value = '';
-    }
-    
     function simulatePriceChanges() {
         priceInterval = setInterval(() => {
             for (let crypto in marketPrices) {
@@ -927,7 +872,6 @@
     
     checkAuth();
     getUserName();
-    checkSelectedCrypto();
 </script>
 
 </body>
