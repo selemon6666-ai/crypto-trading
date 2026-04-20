@@ -78,19 +78,7 @@
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
-            
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            const userData = userDoc.data();
-            
-            sessionStorage.setItem('userId', user.uid);
-            sessionStorage.setItem('userEmail', user.email);
-            sessionStorage.setItem('userName', userData.fullName);
-            
-            if (email === 'admin@luno.com') {
-                window.location.href = 'admin.html';
-            } else {
-                window.location.href = 'dashboard.html';
-            }
+            window.location.href = 'dashboard.html';
         } catch (error) {
             errorMsg.style.display = 'block';
             errorMsg.innerText = '❌ Invalid email or password';
