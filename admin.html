@@ -340,14 +340,72 @@
             font-weight: bold;
         }
 
-        .doc-link {
-            color: #00d4ff;
-            text-decoration: none;
-            cursor: pointer;
+        /* Modal for viewing documents */
+        .doc-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
         }
 
-        .doc-link:hover {
-            text-decoration: underline;
+        .doc-modal-content {
+            background: linear-gradient(135deg, #1a1a3e, #0a0e27);
+            padding: 30px;
+            border-radius: 20px;
+            width: 500px;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .doc-modal-content h3 {
+            margin-bottom: 20px;
+            color: #00d4ff;
+        }
+
+        .doc-list {
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .doc-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .doc-item span {
+            word-break: break-all;
+            font-size: 0.85rem;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border: none;
+            padding: 6px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .close-modal-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            margin-top: 15px;
         }
 
         @media (max-width: 768px) {
@@ -429,11 +487,11 @@
                 <div class="page-header"><h1>💰 Trade Control</h1><p>Global ON/OFF switch controls all trades</p></div>
             </div>
 
-            <!-- KYC Requests Page with File View -->
+            <!-- KYC Requests Page with View/Download -->
             <div id="kycPage" class="page-content" style="display: none;">
                 <div class="page-header">
                     <h1>✅ KYC Verification Requests</h1>
-                    <p>Approve or reject user identity verification</p>
+                    <p>View, download, approve or reject user identity verification</p>
                 </div>
                 <div class="table-container">
                     <table>
@@ -518,6 +576,15 @@
     </div>
 </div>
 
+<!-- Document View Modal -->
+<div id="docModal" class="doc-modal">
+    <div class="doc-modal-content">
+        <h3>📎 KYC Documents</h3>
+        <div id="docList" class="doc-list"></div>
+        <button class="close-modal-btn" onclick="closeDocModal()">Close</button>
+    </div>
+</div>
+
 <script>
     const ADMIN_PASSWORD = "admin123";
 
@@ -559,7 +626,7 @@
         loadDepositAddressesForAdmin();
     }
 
-    // KYC Requests with File Display
+    // KYC Requests with View/Download
     function loadKYCRequests() {
         const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
         const kycList = document.getElementById('kycList');
@@ -582,7 +649,7 @@
                     <td>${req.fullName}</td>
                     <td>${req.idType}</td>
                     <td>${req.idNumber}</td>
-                    <td style="font-size: 0.75rem;">${docsHtml}</td>
+                    <td style="font-size: 0.75rem;">${docsHtml}<br><button class="btn-view" onclick="viewDocuments(${index})">👁️ View & Download</button></td>
                     <td>${req.date}</td>
                     <td class="status-pending">Pending</td>
                     <td>
@@ -592,6 +659,87 @@
                 </tr>
             `;
         }).join('');
+    }
+
+    // View and Download Documents
+    function viewDocuments(index) {
+        const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
+        const req = kycRequests[index];
+        
+        const docListDiv = document.getElementById('docList');
+        let docsHtml = '';
+        
+        if (req.frontFile) {
+            docsHtml += `
+                <div class="doc-item">
+                    <span>📄 Front ID: ${req.frontFile}</span>
+                    <button class="btn-download" onclick="downloadFile('${req.frontFile}', 'front_id')">Download</button>
+                </div>
+            `;
+        }
+        if (req.backFile) {
+            docsHtml += `
+                <div class="doc-item">
+                    <span>📄 Back ID: ${req.backFile}</span>
+                    <button class="btn-download" onclick="downloadFile('${req.backFile}', 'back_id')">Download</button>
+                </div>
+            `;
+        }
+        if (req.selfieFile) {
+            docsHtml += `
+                <div class="doc-item">
+                    <span>📸 Selfie with ID: ${req.selfieFile}</span>
+                    <button class="btn-download" onclick="downloadFile('${req.selfieFile}', 'selfie')">Download</button>
+                </div>
+            `;
+        }
+        if (!docsHtml) {
+            docsHtml = '<p>No documents uploaded</p>';
+        }
+        
+        docListDiv.innerHTML = docsHtml;
+        document.getElementById('docModal').style.display = 'flex';
+    }
+    
+    function downloadFile(fileName, type) {
+        // Since we can't store actual files in localStorage, we create a text file with info
+        const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
+        const currentRequest = kycRequests.find(req => 
+            req.frontFile === fileName || req.backFile === fileName || req.selfieFile === fileName
+        );
+        
+        if (currentRequest) {
+            const content = `KYC Document Information
+========================
+User: ${currentRequest.email}
+Full Name: ${currentRequest.fullName}
+Document Type: ${type}
+File Name: ${fileName}
+Submission Date: ${currentRequest.date}
+ID Type: ${currentRequest.idType}
+ID Number: ${currentRequest.idNumber}
+
+Note: The actual image file was not stored. This is a placeholder.
+In a production environment, you would upload and store actual images.`;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentRequest.email}_${type}_${fileName}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`📄 Document info downloaded as: ${currentRequest.email}_${type}_${fileName}.txt\n\nNote: In production, actual image files would be stored and downloaded.`);
+        } else {
+            alert('Document not found');
+        }
+    }
+    
+    function closeDocModal() {
+        document.getElementById('docModal').style.display = 'none';
     }
 
     function approveKYC(index) {
