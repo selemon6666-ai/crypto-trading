@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - My Profile</title>
-    <script src="auth.js"></script>
     <style>
         * {
             margin: 0;
@@ -521,14 +520,23 @@
 </div>
 
 <script>
-    const coinNames = {
-        BTC: 'Bitcoin', ETH: 'Ethereum', USDT: 'Tether', BNB: 'Binance Coin',
-        XRP: 'XRP', SOL: 'Solana', ADA: 'Cardano', AVAX: 'Avalanche',
-        DOGE: 'Dogecoin', DOT: 'Polkadot', LINK: 'Chainlink', MATIC: 'Polygon',
-        ATOM: 'Cosmos', FIL: 'Filecoin', VET: 'VeChain', UNI: 'Uniswap',
-        AAVE: 'Aave', CRV: 'Curve DAO', MKR: 'Maker', COMP: 'Compound',
-        SHIB: 'Shiba Inu', PEPE: 'Pepe', FLOKI: 'Floki', BONK: 'Bonk'
-    };
+    // Check authentication
+    function checkAuth() {
+        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+        if (!savedUser) {
+            window.location.href = 'index.html';
+        }
+        return savedUser ? JSON.parse(savedUser) : null;
+    }
+
+    function displayUsername() {
+        const user = checkAuth();
+        if (user && user.fullName) {
+            document.getElementById('displayUsername').innerText = user.fullName.split(' ')[0];
+        } else if (user && user.email) {
+            document.getElementById('displayUsername').innerText = user.email.split('@')[0];
+        }
+    }
 
     let userData = {
         fullName: '', email: '', memberSince: new Date().toLocaleDateString(),
@@ -539,7 +547,7 @@
     let currentTransactionType = '';
 
     function loadUserData() {
-        const user = getCurrentUser();
+        const user = checkAuth();
         if (user) {
             userData.email = user.email;
             userData.fullName = user.fullName || user.email.split('@')[0];
@@ -589,7 +597,7 @@
             const profitClass = trade.profit >= 0 ? 'history-profit' : 'history-loss';
             const statusClass = trade.status === 'completed' || trade.status === 'won' ? 'history-status-completed' : 'history-status-pending';
             const typeClass = trade.tradeType === 'buy' ? '💰 BUY' : '💸 SELL';
-            html += `<tr><td>${trade.date}</td><td>${coinNames[trade.coin]} (${trade.coin})</td><td>${typeClass}</td><td>$${trade.amount.toFixed(2)}</td><td>${trade.duration}s</td><td>+${trade.rate}%</td><td class="${profitClass}">${trade.profit >= 0 ? '+' : ''}$${trade.profit.toFixed(2)}</td><td class="${statusClass}">${trade.status}</td></tr>`;
+            html += `<tr><td>${trade.date}</td><td>${trade.coinName} (${trade.coin})</td><td>${typeClass}</td><td>$${trade.amount.toFixed(2)}</td><td>${trade.duration}s</td><td>+${trade.rate}%</td><td class="${profitClass}">${trade.profit >= 0 ? '+' : ''}$${trade.profit.toFixed(2)}</td><td class="${statusClass}">${trade.status}</td></tr>`;
         });
         html += '</tbody></table>';
         container.innerHTML = html;
@@ -631,10 +639,7 @@
         const idType = document.getElementById('idType').value;
         const idNumber = document.getElementById('idNumber').value;
         if (!fullName || !idNumber) { alert('Please fill in all fields'); return; }
-        const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
-        kycRequests.push({ email: userData.email, fullName, idType, idNumber, date: new Date().toLocaleString() });
-        localStorage.setItem('kycRequests', JSON.stringify(kycRequests));
-        alert('✅ KYC verification submitted! Admin will review your request.');
+        alert(`KYC verification submitted!\n\nName: ${fullName}\nID Type: ${idType}\nID Number: ${idNumber}\n\nAdmin will review your request.`);
     }
 
     function updateProfile() {
@@ -661,16 +666,18 @@
         const amount = parseFloat(document.getElementById('transactionAmount').value);
         if (isNaN(amount) || amount <= 0) { alert('Please enter a valid amount'); return; }
         if (currentTransactionType === 'deposit') {
-            const depositRequests = JSON.parse(localStorage.getItem('depositRequests') || '[]');
-            depositRequests.push({ email: userData.email, amount, date: new Date().toLocaleString() });
-            localStorage.setItem('depositRequests', JSON.stringify(depositRequests));
-            alert(`✅ Deposit request of $${amount.toFixed(2)} submitted! Admin will approve it.`);
+            userData.balance += amount;
+            alert(`✅ Successfully deposited $${amount.toFixed(2)}!`);
         } else if (currentTransactionType === 'withdraw') {
-            const withdrawalRequests = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
-            withdrawalRequests.push({ email: userData.email, amount, address: 'User Wallet Address', date: new Date().toLocaleString() });
-            localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawalRequests));
-            alert(`✅ Withdrawal request of $${amount.toFixed(2)} submitted! Admin will approve it.`);
+            if (amount > userData.balance) {
+                alert(`Insufficient balance! You have $${userData.balance.toFixed(2)}`);
+                return;
+            }
+            userData.balance -= amount;
+            alert(`✅ Successfully withdrew $${amount.toFixed(2)}!`);
         }
+        saveUserData();
+        updateUI();
         closeModal();
     }
 
@@ -683,7 +690,11 @@
         else { plElem.innerHTML = `${pl.toFixed(2)} USDT`; plElem.className = 'profit-loss negative'; }
     }
 
-    function logout() { logoutUser(); }
+    function logout() {
+        localStorage.removeItem('lunoUser');
+        sessionStorage.removeItem('lunoUser');
+        window.location.href = 'index.html';
+    }
 
     document.querySelectorAll('.sidebar-item').forEach(item => {
         item.addEventListener('click', () => {
@@ -705,6 +716,7 @@
 
     window.onclick = function(event) { const modal = document.getElementById('transactionModal'); if (event.target === modal) closeModal(); };
 
+    displayUsername();
     loadUserData();
     updateDailyPL();
     setInterval(updateDailyPL, 30000);
