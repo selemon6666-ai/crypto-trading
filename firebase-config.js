@@ -1,12 +1,12 @@
 // firebase-config.js
 const firebaseConfig = {
-    apiKey: "AIzaSyB7LAc7M-K7YBqVvjd8-Jx6Q_ddJE1dfC8",
-    authDomain: "luno-trading.firebaseapp.com",
-    projectId: "luno-trading",
-    storageBucket: "luno-trading.firebasestorage.app",
-    messagingSenderId: "124120101873",
-    appId: "1:124120101873:web:4f9e47a6a198f13683ca50",
-    measurementId: "G-B3H52HPSSG"
+    apiKey: "AIzaSyBzv4J3mPaaMTCeFyGy6ZWUGuRjFwAfCRY",
+    authDomain: "luno-trading2.firebaseapp.com",
+    projectId: "luno-trading2",
+    storageBucket: "luno-trading2.firebasestorage.app",
+    messagingSenderId: "1043110713188",
+    appId: "1:1043110713188:web:80f5d6f08633f96928cc71",
+    measurementId: "G-XLTYY59YMX"
 };
 
 firebase.initializeApp(firebaseConfig);
