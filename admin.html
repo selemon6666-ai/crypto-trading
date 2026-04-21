@@ -165,37 +165,67 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
-        .btn-win {
-            background: rgba(0, 255, 136, 0.2);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            padding: 8px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: #00ff88;
-            margin-right: 10px;
-            font-weight: bold;
-            transition: 0.3s;
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
         }
 
-        .btn-lose {
-            background: rgba(255, 68, 68, 0.2);
-            border: 1px solid rgba(255, 68, 68, 0.3);
-            padding: 8px 20px;
-            border-radius: 8px;
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
             cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ff4444;
+            transition: 0.3s;
+            border-radius: 30px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #00ff88;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        /* Toggle Labels */
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-label span:first-child {
             color: #ff4444;
             font-weight: bold;
-            transition: 0.3s;
         }
 
-        .btn-win:hover {
-            background: rgba(0, 255, 136, 0.4);
-            transform: scale(1.02);
-        }
-
-        .btn-lose:hover {
-            background: rgba(255, 68, 68, 0.4);
-            transform: scale(1.02);
+        .toggle-label span:last-child {
+            color: #00ff88;
+            font-weight: bold;
         }
 
         .status-pending {
@@ -265,10 +295,6 @@
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-            .btn-win, .btn-lose {
-                padding: 5px 12px;
-                font-size: 0.8rem;
-            }
         }
     </style>
 </head>
@@ -309,16 +335,16 @@
                 <div class="stat-card"><div class="stat-number" id="totalVolume">$0</div><div>Total Volume</div></div>
             </div>
 
-            <!-- Pending Trades Page - Admin manually sets WIN or LOSE -->
+            <!-- Pending Trades Page - ON/OFF Switch for each trade -->
             <div id="pendingPage" class="page-content">
                 <div class="page-header">
                     <h1>💰 Pending Trades</h1>
-                    <p>Manually decide WIN or LOSE for each trade</p>
+                    <p>Use the ON/OFF switch to control trade outcome</p>
                 </div>
                 <div class="instruction-box">
-                    <p>⚡ Click <strong style="color:#00ff88;">WIN</strong> to give the user profit + investment back</p>
-                    <p>💀 Click <strong style="color:#ff4444;">LOSE</strong> to make the user lose their investment</p>
-                    <p>📌 The outcome applies immediately - no approval needed</p>
+                    <p>🟢 <strong style="color:#00ff88;">ON (WIN)</strong> → User gets profit + investment back</p>
+                    <p>🔴 <strong style="color:#ff4444;">OFF (LOSE)</strong> → User loses their investment</p>
+                    <p>📌 Flip the switch anytime - outcome applies immediately</p>
                 </div>
                 <div class="table-container">
                     <table>
@@ -331,7 +357,7 @@
                                 <th>Duration</th>
                                 <th>Expected Return</th>
                                 <th>Status</th>
-                                <th>Action</th>
+                                <th>WIN / LOSE</th>
                             </tr>
                         </thead>
                         <tbody id="pendingTradesList"></tbody>
@@ -407,7 +433,7 @@
         updateStats();
     }
 
-    // Load pending trades for manual WIN/LOSE control
+    // Load pending trades with ON/OFF switches
     function loadPendingTrades() {
         const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
         const pendingList = document.getElementById('pendingTradesList');
@@ -427,15 +453,21 @@
                 <td>+${trade.rate}% ($${trade.expectedProfit.toFixed(2)})</td>
                 <td class="status-pending">⏳ PENDING</td>
                 <td>
-                    <button class="btn-win" onclick="setTradeOutcome(${index}, 'win')">🏆 WIN</button>
-                    <button class="btn-lose" onclick="setTradeOutcome(${index}, 'lose')">💀 LOSE</button>
-                </td>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="toggle_${index}" onchange="toggleTradeOutcome(${index}, this.checked)">
+                        <span class="slider"></span>
+                    </div>
+                    <div class="toggle-label" style="margin-top: 5px;">
+                        <span>LOSE</span>
+                        <span>WIN</span>
+                    </div>
+                 </td>
             </tr>
         `).join('');
     }
 
-    // Set WIN or LOSE outcome for a trade (MANUAL CONTROL)
-    function setTradeOutcome(index, outcome) {
+    // Handle toggle switch - ON = WIN, OFF = LOSE
+    function toggleTradeOutcome(index, isWin) {
         const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
         const trade = pendingTrades[index];
         
@@ -444,14 +476,22 @@
             return;
         }
         
+        // Confirm action
+        const action = isWin ? 'WIN' : 'LOSE';
+        if (!confirm(`Are you sure you want to set this trade to ${action}?\n\nUser: ${trade.userEmail}\nAmount: $${trade.amount}\nExpected Return: $${trade.expectedProfit}\n\nThis action cannot be undone.`)) {
+            // Reload to reset toggle
+            loadPendingTrades();
+            return;
+        }
+        
         // Get current user profile
         let userProfile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 10000}');
         
-        if (outcome === 'win') {
+        if (isWin) {
+            // WIN - User gets profit + investment back
             const profit = trade.expectedProfit;
             const totalReturn = trade.amount + profit;
             
-            // Add profit to user balance
             userProfile.balance = (userProfile.balance || 10000) + totalReturn;
             localStorage.setItem('lunoProfile', JSON.stringify(userProfile));
             
@@ -477,7 +517,7 @@
             
             alert(`✅ TRADE WON!\n\nUser: ${trade.userEmail}\nAmount: $${trade.amount}\nProfit: +$${profit.toFixed(2)}\nTotal Return: $${totalReturn.toFixed(2)}`);
         } else {
-            // LOSE - user loses their investment (already deducted when trade was placed)
+            // LOSE - User loses their investment (already deducted when trade was placed)
             const tradeRecord = {
                 id: trade.id,
                 userEmail: trade.userEmail,
@@ -528,9 +568,9 @@
                 <td class="${profile.kycStatus === 'verified' ? 'status-won' : 'status-pending'}">${profile.kycStatus || 'pending'}</td>
                 <td>${new Date(user.registeredAt).toLocaleDateString()}</td>
                 <td>
-                    <button class="btn-win" onclick="editUserBalance()" style="padding: 5px 12px;">Edit Balance</button>
-                    <button class="btn-win" onclick="approveUserKYC()" style="padding: 5px 12px;">Approve KYC</button>
-                </td>
+                    <button class="btn-win" onclick="editUserBalance()" style="background: rgba(0,212,255,0.2); border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer;">Edit Balance</button>
+                    <button class="btn-win" onclick="approveUserKYC()" style="background: rgba(0,212,255,0.2); border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; margin-left: 5px;">Approve KYC</button>
+                 </td>
             </tr>
         `;
     }
