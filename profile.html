@@ -388,6 +388,14 @@
             color: white;
         }
 
+        .image-preview {
+            max-width: 100%;
+            max-height: 150px;
+            margin-top: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .sidebar { width: 80px; }
             .sidebar-item span:last-child { display: none; }
@@ -477,7 +485,7 @@
             </div>
         </div>
 
-        <!-- Updated KYC Page with File Upload -->
+        <!-- KYC Page with File Upload -->
         <div id="kycPage" class="page-content" style="display: none;">
             <div class="page-header">
                 <h1>KYC Verification</h1>
@@ -507,18 +515,18 @@
                 </div>
                 <div class="form-group">
                     <label>📎 Upload ID Document (Front Side)</label>
-                    <input type="file" id="kycFileFront" accept="image/*" class="file-input">
-                    <small style="color: rgba(255,255,255,0.5); font-size: 0.7rem;">Upload clear image of your ID (JPG, PNG)</small>
+                    <input type="file" id="kycFileFront" accept="image/*" class="file-input" onchange="previewImage(this, 'frontPreview')">
+                    <img id="frontPreview" class="image-preview" alt="Front ID Preview">
                 </div>
                 <div class="form-group">
                     <label>📎 Upload ID Document (Back Side)</label>
-                    <input type="file" id="kycFileBack" accept="image/*" class="file-input">
-                    <small style="color: rgba(255,255,255,0.5); font-size: 0.7rem;">Upload clear image of the back side (if applicable)</small>
+                    <input type="file" id="kycFileBack" accept="image/*" class="file-input" onchange="previewImage(this, 'backPreview')">
+                    <img id="backPreview" class="image-preview" alt="Back ID Preview">
                 </div>
                 <div class="form-group">
                     <label>📎 Upload Selfie with ID</label>
-                    <input type="file" id="kycSelfie" accept="image/*" class="file-input">
-                    <small style="color: rgba(255,255,255,0.5); font-size: 0.7rem;">Take a selfie holding your ID</small>
+                    <input type="file" id="kycSelfie" accept="image/*" class="file-input" onchange="previewImage(this, 'selfiePreview')">
+                    <img id="selfiePreview" class="image-preview" alt="Selfie Preview">
                 </div>
                 <button class="btn-save" onclick="submitKYC()">Submit Verification</button>
                 <div class="info-text" style="margin-top: 15px; font-size: 0.7rem; color: rgba(255,255,255,0.4);">
@@ -571,6 +579,18 @@
 </div>
 
 <script>
+    function previewImage(input, previewId) {
+        const preview = document.getElementById(previewId);
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     // Check authentication
     function checkAuth() {
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
@@ -694,6 +714,7 @@
         }));
     }
 
+    // Updated submitKYC function with corrected message
     function submitKYC() {
         const fullName = document.getElementById('kycFullName').value;
         const idType = document.getElementById('idType').value;
@@ -712,33 +733,74 @@
             return;
         }
         
-        let message = `KYC verification submitted!\n\nName: ${fullName}\nID Type: ${idType}\nID Number: ${idNumber}\n`;
-        message += `\nDocuments uploaded:\n- Front ID: ${frontFile.name}\n`;
-        if (backFile) message += `- Back ID: ${backFile.name}\n`;
-        if (selfieFile) message += `- Selfie: ${selfieFile.name}\n`;
-        message += `\nYour verification is under review. Please wait for admin approval.`;
+        // Convert images to base64 for storage
+        const readerFront = new FileReader();
+        const readerBack = backFile ? new FileReader() : null;
+        const readerSelfie = selfieFile ? new FileReader() : null;
         
-        alert(message);
+        let frontBase64 = null;
+        let backBase64 = null;
+        let selfieBase64 = null;
+        let filesProcessed = 0;
+        let totalFiles = 1 + (backFile ? 1 : 0) + (selfieFile ? 1 : 0);
         
-        // Save KYC request to admin
-        const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
-        kycRequests.push({
-            email: userData.email,
-            fullName: fullName,
-            idType: idType,
-            idNumber: idNumber,
-            frontFile: frontFile.name,
-            backFile: backFile ? backFile.name : null,
-            selfieFile: selfieFile ? selfieFile.name : null,
-            date: new Date().toLocaleString(),
-            status: 'pending'
-        });
-        localStorage.setItem('kycRequests', JSON.stringify(kycRequests));
+        function checkAndSave() {
+            filesProcessed++;
+            if (filesProcessed === totalFiles) {
+                // Save KYC request to admin with base64 images
+                const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
+                kycRequests.push({
+                    email: userData.email,
+                    fullName: fullName,
+                    idType: idType,
+                    idNumber: idNumber,
+                    frontImage: frontBase64,
+                    backImage: backBase64,
+                    selfieImage: selfieBase64,
+                    frontFileName: frontFile.name,
+                    backFileName: backFile ? backFile.name : null,
+                    selfieFileName: selfieFile ? selfieFile.name : null,
+                    date: new Date().toLocaleString(),
+                    status: 'pending'
+                });
+                localStorage.setItem('kycRequests', JSON.stringify(kycRequests));
+                
+                // UPDATED MESSAGE HERE
+                alert(`✅ KYC verification submitted!\n\nName: ${fullName}\nID Type: ${idType}\nID Number: ${idNumber}\n\nYour verification is under review, please wait a moment.`);
+                
+                // Reset form
+                document.getElementById('kycFullName').value = '';
+                document.getElementById('idNumber').value = '';
+                document.getElementById('kycFileFront').value = '';
+                document.getElementById('kycFileBack').value = '';
+                document.getElementById('kycSelfie').value = '';
+                document.getElementById('frontPreview').style.display = 'none';
+                document.getElementById('backPreview').style.display = 'none';
+                document.getElementById('selfiePreview').style.display = 'none';
+            }
+        }
         
-        // Reset file inputs
-        document.getElementById('kycFileFront').value = '';
-        document.getElementById('kycFileBack').value = '';
-        document.getElementById('kycSelfie').value = '';
+        readerFront.onload = function(e) {
+            frontBase64 = e.target.result;
+            checkAndSave();
+        };
+        readerFront.readAsDataURL(frontFile);
+        
+        if (backFile && readerBack) {
+            readerBack.onload = function(e) {
+                backBase64 = e.target.result;
+                checkAndSave();
+            };
+            readerBack.readAsDataURL(backFile);
+        }
+        
+        if (selfieFile && readerSelfie) {
+            readerSelfie.onload = function(e) {
+                selfieBase64 = e.target.result;
+                checkAndSave();
+            };
+            readerSelfie.readAsDataURL(selfieFile);
+        }
     }
 
     function updateProfile() {
