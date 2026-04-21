@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - Trade</title>
-    <script src="auth.js"></script>
+    
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -429,7 +435,7 @@
 
 <script>
     let userBalance = 10000;
-    let userEmail = '';
+    let currentUserId = null;
     let tradeType = 'buy';
     let selectedDuration = null;
     let selectedRate = 0;
@@ -451,36 +457,30 @@
         UNI: 'Uniswap', AAVE: 'Aave', CRV: 'Curve DAO', MKR: 'Maker', COMP: 'Compound',
         SHIB: 'Shiba Inu', PEPE: 'Pepe', FLOKI: 'Floki', BONK: 'Bonk'
     };
-    
-    function loadUserBalance() {
-        const savedProfile = localStorage.getItem('lunoProfile');
-        if (savedProfile) {
-            try {
-                const profile = JSON.parse(savedProfile);
-                userBalance = profile.balance || 10000;
-            } catch(e) {}
-        }
-        document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
-    }
-    
-    function getUserEmail() {
-        const user = getCurrentUser();
+
+    // Authentication check
+    auth.onAuthStateChanged(async (user) => {
         if (user) {
-            userEmail = user.email;
+            currentUserId = user.uid;
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                userBalance = userData.balance || 10000;
+                document.getElementById('displayUsername').innerText = userData.fullName?.split(' ')[0] || user.email.split('@')[0];
+                document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
+            }
+        } else {
+            window.location.href = 'index.html';
         }
+    });
+
+    function formatPrice(price) {
+        if (price < 0.01) return `$${price.toExponential(4)}`;
+        if (price < 1) return `$${price.toFixed(4)}`;
+        if (price < 10) return `$${price.toFixed(2)}`;
+        return `$${price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     }
-    
-    function saveUserBalance() {
-        const savedProfile = localStorage.getItem('lunoProfile');
-        if (savedProfile) {
-            try {
-                const profile = JSON.parse(savedProfile);
-                profile.balance = userBalance;
-                localStorage.setItem('lunoProfile', JSON.stringify(profile));
-            } catch(e) {}
-        }
-    }
-    
+
     function changeCrypto() {
         const select = document.getElementById('cryptoSelect');
         currentCoin = select.value;
@@ -489,14 +489,7 @@
         document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
         calculateReturn();
     }
-    
-    function formatPrice(price) {
-        if (price < 0.01) return `$${price.toExponential(4)}`;
-        if (price < 1) return `$${price.toFixed(4)}`;
-        if (price < 10) return `$${price.toFixed(2)}`;
-        return `$${price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    }
-    
+
     function setTradeType(type) {
         tradeType = type;
         const buyBtn = document.querySelector('.trade-type-btn.buy');
@@ -504,7 +497,6 @@
         if (type === 'buy') {
             buyBtn.classList.add('active');
             sellBtn.classList.remove('active');
-            document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
         } else {
             sellBtn.classList.add('active');
             buyBtn.classList.remove('active');
@@ -512,7 +504,7 @@
         }
         calculateReturn();
     }
-    
+
     function selectDuration(element) {
         document.querySelectorAll('.return-option').forEach(opt => opt.classList.remove('selected'));
         element.classList.add('selected');
@@ -521,7 +513,7 @@
         selectedMinAmount = parseInt(element.getAttribute('data-min'));
         calculateReturn();
     }
-    
+
     function calculateReturn() {
         const amount = parseFloat(document.getElementById('amount').value);
         const warningMsg = document.getElementById('warningMsg');
@@ -558,7 +550,7 @@
         document.getElementById('transactionFee').innerHTML = `${transactionFee.toFixed(2)} USDT`;
         document.getElementById('totalPay').innerHTML = `${totalPayAmount.toFixed(2)} USDT`;
     }
-    
+
     function cancelTrade() {
         document.getElementById('amount').value = '';
         document.querySelectorAll('.return-option').forEach(opt => opt.classList.remove('selected'));
@@ -568,8 +560,8 @@
         calculateReturn();
         document.getElementById('warningMsg').style.display = 'none';
     }
-    
-    function confirmTrade() {
+
+    async function confirmTrade() {
         const amount = parseFloat(document.getElementById('amount').value);
         
         if (isNaN(amount) || amount <= 0) {
@@ -597,14 +589,20 @@
                 return;
             }
             
-            userBalance -= totalPay;
-            saveUserBalance();
+            // Update balance in Firestore
+            const newBalance = userBalance - totalPay;
+            await db.collection('users').doc(currentUserId).update({
+                balance: newBalance
+            });
+            userBalance = newBalance;
             
             const tradeId = Date.now();
             const tradeRecord = {
                 id: tradeId,
-                date: new Date().toLocaleString(),
+                userId: currentUserId,
+                date: new Date().toISOString(),
                 coin: currentCoin,
+                coinName: coinNames[currentCoin],
                 tradeType: tradeType,
                 amount: amount,
                 duration: selectedDuration,
@@ -612,28 +610,17 @@
                 expectedProfit: expectedReturnAmount,
                 profit: 0,
                 status: 'pending',
-                fee: transactionFee,
-                userEmail: userEmail
+                fee: transactionFee
             };
             
-            const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
-            history.unshift(tradeRecord);
-            localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
+            // Save to Firestore trades collection
+            await db.collection('trades').doc(tradeId.toString()).set(tradeRecord);
             
-            const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
-            pendingTrades.push({
-                id: tradeId,
-                userEmail: userEmail,
-                coin: currentCoin,
-                coinName: coinNames[currentCoin],
-                amount: amount,
-                duration: selectedDuration,
-                rate: selectedRate,
-                expectedProfit: expectedReturnAmount,
-                status: 'pending',
-                date: new Date().toLocaleString()
-            });
-            localStorage.setItem('pendingTrades', JSON.stringify(pendingTrades));
+            // Add to user's trades subcollection
+            await db.collection('users').doc(currentUserId).collection('trades').doc(tradeId.toString()).set(tradeRecord);
+            
+            // Add to pending trades for admin
+            await db.collection('pendingTrades').doc(tradeId.toString()).set(tradeRecord);
             
             const modalMessage = `Your ${tradeType.toUpperCase()} trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration has been submitted!\n\nAmount: $${amount.toFixed(2)} USDT\nExpected Return: +${selectedRate}% ($${expectedReturnAmount.toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT\n\nWaiting for admin approval.`;
             document.getElementById('modalMessage').innerHTML = modalMessage.replace(/\n/g, '<br>');
@@ -645,18 +632,20 @@
             alert('Sell feature coming soon!');
         }
     }
-    
+
     function closeModal() {
         document.getElementById('successModal').style.display = 'none';
         window.location.href = 'profile.html';
     }
-    
+
     function logout() {
-        logoutUser();
+        auth.signOut().then(() => {
+            localStorage.removeItem('lunoUser');
+            sessionStorage.removeItem('lunoUser');
+            window.location.href = 'index.html';
+        });
     }
-    
-    loadUserBalance();
-    getUserEmail();
+
     changeCrypto();
 </script>
 
