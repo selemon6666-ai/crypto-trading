@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luno Trading - Admin Panel</title>
+    
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: white;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .nav-links { display: flex; gap: 30px; }
+        .nav-links a { color: white; text-decoration: none; }
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+        .main-container {
+            display: flex;
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
+        }
+        .sidebar {
+            width: 280px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 0;
+            position: fixed;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+        .sidebar-item {
+            padding: 15px 25px;
+            margin: 5px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-item:hover { background: rgba(0, 212, 255, 0.1); }
+        .sidebar-item.active {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2));
+            border-left: 3px solid #00d4ff;
+        }
+        .content-area {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px 40px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-number { font-size: 2rem; font-weight: bold; color: #00d4ff; }
+        .table-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .btn-approve {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #00ff88;
+            margin-right: 5px;
+        }
+        .btn-reject {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #ff4444;
+        }
+        .btn-edit {
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #00d4ff;
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 80px; }
+            .sidebar-item span:last-child { display: none; }
+            .content-area { margin-left: 80px; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">👑 Luno Admin</div>
+    <div class="nav-links">
+        <a href="dashboard.html">Home</a>
+        <a href="markets.html">Markets</a>
+        <a href="trade.html">Trades</a>
+        <a href="profile.html">Profile</a>
+        <a href="admin-firebase.html" style="color:#00d4ff;">Admin</a>
+    </div>
+    <div class="logout-btn" onclick="logout()">Logout</div>
+</nav>
+
+<div class="main-container">
+    <div class="sidebar">
+        <div class="sidebar-item active" data-page="users"><span>👥</span> <span>Users</span></div>
+        <div class="sidebar-item" data-page="deposits"><span>💰</span> <span>Deposits</span></div>
+        <div class="sidebar-item" data-page="withdrawals"><span>💸</span> <span>Withdrawals</span></div>
+        <div class="sidebar-item" data-page="trades"><span>📊</span> <span>Trades</span></div>
+    </div>
+
+    <div class="content-area">
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><div class="stat-number" id="totalUsers">0</div><div>Total Users</div></div>
+            <div class="stat-card"><div class="stat-number" id="pendingKYC">0</div><div>Pending KYC</div></div>
+            <div class="stat-card"><div class="stat-number" id="totalVolume">$0</div><div>Total Volume</div></div>
+            <div class="stat-card"><div class="stat-number" id="activeUsers">0</div><div>Active Users</div></div>
+        </div>
+
+        <div id="usersPage" class="page-content">
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>User</th><th>Email</th><th>Balance</th><th>KYC Status</th><th>Joined</th><th>Actions</th></tr></thead>
+                    <tbody id="usersList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="depositsPage" class="page-content" style="display: none;">
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>User</th><th>Amount</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody id="depositsList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="withdrawalsPage" class="page-content" style="display: none;">
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>User</th><th>Amount</th><th>Wallet</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody id="withdrawalsList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tradesPage" class="page-content" style="display: none;">
+            <div class="table-container">
+                </table>
+                    <thead><tr><th>User</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Return</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody id="tradesList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentUser = null;
+
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUser = user;
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if (userDoc.exists && userDoc.data().isAdmin) {
+                loadAllData();
+            } else {
+                alert('Access denied. Admin only.');
+                window.location.href = 'dashboard.html';
+            }
+        } else {
+            window.location.href = 'index.html';
+        }
+    });
+
+    async function loadAllData() {
+        loadUsers();
+        updateStats();
+    }
+
+    async function loadUsers() {
+        const usersSnapshot = await db.collection('users').get();
+        const usersList = document.getElementById('usersList');
+        
+        if (usersSnapshot.empty) {
+            usersList.innerHTML = '<tr><td colspan="6" style="text-align:center;">No users found</td></tr>';
+            return;
+        }
+        
+        usersList.innerHTML = '';
+        usersSnapshot.forEach(doc => {
+            const user = doc.data();
+            usersList.innerHTML += `
+                <tr>
+                    <td>${user.fullName || 'N/A'}</td>
+                    <td>${user.email}</td>
+                    <td>$${user.balance?.toLocaleString() || 0}</td>
+                    <td>${user.kycStatus || 'pending'}</td>
+                    <td>${new Date(user.registeredAt).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn-edit" onclick="editUser('${doc.id}')">Edit</button>
+                        <button class="btn-approve" onclick="approveKYC('${doc.id}')">Approve KYC</button>
+                     </td>
+                </tr>
+            `;
+        });
+    }
+
+    async function updateStats() {
+        const usersSnapshot = await db.collection('users').get();
+        const totalUsers = usersSnapshot.size;
+        const pendingKYC = usersSnapshot.docs.filter(d => d.data().kycStatus === 'pending').length;
+        
+        document.getElementById('totalUsers').innerText = totalUsers;
+        document.getElementById('pendingKYC').innerText = pendingKYC;
+    }
+
+    async function approveKYC(userId) {
+        await db.collection('users').doc(userId).update({
+            kycStatus: 'verified',
+            kycApprovedAt: new Date().toISOString()
+        });
+        alert('✅ KYC approved!');
+        loadUsers();
+        updateStats();
+    }
+
+    async function editUser(userId) {
+        const newBalance = prompt('Enter new balance amount:');
+        if (newBalance && !isNaN(newBalance)) {
+            await db.collection('users').doc(userId).update({
+                balance: parseFloat(newBalance)
+            });
+            alert('✅ Balance updated!');
+            loadUsers();
+        }
+    }
+
+    function logout() {
+        auth.signOut().then(() => {
+            window.location.href = 'index.html';
+        });
+    }
+
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const page = item.getAttribute('data-page');
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            
+            document.getElementById('usersPage').style.display = 'none';
+            document.getElementById('depositsPage').style.display = 'none';
+            document.getElementById('withdrawalsPage').style.display = 'none';
+            document.getElementById('tradesPage').style.display = 'none';
+            
+            if (page === 'users') document.getElementById('usersPage').style.display = 'block';
+            if (page === 'deposits') document.getElementById('depositsPage').style.display = 'block';
+            if (page === 'withdrawals') document.getElementById('withdrawalsPage').style.display = 'block';
+            if (page === 'trades') document.getElementById('tradesPage').style.display = 'block';
+        });
+    });
+</script>
+
+</body>
+</html>
