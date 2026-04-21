@@ -110,7 +110,6 @@
             margin-bottom: 5px;
         }
 
-        /* Address Section */
         .address-section {
             padding: 20px 25px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -147,7 +146,6 @@
             transform: translateY(-1px);
         }
 
-        /* Form Section */
         .form-section {
             padding: 20px 25px;
         }
@@ -203,6 +201,47 @@
             color: rgba(255, 255, 255, 0.5);
             text-align: center;
             margin-top: 15px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a3e, #0a0e27);
+            padding: 30px;
+            border-radius: 20px;
+            width: 380px;
+            text-align: center;
+        }
+
+        .modal-content h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
         }
 
         @media (max-width: 768px) {
@@ -293,46 +332,13 @@
     </div>
 </div>
 
-<div id="successModal" class="modal" style="display: none;">
+<div id="successModal" class="modal">
     <div class="modal-content">
         <h3>✅ Deposit Request Submitted!</h3>
-        <p id="modalMessage">Your deposit request has been sent to admin for approval.</p>
+        <p id="modalMessage">Your deposit is under review, please wait a moment.</p>
         <button class="modal-btn" onclick="closeModal()">OK</button>
     </div>
 </div>
-
-<style>
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-
-    .modal-content {
-        background: linear-gradient(135deg, #1a1a3e, #0a0e27);
-        padding: 30px;
-        border-radius: 20px;
-        width: 350px;
-        text-align: center;
-    }
-
-    .modal-btn {
-        background: linear-gradient(135deg, #00d4ff, #7c3aed);
-        border: none;
-        padding: 12px 30px;
-        border-radius: 8px;
-        color: white;
-        cursor: pointer;
-        margin-top: 20px;
-    }
-</style>
 
 <script>
     // Load deposit addresses from localStorage (set by admin)
@@ -399,8 +405,8 @@
         depositRequests.push(depositRequest);
         localStorage.setItem('depositRequests', JSON.stringify(depositRequests));
         
-        // Show success modal
-        document.getElementById('modalMessage').innerHTML = `Deposit request of $${amount.toFixed(2)} ${currency} submitted!<br><br>Admin will review and approve your deposit.`;
+        // Show success modal with new message
+        document.getElementById('modalMessage').innerHTML = `Deposit request of $${amount.toFixed(2)} ${currency} submitted!<br><br>Your deposit is under review, please wait a moment.`;
         document.getElementById('successModal').style.display = 'flex';
         
         // Reset form
