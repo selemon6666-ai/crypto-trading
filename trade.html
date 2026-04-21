@@ -421,7 +421,7 @@
 <div id="successModal" class="modal">
     <div class="modal-content">
         <h3>✅ Trade Submitted!</h3>
-        <p id="modalMessage">Your trade has been submitted for processing.</p>
+        <p id="modalMessage">Your trade has been submitted for admin review.</p>
         <button class="modal-btn" onclick="closeModal()">OK</button>
     </div>
 </div>
@@ -596,10 +596,41 @@
                 return;
             }
             
+            // Deduct from balance
             userBalance -= totalPay;
             saveUserBalance();
             
-            const modalMessage = `Your ${tradeType.toUpperCase()} trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration has been submitted!\n\nAmount: $${amount.toFixed(2)} USDT\nExpected Return: +${selectedRate}% ($${expectedReturnAmount.toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT`;
+            // Get current user email
+            const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+            let userEmail = 'User';
+            if (savedUser) {
+                try {
+                    const user = JSON.parse(savedUser);
+                    userEmail = user.email || userEmail;
+                } catch(e) {}
+            }
+            
+            // Create pending trade for admin to set WIN/LOSE
+            const pendingTrade = {
+                id: Date.now(),
+                userEmail: userEmail,
+                coin: currentCoin,
+                coinName: coinNames[currentCoin],
+                amount: amount,
+                duration: selectedDuration,
+                rate: selectedRate,
+                expectedProfit: expectedReturnAmount,
+                status: 'pending',
+                date: new Date().toLocaleString(),
+                expiryTime: Date.now() + (selectedDuration * 1000)
+            };
+            
+            // Save to pending trades
+            const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
+            pendingTrades.push(pendingTrade);
+            localStorage.setItem('pendingTrades', JSON.stringify(pendingTrades));
+            
+            const modalMessage = `Your ${tradeType.toUpperCase()} trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration has been submitted!\n\nAmount: $${amount.toFixed(2)} USDT\nExpected Return: +${selectedRate}% ($${expectedReturnAmount.toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT\n\nWaiting for admin to set WIN/LOSE.`;
             document.getElementById('modalMessage').innerHTML = modalMessage.replace(/\n/g, '<br>');
             document.getElementById('successModal').style.display = 'flex';
             
