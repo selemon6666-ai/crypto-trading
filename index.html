@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - Login</title>
-    <script src="auth.js"></script>
+    
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -420,7 +426,7 @@
         }
     }
 
-    function handleLogin(event) {
+    async function handleLogin(event) {
         event.preventDefault();
         
         const email = document.getElementById('email').value;
@@ -428,32 +434,35 @@
         const rememberMe = document.getElementById('rememberMe').checked;
         const errorMsg = document.getElementById('errorMsg');
         
-        // Get registered user from localStorage
-        const registeredUser = localStorage.getItem('lunoRegisteredUser');
-        
-        if (registeredUser) {
-            const user = JSON.parse(registeredUser);
+        try {
+            const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
             
-            if (email === user.email && password === user.password) {
-                // Use the centralized save function from auth.js
-                const success = saveUserSession(user, rememberMe);
-                
-                if (success) {
-                    window.location.href = 'dashboard.html';
-                } else {
-                    errorMsg.style.display = 'block';
-                    errorMsg.innerHTML = '❌ Session error. Please try again.';
-                }
-                return false;
+            // Get user data from Firestore
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            const userData = userDoc.data();
+            
+            const sessionData = {
+                uid: user.uid,
+                email: user.email,
+                fullName: userData?.fullName || user.email.split('@')[0],
+                loggedIn: true,
+                loginTime: new Date().toISOString()
+            };
+            
+            if (rememberMe) {
+                localStorage.setItem('lunoUser', JSON.stringify(sessionData));
+            } else {
+                sessionStorage.setItem('lunoUser', JSON.stringify(sessionData));
             }
+            
+            window.location.href = 'dashboard.html';
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            errorMsg.style.display = 'block';
+            errorMsg.innerHTML = `❌ ${error.message}`;
         }
-        
-        errorMsg.style.display = 'block';
-        errorMsg.innerHTML = '❌ Invalid email or password. Please try again or <a href="register.html" style="color:#00d4ff;">Sign Up</a>';
-        
-        setTimeout(() => {
-            errorMsg.style.display = 'none';
-        }, 3000);
         
         return false;
     }
