@@ -327,7 +327,9 @@
             </div>
 
             <button class="submit-btn" onclick="submitDeposit()">📤 Submit Deposit Request</button>
-            <div class="info-text">⚠️ Deposit will be credited after admin approval. Please upload valid proof of payment.</div>
+            
+            <!-- Updated info text -->
+            <div class="info-text">⚠️ Your deposit will be approved after reviewing. Please upload valid proof of payment.</div>
         </div>
     </div>
 </div>
@@ -405,7 +407,7 @@
         depositRequests.push(depositRequest);
         localStorage.setItem('depositRequests', JSON.stringify(depositRequests));
         
-        // Show success modal with new message
+        // Show success modal
         document.getElementById('modalMessage').innerHTML = `Deposit request of $${amount.toFixed(2)} ${currency} submitted!<br><br>Your deposit is under review, please wait a moment.`;
         document.getElementById('successModal').style.display = 'flex';
         
