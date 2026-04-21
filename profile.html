@@ -437,7 +437,7 @@
                     <div class="info-row"><span class="info-label">KYC Status:</span><span class="info-value pending" id="kycStatus">pending</span></div>
                     <div class="info-row"><span class="info-label">Daily Profit/Loss:</span><span class="profit-loss positive" id="dailyPL">+0.00 USDT</span></div>
                     <div class="action-buttons">
-                        <button class="btn-deposit" onclick="openDepositModal()">💰 Deposit</button>
+                        <button class="btn-deposit" onclick="window.location.href='deposit.html'">💰 Deposit</button>
                         <button class="btn-withdraw" onclick="openWithdrawModal()">💸 Withdraw Funds</button>
                     </div>
                 </div>
@@ -510,10 +510,11 @@
 
 <div id="transactionModal" class="modal">
     <div class="modal-content">
-        <h3 id="modalTitle">Deposit Funds</h3>
+        <h3 id="modalTitle">Withdraw Funds</h3>
         <input type="number" id="transactionAmount" placeholder="Enter amount in USD">
+        <input type="text" id="withdrawAddress" placeholder="Enter wallet address">
         <div class="modal-buttons">
-            <button class="btn-confirm" onclick="processTransaction()">Confirm</button>
+            <button class="btn-confirm" onclick="processWithdrawal()">Confirm</button>
             <button class="btn-cancel" onclick="closeModal()">Cancel</button>
         </div>
     </div>
@@ -544,8 +545,6 @@
         totalVolume: 0, totalProfit: 0, phoneNumber: '', tradeHistory: []
     };
     
-    let currentTransactionType = '';
-
     function loadUserData() {
         const user = checkAuth();
         if (user) {
@@ -595,7 +594,7 @@
         let html = '<table><thead><tr><th>Date</th><th>Coin</th><th>Type</th><th>Amount</th><th>Duration</th><th>Return</th><th>Profit</th><th>Status</th></tr></thead><tbody>';
         userData.tradeHistory.forEach(trade => {
             const profitClass = trade.profit >= 0 ? 'history-profit' : 'history-loss';
-            const statusClass = trade.status === 'completed' || trade.status === 'won' ? 'history-status-completed' : 'history-status-pending';
+            const statusClass = trade.status === 'won' ? 'history-status-completed' : 'history-status-pending';
             const typeClass = trade.tradeType === 'buy' ? '💰 BUY' : '💸 SELL';
             html += `<tr><td>${trade.date}</td><td>${trade.coinName} (${trade.coin})</td><td>${typeClass}</td><td>$${trade.amount.toFixed(2)}</td><td>${trade.duration}s</td><td>+${trade.rate}%</td><td class="${profitClass}">${trade.profit >= 0 ? '+' : ''}$${trade.profit.toFixed(2)}</td><td class="${statusClass}">${trade.status}</td></tr>`;
         });
@@ -604,7 +603,7 @@
     }
 
     function updateTradeStats() {
-        const completedTrades = userData.tradeHistory.filter(t => t.status === 'won' || t.status === 'completed');
+        const completedTrades = userData.tradeHistory.filter(t => t.status === 'won');
         userData.totalTrades = completedTrades.length;
         let totalProfit = 0, winningTrades = 0;
         completedTrades.forEach(trade => { totalProfit += trade.profit; if (trade.profit > 0) winningTrades++; });
@@ -658,26 +657,45 @@
         document.getElementById('confirmPassword').value = '';
     }
 
-    function openDepositModal() { currentTransactionType = 'deposit'; document.getElementById('modalTitle').innerText = 'Deposit Funds'; document.getElementById('transactionModal').style.display = 'flex'; }
-    function openWithdrawModal() { currentTransactionType = 'withdraw'; document.getElementById('modalTitle').innerText = 'Withdraw Funds'; document.getElementById('transactionModal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('transactionModal').style.display = 'none'; document.getElementById('transactionAmount').value = ''; }
+    function openWithdrawModal() {
+        document.getElementById('transactionModal').style.display = 'flex';
+    }
 
-    function processTransaction() {
+    function closeModal() {
+        document.getElementById('transactionModal').style.display = 'none';
+        document.getElementById('transactionAmount').value = '';
+        document.getElementById('withdrawAddress').value = '';
+    }
+
+    function processWithdrawal() {
         const amount = parseFloat(document.getElementById('transactionAmount').value);
-        if (isNaN(amount) || amount <= 0) { alert('Please enter a valid amount'); return; }
-        if (currentTransactionType === 'deposit') {
-            userData.balance += amount;
-            alert(`✅ Successfully deposited $${amount.toFixed(2)}!`);
-        } else if (currentTransactionType === 'withdraw') {
-            if (amount > userData.balance) {
-                alert(`Insufficient balance! You have $${userData.balance.toFixed(2)}`);
-                return;
-            }
-            userData.balance -= amount;
-            alert(`✅ Successfully withdrew $${amount.toFixed(2)}!`);
+        const address = document.getElementById('withdrawAddress').value;
+        
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount');
+            return;
         }
-        saveUserData();
-        updateUI();
+        if (!address) {
+            alert('Please enter a wallet address');
+            return;
+        }
+        if (amount > userData.balance) {
+            alert(`Insufficient balance! You have $${userData.balance.toFixed(2)}`);
+            return;
+        }
+        
+        // Send withdrawal request to admin
+        const withdrawalRequests = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+        withdrawalRequests.push({
+            userEmail: userData.email,
+            amount: amount,
+            address: address,
+            date: new Date().toLocaleString(),
+            status: 'pending'
+        });
+        localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawalRequests));
+        
+        alert(`✅ Withdrawal request of $${amount.toFixed(2)} submitted! Admin will review and approve it.`);
         closeModal();
     }
 
