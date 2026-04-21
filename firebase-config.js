@@ -1,6 +1,6 @@
 // firebase-config.js
 const firebaseConfig = {
-   apiKey: "AIzaSyB7lAc7M-K7YByQvjd8-Jx6Q_ddJE1dFC8",
+  apiKey: "AIzaSyB7lAc7M-K7YByQvjd8-Jx6Q_ddJE1dFC8",
   authDomain: "luno-trading.firebaseapp.com",
   projectId: "luno-trading",
   storageBucket: "luno-trading.firebasestorage.app",
