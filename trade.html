@@ -273,7 +273,7 @@
             background: linear-gradient(135deg, #1a1a3e, #0a0e27);
             padding: 30px;
             border-radius: 20px;
-            width: 350px;
+            width: 380px;
             text-align: center;
         }
 
@@ -420,8 +420,8 @@
 
 <div id="successModal" class="modal">
     <div class="modal-content">
-        <h3>✅ Trade Submitted!</h3>
-        <p id="modalMessage">Your trade has been submitted for admin review.</p>
+        <h3 id="modalTitle">Trade Result</h3>
+        <p id="modalMessage">Processing your trade...</p>
         <button class="modal-btn" onclick="closeModal()">OK</button>
     </div>
 </div>
@@ -596,7 +596,7 @@
                 return;
             }
             
-            // Deduct from balance
+            // Deduct amount + fee from balance
             userBalance -= totalPay;
             saveUserBalance();
             
@@ -610,32 +610,69 @@
                 } catch(e) {}
             }
             
-            // Create pending trade for admin to set WIN/LOSE
-            const pendingTrade = {
-                id: Date.now(),
-                userEmail: userEmail,
-                coin: currentCoin,
-                coinName: coinNames[currentCoin],
-                amount: amount,
-                duration: selectedDuration,
-                rate: selectedRate,
-                expectedProfit: expectedReturnAmount,
-                status: 'pending',
-                date: new Date().toLocaleString(),
-                expiryTime: Date.now() + (selectedDuration * 1000)
-            };
+            // Check global trade mode from admin
+            const isWinMode = localStorage.getItem('globalTradeMode') === 'win';
             
-            // Save to pending trades
-            const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
-            pendingTrades.push(pendingTrade);
-            localStorage.setItem('pendingTrades', JSON.stringify(pendingTrades));
-            
-            const modalMessage = `Your ${tradeType.toUpperCase()} trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration has been submitted!\n\nAmount: $${amount.toFixed(2)} USDT\nExpected Return: +${selectedRate}% ($${expectedReturnAmount.toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT\n\nWaiting for admin to set WIN/LOSE.`;
-            document.getElementById('modalMessage').innerHTML = modalMessage.replace(/\n/g, '<br>');
-            document.getElementById('successModal').style.display = 'flex';
-            
-            cancelTrade();
-            document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
+            if (isWinMode) {
+                // WIN MODE - User gets profit + investment back
+                const profit = expectedReturnAmount;
+                const totalReturn = amount + profit;
+                userBalance += totalReturn;
+                saveUserBalance();
+                
+                const tradeRecord = {
+                    id: Date.now(),
+                    userEmail: userEmail,
+                    coin: currentCoin,
+                    coinName: coinNames[currentCoin],
+                    amount: amount,
+                    duration: selectedDuration,
+                    rate: selectedRate,
+                    profit: profit,
+                    status: 'won',
+                    date: new Date().toLocaleString(),
+                    tradeType: 'buy'
+                };
+                
+                const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
+                history.unshift(tradeRecord);
+                localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
+                
+                document.getElementById('modalTitle').innerHTML = '✅ TRADE WON!';
+                const modalMessage = `Your ${tradeType.toUpperCase()} trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration has been processed!\n\nAmount: $${amount.toFixed(2)} USDT\nProfit: +$${profit.toFixed(2)} USDT\nTotal Return: $${totalReturn.toFixed(2)} USDT\nFee: $${transactionFee.toFixed(2)} USDT`;
+                document.getElementById('modalMessage').innerHTML = modalMessage.replace(/\n/g, '<br>');
+                document.getElementById('successModal').style.display = 'flex';
+                
+                cancelTrade();
+                document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
+            } else {
+                // LOSE MODE - User loses investment (already deducted)
+                const tradeRecord = {
+                    id: Date.now(),
+                    userEmail: userEmail,
+                    coin: currentCoin,
+                    coinName: coinNames[currentCoin],
+                    amount: amount,
+                    duration: selectedDuration,
+                    rate: selectedRate,
+                    profit: -amount,
+                    status: 'lost',
+                    date: new Date().toLocaleString(),
+                    tradeType: 'buy'
+                };
+                
+                const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
+                history.unshift(tradeRecord);
+                localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
+                
+                document.getElementById('modalTitle').innerHTML = '❌ TRADE LOST!';
+                const modalMessage = `Your ${tradeType.toUpperCase()} trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration has been processed!\n\nAmount: $${amount.toFixed(2)} USDT\nLoss: -$${amount.toFixed(2)} USDT\nFee: $${transactionFee.toFixed(2)} USDT`;
+                document.getElementById('modalMessage').innerHTML = modalMessage.replace(/\n/g, '<br>');
+                document.getElementById('successModal').style.display = 'flex';
+                
+                cancelTrade();
+                document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
+            }
         } else {
             alert('Sell feature coming soon!');
         }
