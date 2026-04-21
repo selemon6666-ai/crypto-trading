@@ -124,6 +124,109 @@
             font-size: 2rem;
         }
 
+        /* Global Toggle Card */
+        .global-toggle-card {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(124, 58, 237, 0.15));
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .global-toggle-card h2 {
+            margin-bottom: 20px;
+        }
+
+        .global-toggle-card p {
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Big Toggle Switch */
+        .global-toggle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .global-toggle .toggle-label {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .global-toggle .toggle-label.off {
+            color: #ff4444;
+        }
+
+        .global-toggle .toggle-label.on {
+            color: #00ff88;
+        }
+
+        .big-toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 120px;
+            height: 60px;
+        }
+
+        .big-toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .big-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ff4444;
+            transition: 0.3s;
+            border-radius: 60px;
+        }
+
+        .big-slider:before {
+            position: absolute;
+            content: "";
+            height: 52px;
+            width: 52px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .big-slider {
+            background-color: #00ff88;
+        }
+
+        input:checked + .big-slider:before {
+            transform: translateX(60px);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .status-win {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .status-lose {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -165,84 +268,6 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
-        /* Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 30px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ff4444;
-            transition: 0.3s;
-            border-radius: 30px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 24px;
-            width: 24px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: #00ff88;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(30px);
-        }
-
-        /* Toggle Labels */
-        .toggle-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .toggle-label span:first-child {
-            color: #ff4444;
-            font-weight: bold;
-        }
-
-        .toggle-label span:last-child {
-            color: #00ff88;
-            font-weight: bold;
-        }
-
-        .status-pending {
-            color: #ffaa00;
-            font-weight: bold;
-        }
-
-        .status-won {
-            color: #00ff88;
-            font-weight: bold;
-        }
-
-        .status-lost {
-            color: #ff4444;
-            font-weight: bold;
-        }
-
         .login-warning {
             text-align: center;
             padding: 50px;
@@ -268,19 +293,6 @@
             font-weight: bold;
         }
 
-        .instruction-box {
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .instruction-box p {
-            color: #00d4ff;
-        }
-
         @media (max-width: 768px) {
             .sidebar {
                 width: 80px;
@@ -294,6 +306,10 @@
             }
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            .global-toggle {
+                flex-direction: column;
+                gap: 15px;
             }
         }
     </style>
@@ -314,7 +330,7 @@
 
 <div class="main-container">
     <div class="sidebar">
-        <div class="sidebar-item active" data-page="pending"><span>⏳</span> <span>Pending Trades</span></div>
+        <div class="sidebar-item active" data-page="control"><span>🎮</span> <span>Trade Control</span></div>
         <div class="sidebar-item" data-page="users"><span>👥</span> <span>Users</span></div>
         <div class="sidebar-item" data-page="history"><span>📜</span> <span>Trade History</span></div>
     </div>
@@ -328,6 +344,27 @@
         </div>
 
         <div id="adminContent" style="display: none;">
+            <!-- Global Trade Control Card -->
+            <div class="global-toggle-card">
+                <h2>🎮 Global Trade Control</h2>
+                <p>When this switch is <strong style="color:#00ff88;">ON</strong> → All users automatically <strong style="color:#00ff88;">WIN</strong> their trades</p>
+                <p>When this switch is <strong style="color:#ff4444;">OFF</strong> → All users automatically <strong style="color:#ff4444;">LOSE</strong> their trades</p>
+                <p>📌 The outcome applies immediately when a user places a trade</p>
+                
+                <div class="global-toggle">
+                    <span class="toggle-label off">🔴 LOSE</span>
+                    <label class="big-toggle-switch">
+                        <input type="checkbox" id="globalTradeSwitch" onchange="toggleGlobalTrade()">
+                        <span class="big-slider"></span>
+                    </label>
+                    <span class="toggle-label on">🟢 WIN</span>
+                </div>
+                
+                <div id="currentStatus" style="margin-top: 15px; font-size: 1.2rem;">
+                    Current Mode: <span id="modeStatus" class="status-badge status-lose">LOSE MODE</span>
+                </div>
+            </div>
+
             <div class="stats-grid">
                 <div class="stat-card"><div class="stat-number" id="totalUsers">0</div><div>Total Users</div></div>
                 <div class="stat-card"><div class="stat-number" id="pendingTrades">0</div><div>Pending Trades</div></div>
@@ -335,16 +372,11 @@
                 <div class="stat-card"><div class="stat-number" id="totalVolume">$0</div><div>Total Volume</div></div>
             </div>
 
-            <!-- Pending Trades Page - ON/OFF Switch for each trade -->
-            <div id="pendingPage" class="page-content">
+            <!-- Pending Trades Page -->
+            <div id="controlPage" class="page-content">
                 <div class="page-header">
                     <h1>💰 Pending Trades</h1>
-                    <p>Use the ON/OFF switch to control trade outcome</p>
-                </div>
-                <div class="instruction-box">
-                    <p>🟢 <strong style="color:#00ff88;">ON (WIN)</strong> → User gets profit + investment back</p>
-                    <p>🔴 <strong style="color:#ff4444;">OFF (LOSE)</strong> → User loses their investment</p>
-                    <p>📌 Flip the switch anytime - outcome applies immediately</p>
+                    <p>Trades waiting to be processed. Outcome determined by Global Switch.</p>
                 </div>
                 <div class="table-container">
                     <table>
@@ -357,7 +389,6 @@
                                 <th>Duration</th>
                                 <th>Expected Return</th>
                                 <th>Status</th>
-                                <th>WIN / LOSE</th>
                             </tr>
                         </thead>
                         <tbody id="pendingTradesList"></tbody>
@@ -395,7 +426,6 @@
 </div>
 
 <script>
-    // Admin password
     const ADMIN_PASSWORD = "admin123";
 
     function checkAdminAccess() {
@@ -403,6 +433,7 @@
         if (isAdmin === 'true') {
             document.getElementById('loginWarning').style.display = 'none';
             document.getElementById('adminContent').style.display = 'block';
+            loadGlobalSwitchState();
             loadAllData();
         } else {
             document.getElementById('loginWarning').style.display = 'block';
@@ -426,76 +457,60 @@
         window.location.href = 'index.html';
     }
 
-    function loadAllData() {
-        loadPendingTrades();
-        loadUsers();
-        loadTradeHistory();
-        updateStats();
+    // Global Trade Control Functions
+    function loadGlobalSwitchState() {
+        const isWinMode = localStorage.getItem('globalTradeMode') === 'win';
+        document.getElementById('globalTradeSwitch').checked = isWinMode;
+        updateModeDisplay(isWinMode);
     }
 
-    // Load pending trades with ON/OFF switches
-    function loadPendingTrades() {
-        const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
-        const pendingList = document.getElementById('pendingTradesList');
+    function toggleGlobalTrade() {
+        const isChecked = document.getElementById('globalTradeSwitch').checked;
+        const newMode = isChecked ? 'win' : 'lose';
+        localStorage.setItem('globalTradeMode', newMode);
+        updateModeDisplay(isChecked);
         
-        if (pendingTrades.length === 0) {
-            pendingList.innerHTML = '<tr><td colspan="8" style="text-align:center;">✅ No pending trades</td></tr>';
-            return;
-        }
+        // Process all pending trades with the new mode
+        processPendingTrades();
         
-        pendingList.innerHTML = pendingTrades.map((trade, index) => `
-            <tr>
-                <td>#${trade.id || index + 1}</td>
-                <td>${trade.userEmail || 'User'}</td>
-                <td>${trade.coinName} (${trade.coin})</td>
-                <td>$${trade.amount.toFixed(2)}</td>
-                <td>${trade.duration}s</td>
-                <td>+${trade.rate}% ($${trade.expectedProfit.toFixed(2)})</td>
-                <td class="status-pending">⏳ PENDING</td>
-                <td>
-                    <div class="toggle-switch">
-                        <input type="checkbox" id="toggle_${index}" onchange="toggleTradeOutcome(${index}, this.checked)">
-                        <span class="slider"></span>
-                    </div>
-                    <div class="toggle-label" style="margin-top: 5px;">
-                        <span>LOSE</span>
-                        <span>WIN</span>
-                    </div>
-                 </td>
-            </tr>
-        `).join('');
+        alert(`✅ Trade mode changed to ${isChecked ? 'WIN' : 'LOSE'} mode!\n\nAll future trades will ${isChecked ? 'WIN' : 'LOSE'} automatically.`);
     }
 
-    // Handle toggle switch - ON = WIN, OFF = LOSE
-    function toggleTradeOutcome(index, isWin) {
+    function updateModeDisplay(isWin) {
+        const modeStatus = document.getElementById('modeStatus');
+        if (isWin) {
+            modeStatus.innerHTML = 'WIN MODE 🟢';
+            modeStatus.className = 'status-badge status-win';
+        } else {
+            modeStatus.innerHTML = 'LOSE MODE 🔴';
+            modeStatus.className = 'status-badge status-lose';
+        }
+    }
+
+    function processPendingTrades() {
         const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
-        const trade = pendingTrades[index];
+        const isWinMode = localStorage.getItem('globalTradeMode') === 'win';
         
-        if (!trade) {
-            alert('Trade not found!');
-            return;
-        }
+        if (pendingTrades.length === 0) return;
         
-        // Confirm action
-        const action = isWin ? 'WIN' : 'LOSE';
-        if (!confirm(`Are you sure you want to set this trade to ${action}?\n\nUser: ${trade.userEmail}\nAmount: $${trade.amount}\nExpected Return: $${trade.expectedProfit}\n\nThis action cannot be undone.`)) {
-            // Reload to reset toggle
-            loadPendingTrades();
-            return;
-        }
+        pendingTrades.forEach(trade => {
+            processTradeOutcome(trade, isWinMode);
+        });
         
-        // Get current user profile
+        // Clear pending trades
+        localStorage.setItem('pendingTrades', JSON.stringify([]));
+        loadAllData();
+    }
+
+    function processTradeOutcome(trade, isWin) {
         let userProfile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 10000}');
         
         if (isWin) {
-            // WIN - User gets profit + investment back
             const profit = trade.expectedProfit;
             const totalReturn = trade.amount + profit;
-            
             userProfile.balance = (userProfile.balance || 10000) + totalReturn;
             localStorage.setItem('lunoProfile', JSON.stringify(userProfile));
             
-            // Create trade record for history
             const tradeRecord = {
                 id: trade.id,
                 userEmail: trade.userEmail,
@@ -510,14 +525,10 @@
                 tradeType: 'buy'
             };
             
-            // Add to trade history
             const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
             history.unshift(tradeRecord);
             localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
-            
-            alert(`✅ TRADE WON!\n\nUser: ${trade.userEmail}\nAmount: $${trade.amount}\nProfit: +$${profit.toFixed(2)}\nTotal Return: $${totalReturn.toFixed(2)}`);
         } else {
-            // LOSE - User loses their investment (already deducted when trade was placed)
             const tradeRecord = {
                 id: trade.id,
                 userEmail: trade.userEmail,
@@ -532,20 +543,39 @@
                 tradeType: 'buy'
             };
             
-            // Add to trade history
             const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
             history.unshift(tradeRecord);
             localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
-            
-            alert(`❌ TRADE LOST!\n\nUser: ${trade.userEmail}\nAmount: $${trade.amount}\nLoss: -$${trade.amount}`);
+        }
+    }
+
+    function loadAllData() {
+        loadPendingTrades();
+        loadUsers();
+        loadTradeHistory();
+        updateStats();
+    }
+
+    function loadPendingTrades() {
+        const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
+        const pendingList = document.getElementById('pendingTradesList');
+        
+        if (pendingTrades.length === 0) {
+            pendingList.innerHTML = '<tr><td colspan="7" style="text-align:center;">✅ No pending trades</td></tr>';
+            return;
         }
         
-        // Remove from pending trades
-        pendingTrades.splice(index, 1);
-        localStorage.setItem('pendingTrades', JSON.stringify(pendingTrades));
-        
-        // Refresh all data
-        loadAllData();
+        pendingList.innerHTML = pendingTrades.map((trade, index) => `
+            <tr>
+                <td>#${trade.id || index + 1}</td>
+                <td>${trade.userEmail || 'User'}</td>
+                <td>${trade.coinName} (${trade.coin})</td>
+                <td>$${trade.amount.toFixed(2)}</td>
+                <td>${trade.duration}s</td>
+                <td>+${trade.rate}% ($${trade.expectedProfit.toFixed(2)})</td>
+                <td class="status-pending">⏳ PENDING</td>
+            </tr>
+        `).join('');
     }
 
     function loadUsers() {
@@ -565,12 +595,12 @@
                 <td>${user.email}</td>
                 <td>${user.fullName}</td>
                 <td>$${(profile.balance || 10000).toLocaleString()}</td>
-                <td class="${profile.kycStatus === 'verified' ? 'status-won' : 'status-pending'}">${profile.kycStatus || 'pending'}</td>
+                <td class="${profile.kycStatus === 'verified' ? 'status-win' : 'status-pending'}">${profile.kycStatus || 'pending'}</td>
                 <td>${new Date(user.registeredAt).toLocaleDateString()}</td>
                 <td>
-                    <button class="btn-win" onclick="editUserBalance()" style="background: rgba(0,212,255,0.2); border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer;">Edit Balance</button>
-                    <button class="btn-win" onclick="approveUserKYC()" style="background: rgba(0,212,255,0.2); border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; margin-left: 5px;">Approve KYC</button>
-                 </td>
+                    <button onclick="editUserBalance()" style="background: rgba(0,212,255,0.2); border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer;">Edit Balance</button>
+                    <button onclick="approveUserKYC()" style="background: rgba(0,212,255,0.2); border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; margin-left: 5px;">Approve KYC</button>
+                  </td>
             </tr>
         `;
     }
@@ -585,8 +615,8 @@
         }
         
         historyList.innerHTML = history.map(trade => {
-            const profitClass = trade.profit >= 0 ? 'status-won' : 'status-lost';
-            const statusClass = trade.status === 'won' ? 'status-won' : 'status-lost';
+            const profitClass = trade.profit >= 0 ? 'status-win' : 'status-lose';
+            const statusClass = trade.status === 'won' ? 'status-win' : 'status-lose';
             const statusText = trade.status === 'won' ? '🏆 WON' : '💀 LOST';
             return `
                 <tr>
@@ -645,12 +675,12 @@
             document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
             
-            document.getElementById('pendingPage').style.display = 'none';
+            document.getElementById('controlPage').style.display = 'none';
             document.getElementById('usersPage').style.display = 'none';
             document.getElementById('historyPage').style.display = 'none';
             
-            if (page === 'pending') {
-                document.getElementById('pendingPage').style.display = 'block';
+            if (page === 'control') {
+                document.getElementById('controlPage').style.display = 'block';
                 loadPendingTrades();
             }
             if (page === 'users') {
@@ -664,15 +694,14 @@
         });
     });
 
-    // Auto-refresh pending trades every 3 seconds
+    // Auto-refresh every 3 seconds
     setInterval(() => {
-        if (document.getElementById('pendingPage').style.display !== 'none') {
+        if (document.getElementById('controlPage').style.display !== 'none') {
             loadPendingTrades();
         }
         updateStats();
     }, 3000);
 
-    // Initialize
     checkAdminAccess();
 </script>
 
