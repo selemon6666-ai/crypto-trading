@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - Markets</title>
-    <script src="auth.js"></script>
+    
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -598,6 +604,7 @@
 </div>
 
 <script>
+    // Cryptocurrency data
     const cryptocurrencies = [
         { symbol: 'BTC', name: 'Bitcoin', fullName: 'Bitcoin (BTC)', price: 75678.36, marketCap: 1519025675788, volume24h: 32500000000, high24h: 77200, low24h: 75400, change24h: -2.33, category: 'large' },
         { symbol: 'ETH', name: 'Ethereum', fullName: 'Ethereum (ETH)', price: 2363.69, marketCap: 285249946479, volume24h: 18500000000, high24h: 2400, low24h: 2320, change24h: 1.8, category: 'large' },
@@ -630,6 +637,19 @@
     let currentSearch = '';
     let currentTimeframe = '1M';
     let chartData = [];
+
+    // Authentication check
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                document.getElementById('displayUsername').innerText = userData.fullName?.split(' ')[0] || user.email.split('@')[0];
+            }
+        } else {
+            window.location.href = 'index.html';
+        }
+    });
 
     function formatMarketCap(cap) {
         if (cap >= 1e12) return `$${(cap / 1e12).toFixed(2)}T`;
@@ -979,7 +999,11 @@
     }
 
     function logout() {
-        logoutUser();
+        auth.signOut().then(() => {
+            localStorage.removeItem('lunoUser');
+            sessionStorage.removeItem('lunoUser');
+            window.location.href = 'index.html';
+        });
     }
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
