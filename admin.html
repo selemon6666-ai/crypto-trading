@@ -168,22 +168,24 @@
         .btn-win {
             background: rgba(0, 255, 136, 0.2);
             border: 1px solid rgba(0, 255, 136, 0.3);
-            padding: 8px 16px;
+            padding: 8px 20px;
             border-radius: 8px;
             cursor: pointer;
             color: #00ff88;
-            margin-right: 8px;
+            margin-right: 10px;
             font-weight: bold;
+            transition: 0.3s;
         }
 
         .btn-lose {
             background: rgba(255, 68, 68, 0.2);
             border: 1px solid rgba(255, 68, 68, 0.3);
-            padding: 8px 16px;
+            padding: 8px 20px;
             border-radius: 8px;
             cursor: pointer;
             color: #ff4444;
             font-weight: bold;
+            transition: 0.3s;
         }
 
         .btn-win:hover {
@@ -198,14 +200,17 @@
 
         .status-pending {
             color: #ffaa00;
+            font-weight: bold;
         }
 
         .status-won {
             color: #00ff88;
+            font-weight: bold;
         }
 
         .status-lost {
             color: #ff4444;
+            font-weight: bold;
         }
 
         .login-warning {
@@ -221,6 +226,29 @@
             margin: 10px;
             border-radius: 8px;
             border: none;
+            width: 200px;
+        }
+
+        .login-warning button {
+            background: #00d4ff;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .instruction-box {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .instruction-box p {
+            color: #00d4ff;
         }
 
         @media (max-width: 768px) {
@@ -238,7 +266,7 @@
                 grid-template-columns: repeat(2, 1fr);
             }
             .btn-win, .btn-lose {
-                padding: 5px 10px;
+                padding: 5px 12px;
                 font-size: 0.8rem;
             }
         }
@@ -270,7 +298,7 @@
             <h2>🔐 Admin Login Required</h2>
             <p>Enter admin password to access this panel</p>
             <input type="password" id="adminPassword" placeholder="Enter admin password">
-            <button onclick="verifyAdmin()" style="background: #00d4ff; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;">Login as Admin</button>
+            <button onclick="verifyAdmin()">Login as Admin</button>
         </div>
 
         <div id="adminContent" style="display: none;">
@@ -281,16 +309,30 @@
                 <div class="stat-card"><div class="stat-number" id="totalVolume">$0</div><div>Total Volume</div></div>
             </div>
 
-            <!-- Pending Trades Page - Admin sets WIN/LOSE -->
+            <!-- Pending Trades Page - Admin manually sets WIN or LOSE -->
             <div id="pendingPage" class="page-content">
                 <div class="page-header">
-                    <h1>Pending Trades</h1>
-                    <p>Click WIN or LOSE to manually set trade outcomes</p>
+                    <h1>💰 Pending Trades</h1>
+                    <p>Manually decide WIN or LOSE for each trade</p>
+                </div>
+                <div class="instruction-box">
+                    <p>⚡ Click <strong style="color:#00ff88;">WIN</strong> to give the user profit + investment back</p>
+                    <p>💀 Click <strong style="color:#ff4444;">LOSE</strong> to make the user lose their investment</p>
+                    <p>📌 The outcome applies immediately - no approval needed</p>
                 </div>
                 <div class="table-container">
                     <table>
                         <thead>
-                            <tr><th>ID</th><th>User</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Expected Return</th><th>Status</th><th>Action</th>
+                            <tr>
+                                <th>ID</th>
+                                <th>User Email</th>
+                                <th>Coin</th>
+                                <th>Amount</th>
+                                <th>Duration</th>
+                                <th>Expected Return</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
                         </thead>
                         <tbody id="pendingTradesList"></tbody>
                     </table>
@@ -299,10 +341,12 @@
 
             <!-- Users Page -->
             <div id="usersPage" class="page-content" style="display: none;">
-                <div class="page-header"><h1>User Management</h1><p>View and manage all registered users</p></div>
+                <div class="page-header"><h1>👥 User Management</h1><p>View and manage all registered users</p></div>
                 <div class="table-container">
                     <table>
-                        <thead><tr><th>Email</th><th>Full Name</th><th>Balance</th><th>KYC Status</th><th>Registered</th><th>Actions</th></tr></thead>
+                        <thead>
+                            <tr><th>Email</th><th>Full Name</th><th>Balance</th><th>KYC Status</th><th>Registered</th><th>Actions</th></tr>
+                        </thead>
                         <tbody id="usersList"></tbody>
                     </table>
                 </div>
@@ -310,10 +354,12 @@
 
             <!-- Trade History Page -->
             <div id="historyPage" class="page-content" style="display: none;">
-                <div class="page-header"><h1>Trade History</h1><p>All completed trades</p></div>
+                <div class="page-header"><h1>📜 Trade History</h1><p>All completed trades (WON / LOST)</p></div>
                 <div class="table-container">
                     <table>
-                        <thead><tr><th>User</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Return Rate</th><th>Profit/Loss</th><th>Status</th><th>Date</th></tr></thead>
+                        <thead>
+                            <tr><th>User</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Return Rate</th><th>Profit/Loss</th><th>Outcome</th><th>Date</th></tr>
+                        </thead>
                         <tbody id="historyList"></tbody>
                     </table>
                 </div>
@@ -361,37 +407,34 @@
         updateStats();
     }
 
-    // Load pending trades for WIN/LOSE control
+    // Load pending trades for manual WIN/LOSE control
     function loadPendingTrades() {
         const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
         const pendingList = document.getElementById('pendingTradesList');
         
         if (pendingTrades.length === 0) {
-            pendingList.innerHTML = '<tr><td colspan="8" style="text-align:center;">No pending trades</td></tr>';
+            pendingList.innerHTML = '<tr><td colspan="8" style="text-align:center;">✅ No pending trades</td></tr>';
             return;
         }
         
-        pendingList.innerHTML = pendingTrades.map((trade, index) => {
-            const isExpired = trade.expiryTime && Date.now() > trade.expiryTime;
-            return `
-                <tr>
-                    <td>#${trade.id || index + 1}</td>
-                    <td>${trade.userEmail || 'User'}</td>
-                    <td>${trade.coinName} (${trade.coin})</td>
-                    <td>$${trade.amount.toFixed(2)}</td>
-                    <td>${trade.duration}s</td>
-                    <td>+${trade.rate}% ($${trade.expectedProfit.toFixed(2)})</td>
-                    <td class="status-pending">${isExpired ? 'Expired' : 'Pending'}</td>
-                    <td>
-                        <button class="btn-win" onclick="setTradeOutcome(${index}, 'win')">🏆 WIN</button>
-                        <button class="btn-lose" onclick="setTradeOutcome(${index}, 'lose')">💀 LOSE</button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
+        pendingList.innerHTML = pendingTrades.map((trade, index) => `
+            <tr>
+                <td>#${trade.id || index + 1}</td>
+                <td>${trade.userEmail || 'User'}</td>
+                <td>${trade.coinName} (${trade.coin})</td>
+                <td>$${trade.amount.toFixed(2)}</td>
+                <td>${trade.duration}s</td>
+                <td>+${trade.rate}% ($${trade.expectedProfit.toFixed(2)})</td>
+                <td class="status-pending">⏳ PENDING</td>
+                <td>
+                    <button class="btn-win" onclick="setTradeOutcome(${index}, 'win')">🏆 WIN</button>
+                    <button class="btn-lose" onclick="setTradeOutcome(${index}, 'lose')">💀 LOSE</button>
+                </td>
+            </tr>
+        `).join('');
     }
 
-    // Set WIN or LOSE outcome for a trade
+    // Set WIN or LOSE outcome for a trade (MANUAL CONTROL)
     function setTradeOutcome(index, outcome) {
         const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
         const trade = pendingTrades[index];
@@ -412,7 +455,7 @@
             userProfile.balance = (userProfile.balance || 10000) + totalReturn;
             localStorage.setItem('lunoProfile', JSON.stringify(userProfile));
             
-            // Update trade record
+            // Create trade record for history
             const tradeRecord = {
                 id: trade.id,
                 userEmail: trade.userEmail,
@@ -434,7 +477,7 @@
             
             alert(`✅ TRADE WON!\n\nUser: ${trade.userEmail}\nAmount: $${trade.amount}\nProfit: +$${profit.toFixed(2)}\nTotal Return: $${totalReturn.toFixed(2)}`);
         } else {
-            // LOSE - user loses their investment
+            // LOSE - user loses their investment (already deducted when trade was placed)
             const tradeRecord = {
                 id: trade.id,
                 userEmail: trade.userEmail,
@@ -504,6 +547,7 @@
         historyList.innerHTML = history.map(trade => {
             const profitClass = trade.profit >= 0 ? 'status-won' : 'status-lost';
             const statusClass = trade.status === 'won' ? 'status-won' : 'status-lost';
+            const statusText = trade.status === 'won' ? '🏆 WON' : '💀 LOST';
             return `
                 <tr>
                     <td>${trade.userEmail || 'User'}</td>
@@ -512,7 +556,7 @@
                     <td>${trade.duration}s</td>
                     <td>+${trade.rate}%</td>
                     <td class="${profitClass}">${trade.profit >= 0 ? '+' : ''}$${trade.profit.toFixed(2)}</td>
-                    <td class="${statusClass}">${trade.status}</td>
+                    <td class="${statusClass}">${statusText}</td>
                     <td>${trade.date}</td>
                 </tr>
             `;
@@ -580,13 +624,13 @@
         });
     });
 
-    // Auto-refresh pending trades every 5 seconds
+    // Auto-refresh pending trades every 3 seconds
     setInterval(() => {
         if (document.getElementById('pendingPage').style.display !== 'none') {
             loadPendingTrades();
         }
         updateStats();
-    }, 5000);
+    }, 3000);
 
     // Initialize
     checkAdminAccess();
