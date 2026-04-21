@@ -124,107 +124,50 @@
             font-size: 2rem;
         }
 
-        /* Global Toggle Card */
-        .global-toggle-card {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(124, 58, 237, 0.15));
+        .profile-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            text-align: center;
+            padding: 25px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .global-toggle-card h2 {
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group {
             margin-bottom: 20px;
         }
 
-        .global-toggle-card p {
-            margin-bottom: 20px;
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
             color: rgba(255, 255, 255, 0.7);
         }
 
-        /* Big Toggle Switch */
-        .global-toggle {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-            margin: 20px 0;
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
         }
 
-        .global-toggle .toggle-label {
-            font-size: 1.5rem;
+        .btn-save {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
             font-weight: bold;
-        }
-
-        .global-toggle .toggle-label.off {
-            color: #ff4444;
-        }
-
-        .global-toggle .toggle-label.on {
-            color: #00ff88;
-        }
-
-        .big-toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 120px;
-            height: 60px;
-        }
-
-        .big-toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .big-slider {
-            position: absolute;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ff4444;
-            transition: 0.3s;
-            border-radius: 60px;
-        }
-
-        .big-slider:before {
-            position: absolute;
-            content: "";
-            height: 52px;
-            width: 52px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-
-        input:checked + .big-slider {
-            background-color: #00ff88;
-        }
-
-        input:checked + .big-slider:before {
-            transform: translateX(60px);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        .status-win {
-            background: rgba(0, 255, 136, 0.2);
-            color: #00ff88;
-        }
-
-        .status-lose {
-            background: rgba(255, 68, 68, 0.2);
-            color: #ff4444;
+            color: white;
         }
 
         .stats-grid {
@@ -268,6 +211,95 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
+        .btn-approve {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #00ff88;
+            margin-right: 5px;
+        }
+
+        .btn-reject {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #ff4444;
+        }
+
+        .global-toggle-card {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(124, 58, 237, 0.15));
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .big-toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 100px;
+            height: 50px;
+        }
+
+        .big-toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .big-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ff4444;
+            transition: 0.3s;
+            border-radius: 50px;
+        }
+
+        .big-slider:before {
+            position: absolute;
+            content: "";
+            height: 42px;
+            width: 42px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .big-slider {
+            background-color: #00ff88;
+        }
+
+        input:checked + .big-slider:before {
+            transform: translateX(50px);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .status-win {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .status-lose {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+
         .login-warning {
             text-align: center;
             padding: 50px;
@@ -304,13 +336,6 @@
                 margin-left: 80px;
                 padding: 20px;
             }
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .global-toggle {
-                flex-direction: column;
-                gap: 15px;
-            }
         }
     </style>
 </head>
@@ -331,6 +356,9 @@
 <div class="main-container">
     <div class="sidebar">
         <div class="sidebar-item active" data-page="control"><span>🎮</span> <span>Trade Control</span></div>
+        <div class="sidebar-item" data-page="deposits"><span>💰</span> <span>Deposit Requests</span></div>
+        <div class="sidebar-item" data-page="withdrawals"><span>💸</span> <span>Withdrawal Requests</span></div>
+        <div class="sidebar-item" data-page="depositAddresses"><span>🏦</span> <span>Deposit Addresses</span></div>
         <div class="sidebar-item" data-page="users"><span>👥</span> <span>Users</span></div>
         <div class="sidebar-item" data-page="history"><span>📜</span> <span>Trade History</span></div>
     </div>
@@ -344,66 +372,88 @@
         </div>
 
         <div id="adminContent" style="display: none;">
-            <!-- Global Trade Control Card -->
+            <!-- Global Trade Control -->
             <div class="global-toggle-card">
                 <h2>🎮 Global Trade Control</h2>
-                <p>When this switch is <strong style="color:#00ff88;">ON</strong> → All users automatically <strong style="color:#00ff88;">WIN</strong> their trades</p>
-                <p>When this switch is <strong style="color:#ff4444;">OFF</strong> → All users automatically <strong style="color:#ff4444;">LOSE</strong> their trades</p>
-                <p>📌 The outcome applies immediately when a user places a trade</p>
-                
-                <div class="global-toggle">
-                    <span class="toggle-label off">🔴 LOSE</span>
+                <p>When switch is <strong style="color:#00ff88;">ON</strong> → All users WIN their trades</p>
+                <p>When switch is <strong style="color:#ff4444;">OFF</strong> → All users LOSE their trades</p>
+                <div style="margin-top: 15px;">
                     <label class="big-toggle-switch">
                         <input type="checkbox" id="globalTradeSwitch" onchange="toggleGlobalTrade()">
                         <span class="big-slider"></span>
                     </label>
-                    <span class="toggle-label on">🟢 WIN</span>
                 </div>
-                
-                <div id="currentStatus" style="margin-top: 15px; font-size: 1.2rem;">
+                <div id="currentStatus" style="margin-top: 15px;">
                     Current Mode: <span id="modeStatus" class="status-badge status-lose">LOSE MODE</span>
                 </div>
             </div>
 
             <div class="stats-grid">
                 <div class="stat-card"><div class="stat-number" id="totalUsers">0</div><div>Total Users</div></div>
-                <div class="stat-card"><div class="stat-number" id="pendingTrades">0</div><div>Pending Trades</div></div>
+                <div class="stat-card"><div class="stat-number" id="pendingDeposits">0</div><div>Pending Deposits</div></div>
+                <div class="stat-card"><div class="stat-number" id="pendingWithdrawals">0</div><div>Pending Withdrawals</div></div>
                 <div class="stat-card"><div class="stat-number" id="totalTrades">0</div><div>Total Trades</div></div>
-                <div class="stat-card"><div class="stat-number" id="totalVolume">$0</div><div>Total Volume</div></div>
             </div>
 
-            <!-- Pending Trades Page -->
+            <!-- Trade Control Page -->
             <div id="controlPage" class="page-content">
-                <div class="page-header">
-                    <h1>💰 Pending Trades</h1>
-                    <p>Trades waiting to be processed. Outcome determined by Global Switch.</p>
-                </div>
+                <div class="page-header"><h1>💰 Trade Control</h1><p>Global ON/OFF switch controls all trades</p></div>
+            </div>
+
+            <!-- Deposit Requests Page -->
+            <div id="depositsPage" class="page-content" style="display: none;">
+                <div class="page-header"><h1>💰 Deposit Requests</h1><p>Approve or reject deposit requests</p></div>
                 <div class="table-container">
                     <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>User Email</th>
-                                <th>Coin</th>
-                                <th>Amount</th>
-                                <th>Duration</th>
-                                <th>Expected Return</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pendingTradesList"></tbody>
+                        <thead><tr><th>User</th><th>Amount</th><th>Currency</th><th>Date</th><th>Proof</th><th>Status</th><th>Action</th></tr></thead>
+                        <tbody id="depositsList"></tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Withdrawal Requests Page -->
+            <div id="withdrawalsPage" class="page-content" style="display: none;">
+                <div class="page-header"><h1>💸 Withdrawal Requests</h1><p>Approve or reject withdrawal requests</p></div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>User</th><th>Amount</th><th>Wallet</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+                        <tbody id="withdrawalsList"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Deposit Addresses Management -->
+            <div id="depositAddressesPage" class="page-content" style="display: none;">
+                <div class="page-header"><h1>🏦 Deposit Addresses</h1><p>Manage wallet addresses for deposits</p></div>
+                <div class="profile-card">
+                    <div class="card-title">🔷 ETH Address</div>
+                    <div class="form-group">
+                        <label>Ethereum (ETH) Deposit Address</label>
+                        <input type="text" id="adminEthAddress" placeholder="Enter ETH wallet address">
+                    </div>
+                    
+                    <div class="card-title" style="margin-top: 20px;">₿ BTC Address</div>
+                    <div class="form-group">
+                        <label>Bitcoin (BTC) Deposit Address</label>
+                        <input type="text" id="adminBtcAddress" placeholder="Enter BTC wallet address">
+                    </div>
+                    
+                    <div class="card-title" style="margin-top: 20px;">💎 USDT Address</div>
+                    <div class="form-group">
+                        <label>USDT (ERC-20) Deposit Address</label>
+                        <input type="text" id="adminUsdtAddress" placeholder="Enter USDT wallet address">
+                    </div>
+                    
+                    <button class="btn-save" onclick="saveDepositAddresses()">💾 Save All Addresses</button>
                 </div>
             </div>
 
             <!-- Users Page -->
             <div id="usersPage" class="page-content" style="display: none;">
-                <div class="page-header"><h1>👥 User Management</h1><p>View and manage all registered users</p></div>
+                <div class="page-header"><h1>👥 User Management</h1></div>
                 <div class="table-container">
                     <table>
-                        <thead>
-                            <tr><th>Email</th><th>Full Name</th><th>Balance</th><th>KYC Status</th><th>Registered</th><th>Actions</th></tr>
-                        </thead>
+                        <thead><tr><th>Email</th><th>Full Name</th><th>Balance</th><th>KYC Status</th><th>Actions</th></tr></thead>
                         <tbody id="usersList"></tbody>
                     </table>
                 </div>
@@ -411,12 +461,10 @@
 
             <!-- Trade History Page -->
             <div id="historyPage" class="page-content" style="display: none;">
-                <div class="page-header"><h1>📜 Trade History</h1><p>All completed trades (WON / LOST)</p></div>
+                <div class="page-header"><h1>📜 Trade History</h1></div>
                 <div class="table-container">
                     <table>
-                        <thead>
-                            <tr><th>User</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Return Rate</th><th>Profit/Loss</th><th>Outcome</th><th>Date</th></tr>
-                        </thead>
+                        <thead><tr><th>User</th><th>Coin</th><th>Amount</th><th>Profit/Loss</th><th>Outcome</th><th>Date</th></tr></thead>
                         <tbody id="historyList"></tbody>
                     </table>
                 </div>
@@ -433,7 +481,6 @@
         if (isAdmin === 'true') {
             document.getElementById('loginWarning').style.display = 'none';
             document.getElementById('adminContent').style.display = 'block';
-            loadGlobalSwitchState();
             loadAllData();
         } else {
             document.getElementById('loginWarning').style.display = 'block';
@@ -446,7 +493,6 @@
         if (password === ADMIN_PASSWORD) {
             sessionStorage.setItem('isAdmin', 'true');
             checkAdminAccess();
-            loadAllData();
         } else {
             alert('❌ Incorrect admin password!');
         }
@@ -457,7 +503,201 @@
         window.location.href = 'index.html';
     }
 
-    // Global Trade Control Functions
+    function loadAllData() {
+        loadDepositRequests();
+        loadWithdrawalRequests();
+        loadUsers();
+        loadTradeHistory();
+        updateStats();
+        loadGlobalSwitchState();
+    }
+
+    function loadDepositRequests() {
+        const deposits = JSON.parse(localStorage.getItem('depositRequests') || '[]');
+        const depositsList = document.getElementById('depositsList');
+        
+        if (deposits.length === 0) {
+            depositsList.innerHTML = '<tr><td colspan="7" style="text-align:center;">No deposit requests</td></tr>';
+            return;
+        }
+        
+        depositsList.innerHTML = deposits.map((req, index) => `
+            <tr>
+                <td>${req.userEmail}</td>
+                <td>$${req.amount}</td>
+                <td>${req.currency}</td>
+                <td>${req.date}</td>
+                <td>${req.proofFileName || 'No file'}</td>
+                <td class="status-pending">Pending</td>
+                <td>
+                    <button class="btn-approve" onclick="approveDeposit(${index})">Approve</button>
+                    <button class="btn-reject" onclick="rejectDeposit(${index})">Reject</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function loadWithdrawalRequests() {
+        const withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+        const withdrawalsList = document.getElementById('withdrawalsList');
+        
+        if (withdrawals.length === 0) {
+            withdrawalsList.innerHTML = '<tr><td colspan="6" style="text-align:center;">No withdrawal requests</td></tr>';
+            return;
+        }
+        
+        withdrawalsList.innerHTML = withdrawals.map((req, index) => `
+            <tr>
+                <td>${req.userEmail}</td>
+                <td>$${req.amount}</td>
+                <td>${req.address}</td>
+                <td>${req.date}</td>
+                <td class="status-pending">Pending</td>
+                <td>
+                    <button class="btn-approve" onclick="approveWithdrawal(${index})">Approve</button>
+                    <button class="btn-reject" onclick="rejectWithdrawal(${index})">Reject</button>
+                 </td>
+            </tr>
+        `).join('');
+    }
+
+    function approveDeposit(index) {
+        const deposits = JSON.parse(localStorage.getItem('depositRequests') || '[]');
+        const request = deposits[index];
+        
+        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 10000}');
+        profile.balance = (profile.balance || 10000) + request.amount;
+        localStorage.setItem('lunoProfile', JSON.stringify(profile));
+        
+        deposits.splice(index, 1);
+        localStorage.setItem('depositRequests', JSON.stringify(deposits));
+        
+        alert(`✅ Deposit of $${request.amount} approved!`);
+        loadAllData();
+    }
+
+    function rejectDeposit(index) {
+        const deposits = JSON.parse(localStorage.getItem('depositRequests') || '[]');
+        deposits.splice(index, 1);
+        localStorage.setItem('depositRequests', JSON.stringify(deposits));
+        alert('❌ Deposit rejected');
+        loadAllData();
+    }
+
+    function approveWithdrawal(index) {
+        const withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+        const request = withdrawals[index];
+        
+        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 10000}');
+        if ((profile.balance || 10000) >= request.amount) {
+            profile.balance = (profile.balance || 10000) - request.amount;
+            localStorage.setItem('lunoProfile', JSON.stringify(profile));
+            withdrawals.splice(index, 1);
+            localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawals));
+            alert(`✅ Withdrawal of $${request.amount} approved!`);
+        } else {
+            alert('❌ Insufficient balance!');
+        }
+        loadAllData();
+    }
+
+    function rejectWithdrawal(index) {
+        const withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+        withdrawals.splice(index, 1);
+        localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawals));
+        alert('❌ Withdrawal rejected');
+        loadAllData();
+    }
+
+    function loadUsers() {
+        const registeredUser = localStorage.getItem('lunoRegisteredUser');
+        const usersList = document.getElementById('usersList');
+        
+        if (!registeredUser) {
+            usersList.innerHTML = '<tr><td colspan="5" style="text-align:center;">No users found</td></tr>';
+            return;
+        }
+        
+        const user = JSON.parse(registeredUser);
+        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{}');
+        
+        usersList.innerHTML = `
+            <tr>
+                <td>${user.email}</td>
+                <td>${user.fullName}</td>
+                <td>$${(profile.balance || 10000).toLocaleString()}</td>
+                <td>${profile.kycStatus || 'pending'}</td>
+                <td><button class="btn-approve" onclick="editUserBalance()">Edit Balance</button></td>
+            </tr>
+        `;
+    }
+
+    function loadTradeHistory() {
+        const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
+        const historyList = document.getElementById('historyList');
+        
+        if (history.length === 0) {
+            historyList.innerHTML = '<tr><td colspan="6" style="text-align:center;">No trade history</td></tr>';
+            return;
+        }
+        
+        historyList.innerHTML = history.map(trade => `
+            <tr>
+                <td>${trade.userEmail || 'User'}</td>
+                <td>${trade.coinName}</td>
+                <td>$${trade.amount.toFixed(2)}</td>
+                <td class="${trade.profit >= 0 ? 'status-win' : 'status-lose'}">${trade.profit >= 0 ? '+' : ''}$${trade.profit.toFixed(2)}</td>
+                <td class="${trade.status === 'won' ? 'status-win' : 'status-lose'}">${trade.status === 'won' ? 'WON' : 'LOST'}</td>
+                <td>${trade.date}</td>
+            </tr>
+        `).join('');
+    }
+
+    function updateStats() {
+        const deposits = JSON.parse(localStorage.getItem('depositRequests') || '[]').length;
+        const withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]').length;
+        const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
+        
+        document.getElementById('pendingDeposits').innerText = deposits;
+        document.getElementById('pendingWithdrawals').innerText = withdrawals;
+        document.getElementById('totalTrades').innerText = history.length;
+        
+        const registeredUser = localStorage.getItem('lunoRegisteredUser');
+        document.getElementById('totalUsers').innerText = registeredUser ? 1 : 0;
+    }
+
+    function editUserBalance() {
+        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 10000}');
+        const newBalance = prompt('Enter new balance:', profile.balance);
+        if (newBalance && !isNaN(newBalance)) {
+            profile.balance = parseFloat(newBalance);
+            localStorage.setItem('lunoProfile', JSON.stringify(profile));
+            alert('✅ Balance updated!');
+            loadUsers();
+            updateStats();
+        }
+    }
+
+    // Deposit Address Management
+    function loadDepositAddressesForAdmin() {
+        const addresses = JSON.parse(localStorage.getItem('depositAddresses') || '{}');
+        document.getElementById('adminEthAddress').value = addresses.eth || '';
+        document.getElementById('adminBtcAddress').value = addresses.btc || '';
+        document.getElementById('adminUsdtAddress').value = addresses.usdt || '';
+    }
+
+    function saveDepositAddresses() {
+        const addresses = {
+            eth: document.getElementById('adminEthAddress').value,
+            btc: document.getElementById('adminBtcAddress').value,
+            usdt: document.getElementById('adminUsdtAddress').value
+        };
+        
+        localStorage.setItem('depositAddresses', JSON.stringify(addresses));
+        alert('✅ Deposit addresses saved successfully!');
+    }
+
+    // Global Trade Control
     function loadGlobalSwitchState() {
         const isWinMode = localStorage.getItem('globalTradeMode') === 'win';
         document.getElementById('globalTradeSwitch').checked = isWinMode;
@@ -469,11 +709,7 @@
         const newMode = isChecked ? 'win' : 'lose';
         localStorage.setItem('globalTradeMode', newMode);
         updateModeDisplay(isChecked);
-        
-        // Process all pending trades with the new mode
-        processPendingTrades();
-        
-        alert(`✅ Trade mode changed to ${isChecked ? 'WIN' : 'LOSE'} mode!\n\nAll future trades will ${isChecked ? 'WIN' : 'LOSE'} automatically.`);
+        alert(`✅ Trade mode changed to ${isChecked ? 'WIN' : 'LOSE'} mode!`);
     }
 
     function updateModeDisplay(isWin) {
@@ -487,187 +723,6 @@
         }
     }
 
-    function processPendingTrades() {
-        const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
-        const isWinMode = localStorage.getItem('globalTradeMode') === 'win';
-        
-        if (pendingTrades.length === 0) return;
-        
-        pendingTrades.forEach(trade => {
-            processTradeOutcome(trade, isWinMode);
-        });
-        
-        // Clear pending trades
-        localStorage.setItem('pendingTrades', JSON.stringify([]));
-        loadAllData();
-    }
-
-    function processTradeOutcome(trade, isWin) {
-        let userProfile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 10000}');
-        
-        if (isWin) {
-            const profit = trade.expectedProfit;
-            const totalReturn = trade.amount + profit;
-            userProfile.balance = (userProfile.balance || 10000) + totalReturn;
-            localStorage.setItem('lunoProfile', JSON.stringify(userProfile));
-            
-            const tradeRecord = {
-                id: trade.id,
-                userEmail: trade.userEmail,
-                coin: trade.coin,
-                coinName: trade.coinName,
-                amount: trade.amount,
-                duration: trade.duration,
-                rate: trade.rate,
-                profit: profit,
-                status: 'won',
-                date: new Date().toLocaleString(),
-                tradeType: 'buy'
-            };
-            
-            const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
-            history.unshift(tradeRecord);
-            localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
-        } else {
-            const tradeRecord = {
-                id: trade.id,
-                userEmail: trade.userEmail,
-                coin: trade.coin,
-                coinName: trade.coinName,
-                amount: trade.amount,
-                duration: trade.duration,
-                rate: trade.rate,
-                profit: -trade.amount,
-                status: 'lost',
-                date: new Date().toLocaleString(),
-                tradeType: 'buy'
-            };
-            
-            const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
-            history.unshift(tradeRecord);
-            localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
-        }
-    }
-
-    function loadAllData() {
-        loadPendingTrades();
-        loadUsers();
-        loadTradeHistory();
-        updateStats();
-    }
-
-    function loadPendingTrades() {
-        const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]');
-        const pendingList = document.getElementById('pendingTradesList');
-        
-        if (pendingTrades.length === 0) {
-            pendingList.innerHTML = '<tr><td colspan="7" style="text-align:center;">✅ No pending trades</td></tr>';
-            return;
-        }
-        
-        pendingList.innerHTML = pendingTrades.map((trade, index) => `
-            <tr>
-                <td>#${trade.id || index + 1}</td>
-                <td>${trade.userEmail || 'User'}</td>
-                <td>${trade.coinName} (${trade.coin})</td>
-                <td>$${trade.amount.toFixed(2)}</td>
-                <td>${trade.duration}s</td>
-                <td>+${trade.rate}% ($${trade.expectedProfit.toFixed(2)})</td>
-                <td class="status-pending">⏳ PENDING</td>
-            </tr>
-        `).join('');
-    }
-
-    function loadUsers() {
-        const registeredUser = localStorage.getItem('lunoRegisteredUser');
-        const usersList = document.getElementById('usersList');
-        
-        if (!registeredUser) {
-            usersList.innerHTML = '<tr><td colspan="6" style="text-align:center;">No users found</td></tr>';
-            return;
-        }
-        
-        const user = JSON.parse(registeredUser);
-        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{}');
-        
-        usersList.innerHTML = `
-            <tr>
-                <td>${user.email}</td>
-                <td>${user.fullName}</td>
-                <td>$${(profile.balance || 10000).toLocaleString()}</td>
-                <td class="${profile.kycStatus === 'verified' ? 'status-win' : 'status-pending'}">${profile.kycStatus || 'pending'}</td>
-                <td>${new Date(user.registeredAt).toLocaleDateString()}</td>
-                <td>
-                    <button onclick="editUserBalance()" style="background: rgba(0,212,255,0.2); border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer;">Edit Balance</button>
-                    <button onclick="approveUserKYC()" style="background: rgba(0,212,255,0.2); border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; margin-left: 5px;">Approve KYC</button>
-                  </td>
-            </tr>
-        `;
-    }
-
-    function loadTradeHistory() {
-        const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
-        const historyList = document.getElementById('historyList');
-        
-        if (history.length === 0) {
-            historyList.innerHTML = '<tr><td colspan="8" style="text-align:center;">No trade history</td></tr>';
-            return;
-        }
-        
-        historyList.innerHTML = history.map(trade => {
-            const profitClass = trade.profit >= 0 ? 'status-win' : 'status-lose';
-            const statusClass = trade.status === 'won' ? 'status-win' : 'status-lose';
-            const statusText = trade.status === 'won' ? '🏆 WON' : '💀 LOST';
-            return `
-                <tr>
-                    <td>${trade.userEmail || 'User'}</td>
-                    <td>${trade.coinName} (${trade.coin})</td>
-                    <td>$${trade.amount.toFixed(2)}</td>
-                    <td>${trade.duration}s</td>
-                    <td>+${trade.rate}%</td>
-                    <td class="${profitClass}">${trade.profit >= 0 ? '+' : ''}$${trade.profit.toFixed(2)}</td>
-                    <td class="${statusClass}">${statusText}</td>
-                    <td>${trade.date}</td>
-                </tr>
-            `;
-        }).join('');
-    }
-
-    function updateStats() {
-        const registeredUser = localStorage.getItem('lunoRegisteredUser');
-        const totalUsers = registeredUser ? 1 : 0;
-        const pendingTrades = JSON.parse(localStorage.getItem('pendingTrades') || '[]').length;
-        const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
-        const totalTrades = history.length;
-        const totalVolume = history.reduce((sum, t) => sum + t.amount, 0);
-        
-        document.getElementById('totalUsers').innerText = totalUsers;
-        document.getElementById('pendingTrades').innerText = pendingTrades;
-        document.getElementById('totalTrades').innerText = totalTrades;
-        document.getElementById('totalVolume').innerText = `$${totalVolume.toLocaleString()}`;
-    }
-
-    function editUserBalance() {
-        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 10000}');
-        const newBalance = prompt('Enter new balance amount:', profile.balance);
-        if (newBalance && !isNaN(newBalance)) {
-            profile.balance = parseFloat(newBalance);
-            localStorage.setItem('lunoProfile', JSON.stringify(profile));
-            alert('✅ Balance updated!');
-            loadUsers();
-            updateStats();
-        }
-    }
-
-    function approveUserKYC() {
-        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{}');
-        profile.kycStatus = 'verified';
-        localStorage.setItem('lunoProfile', JSON.stringify(profile));
-        alert('✅ KYC approved!');
-        loadUsers();
-        updateStats();
-    }
-
     // Navigation
     document.querySelectorAll('.sidebar-item').forEach(item => {
         item.addEventListener('click', () => {
@@ -676,12 +731,24 @@
             item.classList.add('active');
             
             document.getElementById('controlPage').style.display = 'none';
+            document.getElementById('depositsPage').style.display = 'none';
+            document.getElementById('withdrawalsPage').style.display = 'none';
+            document.getElementById('depositAddressesPage').style.display = 'none';
             document.getElementById('usersPage').style.display = 'none';
             document.getElementById('historyPage').style.display = 'none';
             
-            if (page === 'control') {
-                document.getElementById('controlPage').style.display = 'block';
-                loadPendingTrades();
+            if (page === 'control') document.getElementById('controlPage').style.display = 'block';
+            if (page === 'deposits') {
+                document.getElementById('depositsPage').style.display = 'block';
+                loadDepositRequests();
+            }
+            if (page === 'withdrawals') {
+                document.getElementById('withdrawalsPage').style.display = 'block';
+                loadWithdrawalRequests();
+            }
+            if (page === 'depositAddresses') {
+                document.getElementById('depositAddressesPage').style.display = 'block';
+                loadDepositAddressesForAdmin();
             }
             if (page === 'users') {
                 document.getElementById('usersPage').style.display = 'block';
@@ -693,14 +760,6 @@
             }
         });
     });
-
-    // Auto-refresh every 3 seconds
-    setInterval(() => {
-        if (document.getElementById('controlPage').style.display !== 'none') {
-            loadPendingTrades();
-        }
-        updateStats();
-    }, 3000);
 
     checkAdminAccess();
 </script>
