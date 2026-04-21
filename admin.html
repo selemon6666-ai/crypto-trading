@@ -230,6 +230,16 @@
             color: #ff4444;
         }
 
+        .btn-view {
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #00d4ff;
+            margin-right: 5px;
+        }
+
         .global-toggle-card {
             background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(124, 58, 237, 0.15));
             border-radius: 20px;
@@ -300,6 +310,11 @@
             color: #ff4444;
         }
 
+        .status-pending {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+        }
+
         .login-warning {
             text-align: center;
             padding: 50px;
@@ -325,6 +340,16 @@
             font-weight: bold;
         }
 
+        .doc-link {
+            color: #00d4ff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .doc-link:hover {
+            text-decoration: underline;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 width: 80px;
@@ -335,6 +360,9 @@
             .content-area {
                 margin-left: 80px;
                 padding: 20px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
@@ -356,6 +384,7 @@
 <div class="main-container">
     <div class="sidebar">
         <div class="sidebar-item active" data-page="control"><span>🎮</span> <span>Trade Control</span></div>
+        <div class="sidebar-item" data-page="kyc"><span>✅</span> <span>KYC Requests</span></div>
         <div class="sidebar-item" data-page="deposits"><span>💰</span> <span>Deposit Requests</span></div>
         <div class="sidebar-item" data-page="withdrawals"><span>💸</span> <span>Withdrawal Requests</span></div>
         <div class="sidebar-item" data-page="depositAddresses"><span>🏦</span> <span>Deposit Addresses</span></div>
@@ -390,14 +419,30 @@
 
             <div class="stats-grid">
                 <div class="stat-card"><div class="stat-number" id="totalUsers">0</div><div>Total Users</div></div>
+                <div class="stat-card"><div class="stat-number" id="pendingKYC">0</div><div>Pending KYC</div></div>
                 <div class="stat-card"><div class="stat-number" id="pendingDeposits">0</div><div>Pending Deposits</div></div>
                 <div class="stat-card"><div class="stat-number" id="pendingWithdrawals">0</div><div>Pending Withdrawals</div></div>
-                <div class="stat-card"><div class="stat-number" id="totalTrades">0</div><div>Total Trades</div></div>
             </div>
 
             <!-- Trade Control Page -->
             <div id="controlPage" class="page-content">
                 <div class="page-header"><h1>💰 Trade Control</h1><p>Global ON/OFF switch controls all trades</p></div>
+            </div>
+
+            <!-- KYC Requests Page with File View -->
+            <div id="kycPage" class="page-content" style="display: none;">
+                <div class="page-header">
+                    <h1>✅ KYC Verification Requests</h1>
+                    <p>Approve or reject user identity verification</p>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>User</th><th>Full Name</th><th>ID Type</th><th>ID Number</th><th>Documents</th><th>Date</th><th>Status</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="kycList"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Deposit Requests Page -->
@@ -504,12 +549,72 @@
     }
 
     function loadAllData() {
+        loadKYCRequests();
         loadDepositRequests();
         loadWithdrawalRequests();
         loadUsers();
         loadTradeHistory();
         updateStats();
         loadGlobalSwitchState();
+        loadDepositAddressesForAdmin();
+    }
+
+    // KYC Requests with File Display
+    function loadKYCRequests() {
+        const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
+        const kycList = document.getElementById('kycList');
+        
+        if (kycRequests.length === 0) {
+            kycList.innerHTML = '<tr><td colspan="8" style="text-align:center;">No KYC requests</td></tr>';
+            return;
+        }
+        
+        kycList.innerHTML = kycRequests.map((req, index) => {
+            let docsHtml = '';
+            if (req.frontFile) docsHtml += `<div>📄 Front: ${req.frontFile}</div>`;
+            if (req.backFile) docsHtml += `<div>📄 Back: ${req.backFile}</div>`;
+            if (req.selfieFile) docsHtml += `<div>📸 Selfie: ${req.selfieFile}</div>`;
+            if (!docsHtml) docsHtml = 'No files uploaded';
+            
+            return `
+                <tr>
+                    <td>${req.email}</td>
+                    <td>${req.fullName}</td>
+                    <td>${req.idType}</td>
+                    <td>${req.idNumber}</td>
+                    <td style="font-size: 0.75rem;">${docsHtml}</td>
+                    <td>${req.date}</td>
+                    <td class="status-pending">Pending</td>
+                    <td>
+                        <button class="btn-approve" onclick="approveKYC(${index})">Approve</button>
+                        <button class="btn-reject" onclick="rejectKYC(${index})">Reject</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function approveKYC(index) {
+        const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
+        const request = kycRequests[index];
+        
+        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{}');
+        profile.kycStatus = 'verified';
+        localStorage.setItem('lunoProfile', JSON.stringify(profile));
+        
+        kycRequests.splice(index, 1);
+        localStorage.setItem('kycRequests', JSON.stringify(kycRequests));
+        
+        alert(`✅ KYC approved for ${request.email}`);
+        loadAllData();
+    }
+
+    function rejectKYC(index) {
+        const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
+        kycRequests.splice(index, 1);
+        localStorage.setItem('kycRequests', JSON.stringify(kycRequests));
+        alert('❌ KYC rejected');
+        loadAllData();
     }
 
     function loadDepositRequests() {
@@ -556,7 +661,7 @@
                 <td>
                     <button class="btn-approve" onclick="approveWithdrawal(${index})">Approve</button>
                     <button class="btn-reject" onclick="rejectWithdrawal(${index})">Reject</button>
-                 </td>
+                </td>
             </tr>
         `).join('');
     }
@@ -626,7 +731,7 @@
                 <td>${user.email}</td>
                 <td>${user.fullName}</td>
                 <td>$${(profile.balance || 10000).toLocaleString()}</td>
-                <td>${profile.kycStatus || 'pending'}</td>
+                <td class="${profile.kycStatus === 'verified' ? 'status-win' : 'status-pending'}">${profile.kycStatus || 'pending'}</td>
                 <td><button class="btn-approve" onclick="editUserBalance()">Edit Balance</button></td>
             </tr>
         `;
@@ -654,13 +759,13 @@
     }
 
     function updateStats() {
-        const deposits = JSON.parse(localStorage.getItem('depositRequests') || '[]').length;
-        const withdrawals = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]').length;
-        const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
+        const kycCount = JSON.parse(localStorage.getItem('kycRequests') || '[]').length;
+        const depositCount = JSON.parse(localStorage.getItem('depositRequests') || '[]').length;
+        const withdrawalCount = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]').length;
         
-        document.getElementById('pendingDeposits').innerText = deposits;
-        document.getElementById('pendingWithdrawals').innerText = withdrawals;
-        document.getElementById('totalTrades').innerText = history.length;
+        document.getElementById('pendingKYC').innerText = kycCount;
+        document.getElementById('pendingDeposits').innerText = depositCount;
+        document.getElementById('pendingWithdrawals').innerText = withdrawalCount;
         
         const registeredUser = localStorage.getItem('lunoRegisteredUser');
         document.getElementById('totalUsers').innerText = registeredUser ? 1 : 0;
@@ -731,6 +836,7 @@
             item.classList.add('active');
             
             document.getElementById('controlPage').style.display = 'none';
+            document.getElementById('kycPage').style.display = 'none';
             document.getElementById('depositsPage').style.display = 'none';
             document.getElementById('withdrawalsPage').style.display = 'none';
             document.getElementById('depositAddressesPage').style.display = 'none';
@@ -738,6 +844,10 @@
             document.getElementById('historyPage').style.display = 'none';
             
             if (page === 'control') document.getElementById('controlPage').style.display = 'block';
+            if (page === 'kyc') {
+                document.getElementById('kycPage').style.display = 'block';
+                loadKYCRequests();
+            }
             if (page === 'deposits') {
                 document.getElementById('depositsPage').style.display = 'block';
                 loadDepositRequests();
