@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - Login</title>
+    <script src="auth.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
@@ -13,77 +19,455 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
+            overflow-x: hidden;
         }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
         .container {
+            display: flex;
+            width: 1000px;
+            max-width: 90%;
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border-radius: 30px;
-            padding: 50px;
-            width: 450px;
+            overflow: hidden;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1;
+            position: relative;
         }
-        h1 { color: white; margin-bottom: 20px; text-align: center; }
-        input {
+
+        .form-section {
+            flex: 1;
+            padding: 50px 40px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .input-group input {
             width: 100%;
-            padding: 14px;
-            margin: 10px 0;
+            padding: 14px 16px;
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
             color: white;
             font-size: 1rem;
+            transition: all 0.3s;
         }
-        button {
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .options-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+        }
+
+        .remember-me input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #00d4ff;
+        }
+
+        .forgot-password {
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+
+        .forgot-password:hover {
+            color: #7c3aed;
+        }
+
+        .login-btn {
             width: 100%;
             padding: 14px;
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             border: none;
             border-radius: 12px;
             color: white;
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1rem;
-            margin-top: 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
         }
-        .error { color: #ff6666; margin-top: 10px; display: none; text-align: center; }
-        a { color: #00d4ff; text-decoration: none; }
-        p { text-align: center; margin-top: 20px; color: white; }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 212, 255, 0.3);
+        }
+
+        .divider {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .social-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .social-btn.google {
+            background: rgba(219, 68, 55, 0.15);
+            border-color: rgba(219, 68, 55, 0.3);
+        }
+
+        .social-btn.apple {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 25px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+
+        .signup-link a {
+            color: #00d4ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .signup-link a:hover {
+            color: #7c3aed;
+        }
+
+        .brand-section {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(124, 58, 237, 0.1));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+            text-align: center;
+        }
+
+        .brand-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        .brand-section h2 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .brand-section p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .trading-features {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .feature span:first-child {
+            font-size: 1.2rem;
+        }
+
+        .error-msg {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 15px;
+            color: #ff6666;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .brand-section {
+                display: none;
+            }
+            .form-section {
+                padding: 40px 25px;
+            }
+            .social-buttons {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
+
+<div class="particles" id="particles"></div>
+
 <div class="container">
-    <h1>🔐 Login to Luno Trading</h1>
-    <input type="email" id="email" placeholder="Email Address">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <div id="errorMsg" class="error"></div>
-    <p>Don't have an account? <a href="register.html">Sign Up</a></p>
+    <div class="form-section">
+        <div class="logo">📈 Luno Trading</div>
+        <h1>Login</h1>
+        <p class="subtitle">Enter your credentials to access your account</p>
+
+        <div id="errorMsg" class="error-msg"></div>
+
+        <form id="loginForm" onsubmit="return handleLogin(event)">
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+            </div>
+
+            <div class="options-row">
+                <label class="remember-me">
+                    <input type="checkbox" id="rememberMe"> Remember Me
+                </label>
+                <a href="#" class="forgot-password" onclick="handleForgotPassword()">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+
+        <div class="divider">OR</div>
+
+        <div class="social-buttons">
+            <button class="social-btn google" onclick="socialLogin('google')">
+                <span>G</span> Login with Google
+            </button>
+            <button class="social-btn apple" onclick="socialLogin('apple')">
+                <span>🍎</span> Login with Apple
+            </button>
+        </div>
+
+        <div class="signup-link">
+            Don't have an account? <a href="register.html">Sign Up</a>
+        </div>
+    </div>
+
+    <div class="brand-section">
+        <div class="brand-icon">📊</div>
+        <h2>Your Trusted<br>Trading Platform</h2>
+        <p>Trade smarter with real-time insights, advanced charts, and professional tools.</p>
+        
+        <div class="trading-features">
+            <div class="feature">
+                <span>🚀</span> Real-time market data
+            </div>
+            <div class="feature">
+                <span>📈</span> Advanced charting tools
+            </div>
+            <div class="feature">
+                <span>🔒</span> Secure & reliable
+            </div>
+            <div class="feature">
+                <span>💎</span> 24/7 customer support
+            </div>
+        </div>
+    </div>
 </div>
 
-<script type="module">
-    import { auth, signInWithEmailAndPassword, db, doc, getDoc } from './firebase-config.js';
-    
-    window.login = async function() {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const errorMsg = document.getElementById('errorMsg');
-        
-        errorMsg.style.display = 'none';
-        
-        if (!email || !password) {
-            errorMsg.style.display = 'block';
-            errorMsg.innerText = '❌ Please enter email and password';
-            return;
-        }
-        
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            window.location.href = 'dashboard.html';
-        } catch (error) {
-            errorMsg.style.display = 'block';
-            errorMsg.innerText = '❌ Invalid email or password';
+<script>
+    function createParticles() {
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            const size = Math.random() * 5 + 2;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDuration = Math.random() * 15 + 10 + 's';
+            particle.style.animationDelay = Math.random() * 10 + 's';
+            particlesContainer.appendChild(particle);
         }
     }
+
+    function handleLogin(event) {
+        event.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+        const errorMsg = document.getElementById('errorMsg');
+        
+        // Get registered user from localStorage
+        const registeredUser = localStorage.getItem('lunoRegisteredUser');
+        
+        if (registeredUser) {
+            const user = JSON.parse(registeredUser);
+            
+            if (email === user.email && password === user.password) {
+                // Use the centralized save function from auth.js
+                const success = saveUserSession(user, rememberMe);
+                
+                if (success) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    errorMsg.style.display = 'block';
+                    errorMsg.innerHTML = '❌ Session error. Please try again.';
+                }
+                return false;
+            }
+        }
+        
+        errorMsg.style.display = 'block';
+        errorMsg.innerHTML = '❌ Invalid email or password. Please try again or <a href="register.html" style="color:#00d4ff;">Sign Up</a>';
+        
+        setTimeout(() => {
+            errorMsg.style.display = 'none';
+        }, 3000);
+        
+        return false;
+    }
+    
+    function handleForgotPassword() {
+        alert('Please contact support@lunotrading.com for password reset.');
+    }
+    
+    function socialLogin(provider) {
+        alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login is coming soon!`);
+    }
+    
+    createParticles();
 </script>
+
 </body>
 </html>
