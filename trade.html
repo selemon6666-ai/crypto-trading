@@ -83,39 +83,6 @@
             background: rgba(255, 68, 68, 0.3);
         }
 
-        /* Timer Display */
-        .timer-section {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 0 25px 20px 25px;
-            text-align: center;
-        }
-
-        .active-trade {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2));
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 12px;
-            padding: 15px;
-        }
-
-        .timer-text {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-        }
-
-        .countdown {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #00d4ff;
-        }
-
-        .trade-locked {
-            color: #ffaa00;
-            font-size: 0.9rem;
-            margin-top: 10px;
-        }
-
         .main-content {
             margin-top: 80px;
             padding: 30px 40px;
@@ -141,6 +108,28 @@
         .card-header h1 {
             font-size: 1.8rem;
             margin-bottom: 5px;
+        }
+
+        /* Active Trade Banner */
+        .active-trade-banner {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2));
+            border: 2px solid #00d4ff;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 25px;
+            text-align: center;
+        }
+
+        .active-trade-banner .timer {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+            margin: 10px 0;
+        }
+
+        .trade-locked {
+            color: #ffaa00;
+            font-size: 0.85rem;
         }
 
         .trade-type {
@@ -218,6 +207,11 @@
             font-size: 1rem;
         }
 
+        .form-group input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .return-options {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -233,6 +227,12 @@
             text-align: center;
             cursor: pointer;
             transition: 0.3s;
+        }
+
+        .return-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
         .return-option:hover { background: rgba(0, 212, 255, 0.2); }
@@ -301,7 +301,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -354,11 +354,11 @@
             <p>Review your trade details before confirming</p>
         </div>
 
-        <!-- Timer Display -->
-        <div class="timer-section" id="timerSection" style="display: none;">
-            <div class="active-trade">
-                <div class="timer-text">⏳ Active Trade in Progress</div>
-                <div class="countdown" id="countdownTimer">0s</div>
+        <!-- Active Trade Banner -->
+        <div id="activeTradeBanner" style="display: none;">
+            <div class="active-trade-banner">
+                <div>⏳ Active Trade in Progress</div>
+                <div class="timer" id="timerDisplay">0s</div>
                 <div class="trade-locked">🔒 New trades are locked until current trade completes</div>
             </div>
         </div>
@@ -416,7 +416,7 @@
         <div class="form-section">
             <div class="form-group">
                 <label>Amount (USDT)</label>
-                <input type="number" id="amount" placeholder="Enter amount to trade" oninput="calculateReturn()" disabled>
+                <input type="number" id="amount" placeholder="Enter amount to trade" oninput="calculateReturn()">
             </div>
 
             <label style="display: block; margin-bottom: 10px; color: rgba(255,255,255,0.7);">Select Duration</label>
@@ -482,8 +482,8 @@
     let currentCoin = 'BTC';
     let currentCoinPrice = 75875;
     let activeTrade = false;
-    let tradeTimer = null;
-    let activeTradeData = null;
+    let activeTimer = null;
+    let activeTradeEndTime = null;
     
     const coinPrices = {
         BTC: 75875, ETH: 2363.69, USDT: 1.00, BNB: 580.50, XRP: 1.43, SOL: 142.30,
@@ -502,64 +502,74 @@
 
     // Check for active trade on page load
     function checkActiveTrade() {
-        const savedActiveTrade = localStorage.getItem('activeTrade');
-        if (savedActiveTrade) {
-            try {
-                activeTradeData = JSON.parse(savedActiveTrade);
-                const expiryTime = activeTradeData.expiryTime;
-                const now = Date.now();
-                
-                if (expiryTime > now) {
-                    // Trade is still active
-                    activeTrade = true;
-                    const remainingSeconds = Math.ceil((expiryTime - now) / 1000);
-                    startCountdown(remainingSeconds);
-                    lockTradeInterface(true);
-                } else {
-                    // Trade has expired - process result
-                    localStorage.removeItem('activeTrade');
-                    processTradeResult(activeTradeData);
+        const savedEndTime = localStorage.getItem('tradeEndTime');
+        if (savedEndTime) {
+            const endTime = parseInt(savedEndTime);
+            const now = Date.now();
+            
+            if (endTime > now) {
+                // Trade still active
+                const remaining = Math.ceil((endTime - now) / 1000);
+                startActiveTrade(remaining);
+            } else {
+                // Trade expired - process result
+                localStorage.removeItem('tradeEndTime');
+                const savedTradeData = localStorage.getItem('activeTradeData');
+                if (savedTradeData) {
+                    const tradeData = JSON.parse(savedTradeData);
+                    processTradeCompletion(tradeData);
+                    localStorage.removeItem('activeTradeData');
                 }
-            } catch(e) {
-                localStorage.removeItem('activeTrade');
             }
         }
     }
 
-    function startCountdown(seconds) {
-        const timerSection = document.getElementById('timerSection');
-        const countdownElem = document.getElementById('countdownTimer');
+    function startActiveTrade(remainingSeconds) {
+        activeTrade = true;
+        const banner = document.getElementById('activeTradeBanner');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const amountInput = document.getElementById('amount');
+        const cryptoSelect = document.getElementById('cryptoSelect');
         const confirmBtn = document.getElementById('confirmBtn');
+        const durationOptions = document.querySelectorAll('.return-option');
         
-        timerSection.style.display = 'block';
+        banner.style.display = 'block';
+        amountInput.disabled = true;
+        cryptoSelect.disabled = true;
         confirmBtn.disabled = true;
+        durationOptions.forEach(opt => opt.classList.add('disabled'));
         
-        let remaining = seconds;
+        let remaining = remainingSeconds;
+        timerDisplay.innerText = `${remaining}s`;
         
-        if (tradeTimer) clearInterval(tradeTimer);
+        if (activeTimer) clearInterval(activeTimer);
         
-        tradeTimer = setInterval(() => {
+        activeTimer = setInterval(() => {
             remaining--;
-            countdownElem.innerText = `${remaining}s`;
+            timerDisplay.innerText = `${remaining}s`;
             
             if (remaining <= 0) {
-                clearInterval(tradeTimer);
-                tradeTimer = null;
-                // Process trade result
-                if (activeTradeData) {
-                    processTradeResult(activeTradeData);
+                clearInterval(activeTimer);
+                activeTimer = null;
+                
+                // Process trade completion
+                const savedTradeData = localStorage.getItem('activeTradeData');
+                if (savedTradeData) {
+                    const tradeData = JSON.parse(savedTradeData);
+                    processTradeCompletion(tradeData);
+                    localStorage.removeItem('activeTradeData');
+                    localStorage.removeItem('tradeEndTime');
                 }
             }
         }, 1000);
     }
 
-    function processTradeResult(tradeData) {
+    function processTradeCompletion(tradeData) {
         activeTrade = false;
-        localStorage.removeItem('activeTrade');
         
-        if (tradeTimer) {
-            clearInterval(tradeTimer);
-            tradeTimer = null;
+        if (activeTimer) {
+            clearInterval(activeTimer);
+            activeTimer = null;
         }
         
         const isWinMode = localStorage.getItem('globalTradeMode') === 'win';
@@ -590,8 +600,8 @@
             localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
             
             document.getElementById('modalTitle').innerHTML = '✅ TRADE WON!';
-            const modalMessage = `Your trade for ${tradeData.coinName} (${tradeData.coin}) with ${tradeData.duration}s duration has completed!\n\nAmount: $${tradeData.amount.toFixed(2)} USDT\nProfit: +$${profit.toFixed(2)} USDT\nTotal Return: $${totalReturn.toFixed(2)} USDT`;
-            document.getElementById('modalMessage').innerHTML = modalMessage.replace(/\n/g, '<br>');
+            const msg = `Your trade for ${tradeData.coinName} (${tradeData.coin}) with ${tradeData.duration}s duration has completed!\n\nAmount: $${tradeData.amount.toFixed(2)} USDT\nProfit: +$${profit.toFixed(2)} USDT\nTotal Return: $${totalReturn.toFixed(2)} USDT`;
+            document.getElementById('modalMessage').innerHTML = msg.replace(/\n/g, '<br>');
         } else {
             // LOSE - User loses investment (already deducted)
             const tradeRecord = {
@@ -613,43 +623,27 @@
             localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
             
             document.getElementById('modalTitle').innerHTML = '❌ TRADE LOST!';
-            const modalMessage = `Your trade for ${tradeData.coinName} (${tradeData.coin}) with ${tradeData.duration}s duration has completed!\n\nAmount: $${tradeData.amount.toFixed(2)} USDT\nLoss: -$${tradeData.amount.toFixed(2)} USDT`;
-            document.getElementById('modalMessage').innerHTML = modalMessage.replace(/\n/g, '<br>');
+            const msg = `Your trade for ${tradeData.coinName} (${tradeData.coin}) with ${tradeData.duration}s duration has completed!\n\nAmount: $${tradeData.amount.toFixed(2)} USDT\nLoss: -$${tradeData.amount.toFixed(2)} USDT`;
+            document.getElementById('modalMessage').innerHTML = msg.replace(/\n/g, '<br>');
         }
         
+        // Unlock interface
+        const banner = document.getElementById('activeTradeBanner');
+        const amountInput = document.getElementById('amount');
+        const cryptoSelect = document.getElementById('cryptoSelect');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const durationOptions = document.querySelectorAll('.return-option');
+        
+        banner.style.display = 'none';
+        amountInput.disabled = false;
+        cryptoSelect.disabled = false;
+        confirmBtn.disabled = false;
+        durationOptions.forEach(opt => opt.classList.remove('disabled'));
+        
         document.getElementById('resultModal').style.display = 'flex';
-        lockTradeInterface(false);
         updateBalanceDisplay();
     }
 
-    function lockTradeInterface(lock) {
-        const amountInput = document.getElementById('amount');
-        const durationOptions = document.querySelectorAll('.return-option');
-        const cryptoSelect = document.getElementById('cryptoSelect');
-        const confirmBtn = document.getElementById('confirmBtn');
-        const timerSection = document.getElementById('timerSection');
-        
-        if (lock) {
-            amountInput.disabled = true;
-            cryptoSelect.disabled = true;
-            confirmBtn.disabled = true;
-            durationOptions.forEach(opt => opt.style.pointerEvents = 'none');
-            timerSection.style.display = 'block';
-        } else {
-            amountInput.disabled = false;
-            cryptoSelect.disabled = false;
-            confirmBtn.disabled = false;
-            durationOptions.forEach(opt => opt.style.pointerEvents = 'auto');
-            timerSection.style.display = 'none';
-            document.getElementById('countdownTimer').innerText = '0s';
-        }
-    }
-
-    function updateBalanceDisplay() {
-        document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
-    }
-
-    // Check authentication
     function checkAuth() {
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
         if (!savedUser) {
@@ -677,6 +671,10 @@
         const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 10000}');
         profile.balance = userBalance;
         localStorage.setItem('lunoProfile', JSON.stringify(profile));
+    }
+
+    function updateBalanceDisplay() {
+        document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
     }
 
     function changeCrypto() {
@@ -767,7 +765,7 @@
     
     function confirmTrade() {
         if (activeTrade) {
-            alert('⚠️ You have an active trade in progress! Please wait for it to complete before placing a new trade.');
+            alert('⚠️ You have an active trade! Please wait for it to complete.');
             return;
         }
         
@@ -798,11 +796,11 @@
                 return;
             }
             
-            // Deduct amount + fee from balance
+            // Deduct from balance
             userBalance -= totalPay;
             saveUserBalance();
             
-            // Get current user email
+            // Get user email
             const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
             let userEmail = 'User';
             if (savedUser) {
@@ -813,10 +811,9 @@
             }
             
             const tradeId = Date.now();
-            const expiryTime = Date.now() + (selectedDuration * 1000);
+            const endTime = Date.now() + (selectedDuration * 1000);
             
-            // Create active trade data
-            activeTradeData = {
+            const tradeData = {
                 id: tradeId,
                 userEmail: userEmail,
                 coin: currentCoin,
@@ -824,26 +821,24 @@
                 amount: amount,
                 duration: selectedDuration,
                 rate: selectedRate,
-                expectedProfit: expectedReturnAmount,
-                expiryTime: expiryTime
+                expectedProfit: expectedReturnAmount
             };
             
-            // Save active trade to localStorage
-            localStorage.setItem('activeTrade', JSON.stringify(activeTradeData));
-            activeTrade = true;
+            // Save to localStorage for persistence
+            localStorage.setItem('tradeEndTime', endTime.toString());
+            localStorage.setItem('activeTradeData', JSON.stringify(tradeData));
             
-            // Start countdown
-            startCountdown(selectedDuration);
-            lockTradeInterface(true);
-            updateBalanceDisplay();
+            // Start active trade
+            startActiveTrade(selectedDuration);
             
-            // Show confirmation modal
+            // Show confirmation
             document.getElementById('modalTitle').innerHTML = '⏳ TRADE PLACED!';
-            const modalMessage = `Your ${tradeType.toUpperCase()} trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration has been placed!\n\nAmount: $${amount.toFixed(2)} USDT\nExpected Return: +${selectedRate}% ($${expectedReturnAmount.toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT\n\nTrade will complete in ${selectedDuration} seconds.`;
-            document.getElementById('modalMessage').innerHTML = modalMessage.replace(/\n/g, '<br>');
+            const msg = `Your ${tradeType.toUpperCase()} trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration has been placed!\n\nAmount: $${amount.toFixed(2)} USDT\nExpected Return: +${selectedRate}% ($${expectedReturnAmount.toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT\n\nTrade will complete in ${selectedDuration} seconds.`;
+            document.getElementById('modalMessage').innerHTML = msg.replace(/\n/g, '<br>');
             document.getElementById('resultModal').style.display = 'flex';
             
             cancelTrade();
+            updateBalanceDisplay();
         } else {
             alert('Sell feature coming soon!');
         }
