@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luno Trading - Deposit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #00d4ff;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .username {
+            color: #00d4ff;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 68, 68, 0.3);
+        }
+
+        .main-content {
+            margin-top: 80px;
+            padding: 30px 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .deposit-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .card-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        /* Address Section */
+        .address-section {
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .address-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #00d4ff;
+        }
+
+        .address-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-size: 0.85rem;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Form Section */
+        .form-section {
+            padding: 20px 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .file-input {
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .info-text {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            .nav-links {
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">📈 Luno Trading</div>
+    <div class="nav-links">
+        <a href="dashboard.html">Home</a>
+        <a href="markets.html">Markets</a>
+        <a href="trade.html">Trades</a>
+        <a href="profile.html">My Profile</a>
+    </div>
+    <div class="user-info">
+        <span class="username" id="displayUsername">Trader</span>
+        <a href="#" class="logout-btn" onclick="logout()">Logout</a>
+    </div>
+</nav>
+
+<div class="main-content">
+    <div class="deposit-card">
+        <div class="card-header">
+            <h1>💰 Deposit Funds</h1>
+            <p>Send funds to the address below</p>
+        </div>
+
+        <!-- ETH Address -->
+        <div class="address-section">
+            <div class="address-title">🔷 ETH</div>
+            <div class="address-box" id="ethAddress">Loading...</div>
+            <button class="copy-btn" onclick="copyAddress('eth')">📋 Copy Address</button>
+        </div>
+
+        <!-- BTC Address -->
+        <div class="address-section">
+            <div class="address-title">₿ BTC</div>
+            <div class="address-box" id="btcAddress">Loading...</div>
+            <button class="copy-btn" onclick="copyAddress('btc')">📋 Copy Address</button>
+        </div>
+
+        <!-- USDT Address -->
+        <div class="address-section">
+            <div class="address-title">💎 USDT (ERC-20)</div>
+            <div class="address-box" id="usdtAddress">Loading...</div>
+            <button class="copy-btn" onclick="copyAddress('usdt')">📋 Copy Address</button>
+        </div>
+
+        <!-- Deposit Form -->
+        <div class="form-section">
+            <div class="form-group">
+                <label>Amount (USDT)</label>
+                <input type="number" id="depositAmount" placeholder="Enter amount in USDT">
+            </div>
+
+            <div class="form-group">
+                <label>Currency</label>
+                <select id="depositCurrency">
+                    <option value="USDT">USDT (ERC-20)</option>
+                    <option value="BTC">BTC</option>
+                    <option value="ETH">ETH</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>📎 Upload Proof of Payment (Screenshot)</label>
+                <input type="file" id="paymentProof" accept="image/*" class="file-input">
+            </div>
+
+            <button class="submit-btn" onclick="submitDeposit()">📤 Submit Deposit Request</button>
+            <div class="info-text">⚠️ Deposit will be credited after admin approval. Please upload valid proof of payment.</div>
+        </div>
+    </div>
+</div>
+
+<div id="successModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3>✅ Deposit Request Submitted!</h3>
+        <p id="modalMessage">Your deposit request has been sent to admin for approval.</p>
+        <button class="modal-btn" onclick="closeModal()">OK</button>
+    </div>
+</div>
+
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: linear-gradient(135deg, #1a1a3e, #0a0e27);
+        padding: 30px;
+        border-radius: 20px;
+        width: 350px;
+        text-align: center;
+    }
+
+    .modal-btn {
+        background: linear-gradient(135deg, #00d4ff, #7c3aed);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+</style>
+
+<script>
+    // Load deposit addresses from localStorage (set by admin)
+    function loadDepositAddresses() {
+        const addresses = JSON.parse(localStorage.getItem('depositAddresses') || '{}');
+        
+        document.getElementById('ethAddress').innerHTML = addresses.eth || '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
+        document.getElementById('btcAddress').innerHTML = addresses.btc || 'bc1q7nzqm4jxkhit6jwy4de2g50';
+        document.getElementById('usdtAddress').innerHTML = addresses.usdt || '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
+    }
+
+    function copyAddress(type) {
+        let address = '';
+        if (type === 'eth') address = document.getElementById('ethAddress').innerText;
+        if (type === 'btc') address = document.getElementById('btcAddress').innerText;
+        if (type === 'usdt') address = document.getElementById('usdtAddress').innerText;
+        
+        navigator.clipboard.writeText(address).then(() => {
+            alert(`✅ ${type.toUpperCase()} address copied to clipboard!`);
+        });
+    }
+
+    function submitDeposit() {
+        const amount = parseFloat(document.getElementById('depositAmount').value);
+        const currency = document.getElementById('depositCurrency').value;
+        const fileInput = document.getElementById('paymentProof');
+        
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+        
+        if (fileInput.files.length === 0) {
+            alert('Please upload proof of payment');
+            return;
+        }
+        
+        // Get user info
+        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+        let userEmail = 'User';
+        let userName = 'User';
+        if (savedUser) {
+            try {
+                const user = JSON.parse(savedUser);
+                userEmail = user.email || userEmail;
+                userName = user.fullName || userName;
+            } catch(e) {}
+        }
+        
+        // Create deposit request
+        const depositRequest = {
+            id: Date.now(),
+            userEmail: userEmail,
+            userName: userName,
+            amount: amount,
+            currency: currency,
+            status: 'pending',
+            date: new Date().toLocaleString(),
+            proofFileName: fileInput.files[0].name
+        };
+        
+        // Save to localStorage
+        const depositRequests = JSON.parse(localStorage.getItem('depositRequests') || '[]');
+        depositRequests.push(depositRequest);
+        localStorage.setItem('depositRequests', JSON.stringify(depositRequests));
+        
+        // Show success modal
+        document.getElementById('modalMessage').innerHTML = `Deposit request of $${amount.toFixed(2)} ${currency} submitted!<br><br>Admin will review and approve your deposit.`;
+        document.getElementById('successModal').style.display = 'flex';
+        
+        // Reset form
+        document.getElementById('depositAmount').value = '';
+        document.getElementById('paymentProof').value = '';
+    }
+
+    function closeModal() {
+        document.getElementById('successModal').style.display = 'none';
+        window.location.href = 'profile.html';
+    }
+
+    function checkAuth() {
+        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+        if (!savedUser) {
+            window.location.href = 'index.html';
+        }
+        return savedUser ? JSON.parse(savedUser) : null;
+    }
+
+    function displayUsername() {
+        const user = checkAuth();
+        if (user && user.fullName) {
+            document.getElementById('displayUsername').innerText = user.fullName.split(' ')[0];
+        } else if (user && user.email) {
+            document.getElementById('displayUsername').innerText = user.email.split('@')[0];
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('lunoUser');
+        sessionStorage.removeItem('lunoUser');
+        window.location.href = 'index.html';
+    }
+
+    displayUsername();
+    loadDepositAddresses();
+</script>
+
+</body>
+</html>
