@@ -4,13 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - Trade</title>
-    
-    <!-- Firebase Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    
     <style>
         * {
             margin: 0;
@@ -435,7 +428,6 @@
 
 <script>
     let userBalance = 10000;
-    let currentUserId = null;
     let tradeType = 'buy';
     let selectedDuration = null;
     let selectedRate = 0;
@@ -458,27 +450,34 @@
         SHIB: 'Shiba Inu', PEPE: 'Pepe', FLOKI: 'Floki', BONK: 'Bonk'
     };
 
-    // Authentication check
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            currentUserId = user.uid;
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            if (userDoc.exists) {
-                const userData = userDoc.data();
-                userBalance = userData.balance || 10000;
-                document.getElementById('displayUsername').innerText = userData.fullName?.split(' ')[0] || user.email.split('@')[0];
-                document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
-            }
-        } else {
+    // Check authentication
+    function checkAuth() {
+        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+        if (!savedUser) {
             window.location.href = 'index.html';
         }
-    });
+        return savedUser ? JSON.parse(savedUser) : null;
+    }
 
-    function formatPrice(price) {
-        if (price < 0.01) return `$${price.toExponential(4)}`;
-        if (price < 1) return `$${price.toFixed(4)}`;
-        if (price < 10) return `$${price.toFixed(2)}`;
-        return `$${price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    function displayUsername() {
+        const user = checkAuth();
+        if (user && user.fullName) {
+            document.getElementById('displayUsername').innerText = user.fullName.split(' ')[0];
+        } else if (user && user.email) {
+            document.getElementById('displayUsername').innerText = user.email.split('@')[0];
+        }
+    }
+
+    function loadUserBalance() {
+        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 10000}');
+        userBalance = profile.balance;
+        document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
+    }
+
+    function saveUserBalance() {
+        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 10000}');
+        profile.balance = userBalance;
+        localStorage.setItem('lunoProfile', JSON.stringify(profile));
     }
 
     function changeCrypto() {
@@ -489,7 +488,14 @@
         document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
         calculateReturn();
     }
-
+    
+    function formatPrice(price) {
+        if (price < 0.01) return `$${price.toExponential(4)}`;
+        if (price < 1) return `$${price.toFixed(4)}`;
+        if (price < 10) return `$${price.toFixed(2)}`;
+        return `$${price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    }
+    
     function setTradeType(type) {
         tradeType = type;
         const buyBtn = document.querySelector('.trade-type-btn.buy');
@@ -497,6 +503,7 @@
         if (type === 'buy') {
             buyBtn.classList.add('active');
             sellBtn.classList.remove('active');
+            document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
         } else {
             sellBtn.classList.add('active');
             buyBtn.classList.remove('active');
@@ -504,7 +511,7 @@
         }
         calculateReturn();
     }
-
+    
     function selectDuration(element) {
         document.querySelectorAll('.return-option').forEach(opt => opt.classList.remove('selected'));
         element.classList.add('selected');
@@ -513,7 +520,7 @@
         selectedMinAmount = parseInt(element.getAttribute('data-min'));
         calculateReturn();
     }
-
+    
     function calculateReturn() {
         const amount = parseFloat(document.getElementById('amount').value);
         const warningMsg = document.getElementById('warningMsg');
@@ -550,7 +557,7 @@
         document.getElementById('transactionFee').innerHTML = `${transactionFee.toFixed(2)} USDT`;
         document.getElementById('totalPay').innerHTML = `${totalPayAmount.toFixed(2)} USDT`;
     }
-
+    
     function cancelTrade() {
         document.getElementById('amount').value = '';
         document.querySelectorAll('.return-option').forEach(opt => opt.classList.remove('selected'));
@@ -560,8 +567,8 @@
         calculateReturn();
         document.getElementById('warningMsg').style.display = 'none';
     }
-
-    async function confirmTrade() {
+    
+    function confirmTrade() {
         const amount = parseFloat(document.getElementById('amount').value);
         
         if (isNaN(amount) || amount <= 0) {
@@ -589,40 +596,10 @@
                 return;
             }
             
-            // Update balance in Firestore
-            const newBalance = userBalance - totalPay;
-            await db.collection('users').doc(currentUserId).update({
-                balance: newBalance
-            });
-            userBalance = newBalance;
+            userBalance -= totalPay;
+            saveUserBalance();
             
-            const tradeId = Date.now();
-            const tradeRecord = {
-                id: tradeId,
-                userId: currentUserId,
-                date: new Date().toISOString(),
-                coin: currentCoin,
-                coinName: coinNames[currentCoin],
-                tradeType: tradeType,
-                amount: amount,
-                duration: selectedDuration,
-                rate: selectedRate,
-                expectedProfit: expectedReturnAmount,
-                profit: 0,
-                status: 'pending',
-                fee: transactionFee
-            };
-            
-            // Save to Firestore trades collection
-            await db.collection('trades').doc(tradeId.toString()).set(tradeRecord);
-            
-            // Add to user's trades subcollection
-            await db.collection('users').doc(currentUserId).collection('trades').doc(tradeId.toString()).set(tradeRecord);
-            
-            // Add to pending trades for admin
-            await db.collection('pendingTrades').doc(tradeId.toString()).set(tradeRecord);
-            
-            const modalMessage = `Your ${tradeType.toUpperCase()} trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration has been submitted!\n\nAmount: $${amount.toFixed(2)} USDT\nExpected Return: +${selectedRate}% ($${expectedReturnAmount.toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT\n\nWaiting for admin approval.`;
+            const modalMessage = `Your ${tradeType.toUpperCase()} trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration has been submitted!\n\nAmount: $${amount.toFixed(2)} USDT\nExpected Return: +${selectedRate}% ($${expectedReturnAmount.toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT`;
             document.getElementById('modalMessage').innerHTML = modalMessage.replace(/\n/g, '<br>');
             document.getElementById('successModal').style.display = 'flex';
             
@@ -632,21 +609,39 @@
             alert('Sell feature coming soon!');
         }
     }
-
+    
     function closeModal() {
         document.getElementById('successModal').style.display = 'none';
         window.location.href = 'profile.html';
     }
-
+    
     function logout() {
-        auth.signOut().then(() => {
-            localStorage.removeItem('lunoUser');
-            sessionStorage.removeItem('lunoUser');
-            window.location.href = 'index.html';
-        });
+        localStorage.removeItem('lunoUser');
+        sessionStorage.removeItem('lunoUser');
+        window.location.href = 'index.html';
     }
-
+    
+    // Check for selected crypto from markets page
+    function checkSelectedCrypto() {
+        const selected = localStorage.getItem('selectedCrypto');
+        if (selected) {
+            try {
+                const crypto = JSON.parse(selected);
+                const selectElement = document.getElementById('cryptoSelect');
+                if (selectElement && crypto.symbol) {
+                    selectElement.value = crypto.symbol;
+                    changeCrypto();
+                }
+                localStorage.removeItem('selectedCrypto');
+            } catch(e) {}
+        }
+    }
+    
+    // Initialize
+    displayUsername();
+    loadUserBalance();
     changeCrypto();
+    checkSelectedCrypto();
 </script>
 
 </body>
