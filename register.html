@@ -326,7 +326,7 @@
         }
     }
 
-    function handleRegister(event) {
+    async function handleRegister(event) {
         event.preventDefault();
         
         const fullName = document.getElementById('fullName').value;
@@ -345,28 +345,41 @@
             return false;
         }
         
-        if (password.length < 4) {
+        if (password.length < 6) {
             errorMsg.style.display = 'block';
-            errorMsg.innerHTML = '❌ Password must be at least 4 characters!';
+            errorMsg.innerHTML = '❌ Password must be at least 6 characters!';
             return false;
         }
         
-        // Save user to localStorage
-        const userData = {
-            fullName: fullName,
-            email: email,
-            password: password,
-            registeredAt: new Date().toISOString()
-        };
-        
-        localStorage.setItem('lunoRegisteredUser', JSON.stringify(userData));
-        
-        successMsg.style.display = 'block';
-        successMsg.innerHTML = '✅ Account created successfully! Redirecting to login...';
-        
-        setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 2000);
+        try {
+            // Create user in Firebase Auth
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            
+            // Create user document in Firestore - START WITH $0 BALANCE
+            await db.collection('users').doc(user.uid).set({
+                fullName: fullName,
+                email: email,
+                balance: 0,
+                kycStatus: 'pending',
+                registeredAt: new Date().toISOString(),
+                totalTrades: 0,
+                totalProfit: 0,
+                winRate: 0
+            });
+            
+            successMsg.style.display = 'block';
+            successMsg.innerHTML = '✅ Account created successfully! Redirecting to login...';
+            
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+            
+        } catch (error) {
+            console.error('Registration error:', error);
+            errorMsg.style.display = 'block';
+            errorMsg.innerHTML = `❌ ${error.message}`;
+        }
         
         return false;
     }
