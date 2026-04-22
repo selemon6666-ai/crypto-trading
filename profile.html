@@ -248,15 +248,6 @@
             font-size: 1rem;
         }
 
-        .file-input {
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            color: white;
-            width: 100%;
-        }
-
         .btn-save {
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             border: none;
@@ -278,12 +269,6 @@
             background: rgba(255, 170, 0, 0.2);
             color: #ffaa00;
             border: 1px solid rgba(255, 170, 0, 0.3);
-        }
-
-        .kyc-badge.verified {
-            background: rgba(0, 255, 136, 0.2);
-            color: #00ff88;
-            border: 1px solid rgba(0, 255, 136, 0.3);
         }
 
         .support-item {
@@ -388,14 +373,6 @@
             color: white;
         }
 
-        .image-preview {
-            max-width: 100%;
-            max-height: 150px;
-            margin-top: 10px;
-            border-radius: 8px;
-            display: none;
-        }
-
         @media (max-width: 768px) {
             .sidebar { width: 80px; }
             .sidebar-item span:last-child { display: none; }
@@ -485,7 +462,6 @@
             </div>
         </div>
 
-        <!-- KYC Page with File Upload -->
         <div id="kycPage" class="page-content" style="display: none;">
             <div class="page-header">
                 <h1>KYC Verification</h1>
@@ -497,41 +473,10 @@
                     <span>Current Status:</span> 
                     <span class="kyc-badge" id="kycStatusBadge" style="background: rgba(255, 170, 0, 0.2); color: #ffaa00;">Pending</span>
                 </div>
-                <div class="form-group">
-                    <label>Full Name (as on ID)</label>
-                    <input type="text" id="kycFullName" placeholder="Enter your full name as on ID">
-                </div>
-                <div class="form-group">
-                    <label>ID Type</label>
-                    <select id="idType">
-                        <option value="passport">Passport</option>
-                        <option value="drivers">Driver's License</option>
-                        <option value="national">National ID Card</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>ID Number</label>
-                    <input type="text" id="idNumber" placeholder="Enter your ID number">
-                </div>
-                <div class="form-group">
-                    <label>📎 Upload ID Document (Front Side)</label>
-                    <input type="file" id="kycFileFront" accept="image/*" class="file-input" onchange="previewImage(this, 'frontPreview')">
-                    <img id="frontPreview" class="image-preview" alt="Front ID Preview">
-                </div>
-                <div class="form-group">
-                    <label>📎 Upload ID Document (Back Side)</label>
-                    <input type="file" id="kycFileBack" accept="image/*" class="file-input" onchange="previewImage(this, 'backPreview')">
-                    <img id="backPreview" class="image-preview" alt="Back ID Preview">
-                </div>
-                <div class="form-group">
-                    <label>📎 Upload Selfie with ID</label>
-                    <input type="file" id="kycSelfie" accept="image/*" class="file-input" onchange="previewImage(this, 'selfiePreview')">
-                    <img id="selfiePreview" class="image-preview" alt="Selfie Preview">
-                </div>
+                <div class="form-group"><label>Full Name (as on ID)</label><input type="text" id="kycFullName"></div>
+                <div class="form-group"><label>ID Type</label><select id="idType"><option value="passport">Passport</option><option value="drivers">Driver's License</option><option value="national">National ID Card</option></select></div>
+                <div class="form-group"><label>ID Number</label><input type="text" id="idNumber"></div>
                 <button class="btn-save" onclick="submitKYC()">Submit Verification</button>
-                <div class="info-text" style="margin-top: 15px; font-size: 0.7rem; color: rgba(255,255,255,0.4);">
-                    ⚠️ Your documents are securely encrypted. KYC verification may take 24-48 hours.
-                </div>
             </div>
         </div>
 
@@ -579,19 +524,6 @@
 </div>
 
 <script>
-    function previewImage(input, previewId) {
-        const preview = document.getElementById(previewId);
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    // Check authentication
     function checkAuth() {
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
         if (!savedUser) {
@@ -611,7 +543,7 @@
 
     let userData = {
         fullName: '', email: '', memberSince: new Date().toLocaleDateString(),
-        balance: 10000, kycStatus: 'pending', totalTrades: 0, winRate: 0,
+        balance: 0, kycStatus: 'pending', totalTrades: 0, winRate: 0,
         totalVolume: 0, totalProfit: 0, phoneNumber: '', tradeHistory: []
     };
     
@@ -626,7 +558,7 @@
             const profile = JSON.parse(savedProfile);
             userData.phoneNumber = profile.phoneNumber || '';
             userData.kycStatus = profile.kycStatus || 'pending';
-            userData.balance = profile.balance || 10000;
+            userData.balance = profile.balance || 0;
         }
         updateUI();
     }
@@ -714,93 +646,12 @@
         }));
     }
 
-    // Updated submitKYC function with corrected message
     function submitKYC() {
         const fullName = document.getElementById('kycFullName').value;
         const idType = document.getElementById('idType').value;
         const idNumber = document.getElementById('idNumber').value;
-        const frontFile = document.getElementById('kycFileFront').files[0];
-        const backFile = document.getElementById('kycFileBack').files[0];
-        const selfieFile = document.getElementById('kycSelfie').files[0];
-        
-        if (!fullName || !idNumber) {
-            alert('Please fill in all required fields');
-            return;
-        }
-        
-        if (!frontFile) {
-            alert('Please upload the front side of your ID');
-            return;
-        }
-        
-        // Convert images to base64 for storage
-        const readerFront = new FileReader();
-        const readerBack = backFile ? new FileReader() : null;
-        const readerSelfie = selfieFile ? new FileReader() : null;
-        
-        let frontBase64 = null;
-        let backBase64 = null;
-        let selfieBase64 = null;
-        let filesProcessed = 0;
-        let totalFiles = 1 + (backFile ? 1 : 0) + (selfieFile ? 1 : 0);
-        
-        function checkAndSave() {
-            filesProcessed++;
-            if (filesProcessed === totalFiles) {
-                // Save KYC request to admin with base64 images
-                const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
-                kycRequests.push({
-                    email: userData.email,
-                    fullName: fullName,
-                    idType: idType,
-                    idNumber: idNumber,
-                    frontImage: frontBase64,
-                    backImage: backBase64,
-                    selfieImage: selfieBase64,
-                    frontFileName: frontFile.name,
-                    backFileName: backFile ? backFile.name : null,
-                    selfieFileName: selfieFile ? selfieFile.name : null,
-                    date: new Date().toLocaleString(),
-                    status: 'pending'
-                });
-                localStorage.setItem('kycRequests', JSON.stringify(kycRequests));
-                
-                // UPDATED MESSAGE HERE
-                alert(`✅ KYC verification submitted!\n\nName: ${fullName}\nID Type: ${idType}\nID Number: ${idNumber}\n\nYour verification is under review, please wait a moment.`);
-                
-                // Reset form
-                document.getElementById('kycFullName').value = '';
-                document.getElementById('idNumber').value = '';
-                document.getElementById('kycFileFront').value = '';
-                document.getElementById('kycFileBack').value = '';
-                document.getElementById('kycSelfie').value = '';
-                document.getElementById('frontPreview').style.display = 'none';
-                document.getElementById('backPreview').style.display = 'none';
-                document.getElementById('selfiePreview').style.display = 'none';
-            }
-        }
-        
-        readerFront.onload = function(e) {
-            frontBase64 = e.target.result;
-            checkAndSave();
-        };
-        readerFront.readAsDataURL(frontFile);
-        
-        if (backFile && readerBack) {
-            readerBack.onload = function(e) {
-                backBase64 = e.target.result;
-                checkAndSave();
-            };
-            readerBack.readAsDataURL(backFile);
-        }
-        
-        if (selfieFile && readerSelfie) {
-            readerSelfie.onload = function(e) {
-                selfieBase64 = e.target.result;
-                checkAndSave();
-            };
-            readerSelfie.readAsDataURL(selfieFile);
-        }
+        if (!fullName || !idNumber) { alert('Please fill in all fields'); return; }
+        alert(`KYC verification submitted!\n\nName: ${fullName}\nID Type: ${idType}\nID Number: ${idNumber}\n\nYour verification is under review, please wait a moment.`);
     }
 
     function updateProfile() {
