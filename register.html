@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - Sign Up</title>
-    
-    <!-- Firebase SDKs - MUST BE HERE -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    
     <style>
         * {
             margin: 0;
@@ -332,7 +326,7 @@
         }
     }
 
-    async function handleRegister(event) {
+    function handleRegister(event) {
         event.preventDefault();
         
         const fullName = document.getElementById('fullName').value;
@@ -351,64 +345,37 @@
             return false;
         }
         
-        if (password.length < 6) {
+        if (password.length < 4) {
             errorMsg.style.display = 'block';
-            errorMsg.innerHTML = '❌ Password must be at least 6 characters!';
+            errorMsg.innerHTML = '❌ Password must be at least 4 characters!';
             return false;
         }
         
-        try {
-            // Check if Firebase is loaded
-            if (typeof firebase === 'undefined') {
-                errorMsg.style.display = 'block';
-                errorMsg.innerHTML = '❌ Firebase not loaded. Please refresh the page.';
-                return false;
-            }
-            
-            // Initialize Firebase config if not already done
-            if (!firebase.apps.length) {
-                const firebaseConfig = {
-                    apiKey: "AIzaSyB7LAc7M-K7YBqVvjd8-Jx6Q_ddJE1dfC8",
-                    authDomain: "luno-trading.firebaseapp.com",
-                    projectId: "luno-trading",
-                    storageBucket: "luno-trading.firebasestorage.app",
-                    messagingSenderId: "124120101873",
-                    appId: "1:124120101873:web:4f9e47a6a198f13683ca50"
-                };
-                firebase.initializeApp(firebaseConfig);
-            }
-            
-            const auth = firebase.auth();
-            const db = firebase.firestore();
-            
-            // Create user in Firebase Auth
-            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-            const user = userCredential.user;
-            
-            // Create user document in Firestore - START WITH $0 BALANCE
-            await db.collection('users').doc(user.uid).set({
-                fullName: fullName,
-                email: email,
-                balance: 0,
-                kycStatus: 'pending',
-                registeredAt: new Date().toISOString(),
-                totalTrades: 0,
-                totalProfit: 0,
-                winRate: 0
-            });
-            
-            successMsg.style.display = 'block';
-            successMsg.innerHTML = '✅ Account created successfully! Redirecting to login...';
-            
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 2000);
-            
-        } catch (error) {
-            console.error('Registration error:', error);
-            errorMsg.style.display = 'block';
-            errorMsg.innerHTML = `❌ ${error.message}`;
-        }
+        // Save user to localStorage (NO FIREBASE)
+        const userData = {
+            fullName: fullName,
+            email: email,
+            password: password,
+            balance: 0,
+            registeredAt: new Date().toISOString()
+        };
+        
+        localStorage.setItem('lunoRegisteredUser', JSON.stringify(userData));
+        
+        // Also create profile
+        const profile = {
+            balance: 0,
+            kycStatus: 'pending',
+            phoneNumber: ''
+        };
+        localStorage.setItem('lunoProfile', JSON.stringify(profile));
+        
+        successMsg.style.display = 'block';
+        successMsg.innerHTML = '✅ Account created successfully! Redirecting to login...';
+        
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 2000);
         
         return false;
     }
