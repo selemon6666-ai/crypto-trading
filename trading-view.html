@@ -340,6 +340,16 @@
             color: white;
         }
 
+        /* Current Time Display */
+        .current-time {
+            margin-top: 10px;
+            text-align: right;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 8px;
+        }
+
         @media (max-width: 900px) {
             .trading-layout {
                 flex-direction: column;
@@ -396,13 +406,14 @@
             </div>
         </div>
         <div id="chart-container"></div>
+        <div class="current-time" id="currentTimeDisplay"></div>
     </div>
 
     <!-- Right Sidebar -->
     <div class="trading-sidebar">
         <!-- Market Stats -->
         <div class="stats-widget">
-            <div class="widget-title">Market Statistics</div>
+            <div class="widget-title">MARKET STATISTICS</div>
             <div class="stat-item">
                 <span class="stat-label">24h High</span>
                 <span class="stat-value" id="high24h">$0.00</span>
@@ -456,6 +467,20 @@
         'ADA': 'cardano',
         'AVAX': 'avalanche-2'
     };
+    
+    // Update current time display
+    function updateCurrentTime() {
+        const now = new Date();
+        const formattedTime = now.toLocaleString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        }).replace(',', '');
+        document.getElementById('currentTimeDisplay').innerHTML = `📅 ${formattedTime}`;
+    }
     
     // Get selected coin from URL
     function getSelectedCoin() {
@@ -518,31 +543,29 @@
             const prices = data.prices;
             if (!prices || prices.length === 0) return [];
             
-            // Group into candlesticks based on timeframe
+            // Create candlesticks
             const candles = [];
-            let currentCandle = null;
-            let candlePeriod = 3600; // 1 hour in seconds
+            const periodSeconds = currentTimeframe === '1' ? 3600 : 3600;
             
             for (let i = 0; i < prices.length; i++) {
                 const time = Math.floor(prices[i][0] / 1000);
                 const price = prices[i][1];
                 
-                if (!currentCandle || time - currentCandle.time >= candlePeriod) {
-                    if (currentCandle) candles.push(currentCandle);
-                    currentCandle = {
+                if (candles.length === 0 || time - candles[candles.length - 1].time >= periodSeconds) {
+                    candles.push({
                         time: time,
                         open: price,
                         high: price,
                         low: price,
                         close: price
-                    };
+                    });
                 } else {
-                    currentCandle.high = Math.max(currentCandle.high, price);
-                    currentCandle.low = Math.min(currentCandle.low, price);
-                    currentCandle.close = price;
+                    const lastCandle = candles[candles.length - 1];
+                    lastCandle.high = Math.max(lastCandle.high, price);
+                    lastCandle.low = Math.min(lastCandle.low, price);
+                    lastCandle.close = price;
                 }
             }
-            if (currentCandle) candles.push(currentCandle);
             
             return candles;
         } catch (error) {
@@ -554,7 +577,7 @@
     // Generate mock candlestick data
     function generateMockCandles() {
         const candles = [];
-        let basePrice = 50000;
+        let basePrice = 77500;
         const now = Math.floor(Date.now() / 1000);
         const points = currentTimeframe === '1' ? 24 : currentTimeframe === '24' ? 48 : currentTimeframe === '7' ? 168 : 720;
         
@@ -575,6 +598,21 @@
             basePrice = close;
         }
         return candles;
+    }
+    
+    // Format time label for x-axis
+    function formatTimeLabel(time) {
+        const date = new Date(time * 1000);
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        
+        if (currentTimeframe === '1') {
+            return `${hours}:${minutes.toString().padStart(2, '0')}`;
+        } else if (currentTimeframe === '24') {
+            return `${hours}:00`;
+        } else {
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        }
     }
     
     // Initialize chart with candlesticks
@@ -608,7 +646,16 @@
                 secondsVisible: false,
                 tickMarkFormatter: (time) => {
                     const date = new Date(time * 1000);
-                    return `${date.getHours()}:00`;
+                    const hours = date.getHours();
+                    const minutes = date.getMinutes();
+                    
+                    if (currentTimeframe === '1') {
+                        return `${hours}:${minutes.toString().padStart(2, '0')}`;
+                    } else if (currentTimeframe === '24') {
+                        return `${hours}:00`;
+                    } else {
+                        return `${date.getMonth() + 1}/${date.getDate()}`;
+                    }
                 },
             },
         });
@@ -730,6 +777,7 @@
     getSelectedCoin();
     initChart();
     fetchRealTimePrice();
+    updateCurrentTime();
     
     // Update price every 10 seconds
     setInterval(() => {
@@ -740,6 +788,11 @@
     setInterval(() => {
         updateChart();
     }, 60000);
+    
+    // Update current time every second
+    setInterval(() => {
+        updateCurrentTime();
+    }, 1000);
 </script>
 
 </body>
