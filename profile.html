@@ -76,6 +76,10 @@
             font-size: 0.85rem;
         }
 
+        .logout-btn:hover {
+            background: rgba(255, 68, 68, 0.3);
+        }
+
         .main-container {
             display: flex;
             margin-top: 60px;
@@ -160,7 +164,7 @@
         }
 
         .info-label { color: #787b86; }
-        .info-value { font-weight: 500; }
+        .info-value { font-weight: 500; color: #d1d4dc; }
         .balance-amount { font-size: 2rem; font-weight: bold; color: #00ff88; margin: 15px 0; }
 
         .action-buttons {
@@ -367,7 +371,17 @@
 </div>
 
 <script>
-    let userData = { fullName: '', email: '', balance: 0, kycStatus: 'pending', tradeHistory: [] };
+    let userData = { 
+        fullName: '', 
+        email: '', 
+        balance: 0, 
+        kycStatus: 'pending', 
+        tradeHistory: [],
+        totalTrades: 0,
+        winRate: 0,
+        totalVolume: 0,
+        totalProfit: 0
+    };
     
     function checkAuth() {
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
@@ -384,7 +398,42 @@
         const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 0}');
         userData.balance = profile.balance;
         userData.kycStatus = profile.kycStatus || 'pending';
+        
+        // Load trade history and calculate statistics
+        loadTradeHistoryAndStats();
         updateUI();
+    }
+    
+    function loadTradeHistoryAndStats() {
+        const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
+        userData.tradeHistory = history;
+        
+        // Calculate statistics
+        userData.totalTrades = history.length;
+        
+        // Count completed trades (won or lost)
+        const completedTrades = history.filter(t => t.status === 'won' || t.status === 'lost');
+        const wonTrades = history.filter(t => t.status === 'won').length;
+        
+        userData.winRate = userData.totalTrades > 0 ? (wonTrades / userData.totalTrades * 100).toFixed(1) : 0;
+        userData.totalVolume = history.reduce((sum, t) => sum + t.amount, 0);
+        userData.totalProfit = history.reduce((sum, t) => sum + (t.profit || 0), 0);
+        
+        // Update profile page stats
+        const totalTradesElem = document.getElementById('totalTrades');
+        const winRateElem = document.getElementById('winRate');
+        const totalVolumeElem = document.getElementById('totalVolume');
+        const totalProfitElem = document.getElementById('totalProfit');
+        
+        if (totalTradesElem) totalTradesElem.innerText = userData.totalTrades;
+        if (winRateElem) winRateElem.innerText = userData.winRate + '%';
+        if (totalVolumeElem) totalVolumeElem.innerText = `$${userData.totalVolume.toFixed(2)}`;
+        if (totalProfitElem) {
+            totalProfitElem.innerText = `${userData.totalProfit >= 0 ? '+' : ''}$${userData.totalProfit.toFixed(2)}`;
+            totalProfitElem.style.color = userData.totalProfit >= 0 ? '#00ff88' : '#ff4444';
+        }
+        
+        return history;
     }
     
     function updateUI() {
@@ -394,52 +443,135 @@
         document.getElementById('balance').innerText = `$${userData.balance.toFixed(2)}`;
         document.getElementById('kycStatus').innerText = userData.kycStatus;
         document.getElementById('displayUsername').innerText = userData.fullName.split(' ')[0];
-        loadTradeHistory();
     }
     
     function loadTradeHistory() {
         const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
         const container = document.getElementById('historyTable');
+        
         if (history.length === 0) {
-            container.innerHTML = '<div style="text-align:center;padding:40px;">📭 No trades yet</div>';
+            container.innerHTML = '<div style="text-align:center;padding:40px;">📭 No trades yet. Start trading to see your history!</div>';
             return;
         }
-        let html = '<table><thead><tr><th>Date</th><th>Coin</th><th>Amount</th><th>Profit</th><th>Status</th></tr></thead><tbody>';
-        history.forEach(t => {
-            html += `<tr><td>${t.date}</td><td>${t.coinName}</td><td>$${t.amount.toFixed(2)}</td>
-                    <td class="${t.profit >= 0 ? 'status-won' : 'status-lost'}">${t.profit >= 0 ? '+' : ''}$${t.profit.toFixed(2)}</td>
-                    <td class="${t.status === 'won' ? 'status-won' : 'status-lost'}">${t.status}</td></tr>`;
+        
+        let html = '<table><thead><tr><th>Date</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Return</th><th>Profit/Loss</th><th>Status</th></tr></thead><tbody>';
+        
+        history.forEach(trade => {
+            const profitClass = trade.profit >= 0 ? 'status-won' : 'status-lost';
+            const statusClass = trade.status === 'won' ? 'status-won' : 'status-lost';
+            const statusText = trade.status === 'won' ? '✅ WON' : '❌ LOST';
+            const profitSymbol = trade.profit >= 0 ? '+' : '';
+            
+            html += `<tr>
+                <td>${trade.date || new Date().toLocaleString()}</td>
+                <td>${trade.coinName} (${trade.coin})</td>
+                <td>$${trade.amount.toFixed(2)}</td>
+                <td>${trade.duration || '-'}s</td>
+                <td>${trade.rate ? `+${trade.rate}%` : '-'}</td>
+                <td class="${profitClass}">${profitSymbol}$${(trade.profit || 0).toFixed(2)}</td>
+                <td class="${statusClass}">${statusText}</td>
+            </table>`;
         });
+        
         html += '</tbody></table>';
         container.innerHTML = html;
     }
     
     function submitKYC() {
-        alert('✅ KYC verification submitted! Your verification is under review, please wait a moment.');
+        const fullName = document.getElementById('kycFullName').value;
+        const idType = document.getElementById('idType').value;
+        const idNumber = document.getElementById('idNumber').value;
+        
+        if (!fullName || !idNumber) {
+            alert('Please fill in all fields');
+            return;
+        }
+        
+        // Save KYC request
+        const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
+        kycRequests.push({
+            email: userData.email,
+            fullName: fullName,
+            idType: idType,
+            idNumber: idNumber,
+            date: new Date().toLocaleString(),
+            status: 'pending'
+        });
+        localStorage.setItem('kycRequests', JSON.stringify(kycRequests));
+        
+        alert(`✅ KYC verification submitted!\n\nName: ${fullName}\nID Type: ${idType}\nID Number: ${idNumber}\n\nYour verification is under review, please wait a moment.`);
+        
+        // Reset form
+        document.getElementById('kycFullName').value = '';
+        document.getElementById('idNumber').value = '';
     }
     
     function updateProfile() {
         const newName = document.getElementById('updateFullName').value;
-        if (newName) userData.fullName = newName;
+        if (newName) {
+            userData.fullName = newName;
+            // Update stored user data
+            const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+            if (savedUser) {
+                const user = JSON.parse(savedUser);
+                user.fullName = newName;
+                if (localStorage.getItem('lunoUser')) {
+                    localStorage.setItem('lunoUser', JSON.stringify(user));
+                } else {
+                    sessionStorage.setItem('lunoUser', JSON.stringify(user));
+                }
+            }
+        }
+        
         alert('✅ Profile updated successfully!');
         updateUI();
+        
+        // Clear password fields
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
     }
     
-    function openWithdrawModal() { document.getElementById('transactionModal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('transactionModal').style.display = 'none'; }
+    function openWithdrawModal() { 
+        document.getElementById('transactionModal').style.display = 'flex'; 
+    }
+    
+    function closeModal() { 
+        document.getElementById('transactionModal').style.display = 'none'; 
+    }
     
     function processWithdrawal() {
         const amount = parseFloat(document.getElementById('transactionAmount').value);
         const address = document.getElementById('withdrawAddress').value;
-        if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
-        if (!address) { alert('Enter wallet address'); return; }
-        if (amount > userData.balance) { alert('Insufficient balance!'); return; }
         
-        const requests = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
-        requests.push({ userEmail: userData.email, amount, address, date: new Date().toLocaleString(), status: 'pending' });
-        localStorage.setItem('withdrawalRequests', JSON.stringify(requests));
-        alert('✅ Withdrawal request submitted! Your withdrawal request is under review, please wait a moment.');
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+        if (!address) {
+            alert('Please enter a wallet address');
+            return;
+        }
+        if (amount > userData.balance) {
+            alert(`Insufficient balance! You have $${userData.balance.toFixed(2)}`);
+            return;
+        }
+        
+        const withdrawalRequests = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+        withdrawalRequests.push({
+            userEmail: userData.email,
+            amount: amount,
+            address: address,
+            date: new Date().toLocaleString(),
+            status: 'pending'
+        });
+        localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawalRequests));
+        
+        alert(`✅ Withdrawal request of $${amount.toFixed(2)} submitted!\n\nYour withdrawal request is under review, please wait a moment.`);
         closeModal();
+        
+        // Reset form
+        document.getElementById('transactionAmount').value = '';
+        document.getElementById('withdrawAddress').value = '';
     }
     
     function logout() {
@@ -448,24 +580,34 @@
         window.location.href = 'index.html';
     }
     
+    // Navigation
     document.querySelectorAll('.sidebar-item').forEach(item => {
         item.addEventListener('click', () => {
             const page = item.getAttribute('data-page');
             document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
+            
             document.getElementById('profilePage').style.display = 'none';
             document.getElementById('historyPage').style.display = 'none';
             document.getElementById('kycPage').style.display = 'none';
             document.getElementById('updatePage').style.display = 'none';
             document.getElementById('supportPage').style.display = 'none';
-            if (page === 'profile') document.getElementById('profilePage').style.display = 'block';
-            if (page === 'history') { document.getElementById('historyPage').style.display = 'block'; loadTradeHistory(); }
+            
+            if (page === 'profile') {
+                document.getElementById('profilePage').style.display = 'block';
+                loadTradeHistoryAndStats(); // Refresh stats when returning to profile
+            }
+            if (page === 'history') { 
+                document.getElementById('historyPage').style.display = 'block'; 
+                loadTradeHistory(); 
+            }
             if (page === 'kyc') document.getElementById('kycPage').style.display = 'block';
             if (page === 'update') document.getElementById('updatePage').style.display = 'block';
             if (page === 'support') document.getElementById('supportPage').style.display = 'block';
         });
     });
     
+    // Initialize
     loadUserData();
 </script>
 
