@@ -12,20 +12,29 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            min-height: 100vh;
-            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #131722;
+            color: #d1d4dc;
         }
 
+        /* Canvas Background */
+        #canvas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        /* Navigation */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 60px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 40px;
+            background: #1e222d;
+            border-bottom: 1px solid #2a2e39;
             position: fixed;
             top: 0;
             left: 0;
@@ -34,7 +43,7 @@
         }
 
         .logo {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: bold;
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             -webkit-background-clip: text;
@@ -44,15 +53,14 @@
 
         .nav-links {
             display: flex;
-            gap: 40px;
+            gap: 30px;
         }
 
         .nav-links a {
-            color: white;
+            color: #d1d4dc;
             text-decoration: none;
             transition: 0.3s;
-            font-weight: 500;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         .nav-links a:hover {
@@ -67,26 +75,23 @@
 
         .username {
             color: #00d4ff;
-            font-weight: 500;
         }
 
         .logout-btn {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 24px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-decoration: none;
-            color: white;
+            background: rgba(255, 68, 68, 0.15);
+            padding: 6px 16px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 68, 68, 0.3);
             cursor: pointer;
-            transition: 0.3s;
-            font-size: 0.9rem;
+            color: #ff4444;
+            font-size: 0.85rem;
         }
 
         .logout-btn:hover {
             background: rgba(255, 68, 68, 0.3);
-            border-color: rgba(255, 68, 68, 0.5);
         }
 
+        /* Main Content */
         .main-content {
             min-height: 100vh;
             display: flex;
@@ -98,21 +103,21 @@
         }
 
         .badge {
-            background: rgba(0, 212, 255, 0.15);
+            background: rgba(0, 212, 255, 0.1);
             display: inline-block;
-            padding: 8px 24px;
-            border-radius: 50px;
-            font-size: 0.85rem;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
             margin-bottom: 30px;
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            backdrop-filter: blur(5px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
         }
 
         h1 {
-            font-size: 5rem;
+            font-size: 4rem;
             margin-bottom: 20px;
             line-height: 1.2;
-            font-weight: 700;
+            color: white;
         }
 
         .gradient-text {
@@ -123,28 +128,27 @@
         }
 
         .subtitle {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            color: #787b86;
             margin-bottom: 40px;
-            line-height: 1.6;
             max-width: 600px;
         }
 
         .start-btn {
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             border: none;
-            padding: 14px 48px;
-            font-size: 1.1rem;
+            padding: 12px 40px;
+            font-size: 1rem;
             font-weight: bold;
-            border-radius: 50px;
+            border-radius: 8px;
             color: white;
             cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.3s;
         }
 
         .start-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(0, 212, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 212, 255, 0.3);
         }
 
         .stats-container {
@@ -157,18 +161,18 @@
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
+            background: #1e222d;
+            border-radius: 12px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #2a2e39;
             text-align: center;
         }
 
         .stat-card .stat-label {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            color: #787b86;
             margin-bottom: 8px;
+            text-transform: uppercase;
         }
 
         .stat-card .stat-value {
@@ -179,9 +183,9 @@
 
         @media (max-width: 768px) {
             .navbar {
-                padding: 15px 20px;
+                padding: 12px 20px;
                 flex-direction: column;
-                gap: 15px;
+                gap: 12px;
             }
             .nav-links {
                 gap: 20px;
@@ -189,16 +193,17 @@
                 justify-content: center;
             }
             h1 {
-                font-size: 2.5rem;
+                font-size: 2rem;
             }
             .stats-container {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
             }
         }
     </style>
 </head>
 <body>
+
+<canvas id="canvas-bg"></canvas>
 
 <nav class="navbar">
     <div class="logo">📈 Luno Trading</div>
@@ -228,7 +233,7 @@
     <div class="stats-container">
         <div class="stat-card">
             <div class="stat-label">Your Balance</div>
-            <div class="stat-value" id="balance">$10,000</div>
+            <div class="stat-value" id="balance">$0</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">Total Trades</div>
@@ -246,58 +251,91 @@
 </div>
 
 <script>
-    // Check if user is logged in
+    // Canvas Animation
+    const canvas = document.getElementById('canvas-bg');
+    const ctx = canvas.getContext('2d');
+    
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    
+    function drawGrid() {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+        ctx.lineWidth = 1;
+        const step = 50;
+        for (let x = 0; x < canvas.width; x += step) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+        }
+        for (let y = 0; y < canvas.height; y += step) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+        }
+    }
+    
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, '#131722');
+        gradient.addColorStop(1, '#1e222d');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        drawGrid();
+        requestAnimationFrame(animate);
+    }
+    
+    resizeCanvas();
+    animate();
+    window.addEventListener('resize', resizeCanvas);
+    
+    // Dashboard Functions
     function checkAuth() {
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-        if (!savedUser) {
-            window.location.href = 'index.html';
-        }
+        if (!savedUser) window.location.href = 'index.html';
         return savedUser ? JSON.parse(savedUser) : null;
     }
-
-    // Display username
+    
     function displayUsername() {
         const user = checkAuth();
-        if (user && user.fullName) {
-            document.getElementById('displayUsername').innerText = user.fullName.split(' ')[0];
-        } else if (user && user.email) {
-            document.getElementById('displayUsername').innerText = user.email.split('@')[0];
-        }
+        if (user && user.fullName) document.getElementById('displayUsername').innerText = user.fullName.split(' ')[0];
+        else if (user && user.email) document.getElementById('displayUsername').innerText = user.email.split('@')[0];
     }
-
-    // Update dashboard stats
+    
     function updateStats() {
-        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 10000}');
+        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 0}');
         document.getElementById('balance').innerText = `$${profile.balance.toLocaleString()}`;
         
-        // Random stats for demo
-        const totalTrades = Math.floor(Math.random() * 50);
-        const winRate = Math.floor(Math.random() * 100);
-        const profitToday = (Math.random() * 500 - 100).toFixed(2);
+        const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
+        const totalTrades = history.length;
+        const wonTrades = history.filter(t => t.status === 'won').length;
+        const winRate = totalTrades > 0 ? (wonTrades / totalTrades * 100).toFixed(1) : 0;
         
         document.getElementById('totalTrades').innerText = totalTrades;
         document.getElementById('winRate').innerText = winRate + '%';
         
-        if (profitToday >= 0) {
-            document.getElementById('profitToday').innerHTML = `+$${profitToday}`;
-            document.getElementById('profitToday').style.color = '#00ff88';
+        const todayProfit = (Math.random() * 500 - 100).toFixed(2);
+        const profitElem = document.getElementById('profitToday');
+        if (todayProfit >= 0) {
+            profitElem.innerHTML = `+$${todayProfit}`;
+            profitElem.style.color = '#00ff88';
         } else {
-            document.getElementById('profitToday').innerHTML = `-$${Math.abs(profitToday)}`;
-            document.getElementById('profitToday').style.color = '#ff4444';
+            profitElem.innerHTML = `-$${Math.abs(todayProfit)}`;
+            profitElem.style.color = '#ff4444';
         }
     }
-
-    function goToTrade() {
-        window.location.href = 'trade.html';
-    }
-
+    
+    function goToTrade() { window.location.href = 'trade.html'; }
     function logout() {
         localStorage.removeItem('lunoUser');
         sessionStorage.removeItem('lunoUser');
         window.location.href = 'index.html';
     }
-
-    // Initialize
+    
     displayUsername();
     updateStats();
     setInterval(updateStats, 10000);
