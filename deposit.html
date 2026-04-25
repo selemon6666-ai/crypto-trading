@@ -12,20 +12,18 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            min-height: 100vh;
-            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #131722;
+            color: #d1d4dc;
         }
 
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 40px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 40px;
+            background: #1e222d;
+            border-bottom: 1px solid #2a2e39;
             position: fixed;
             top: 0;
             left: 0;
@@ -34,7 +32,7 @@
         }
 
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: bold;
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             -webkit-background-clip: text;
@@ -48,10 +46,10 @@
         }
 
         .nav-links a {
-            color: white;
+            color: #d1d4dc;
             text-decoration: none;
             transition: 0.3s;
-            font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .nav-links a:hover {
@@ -69,14 +67,13 @@
         }
 
         .logout-btn {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 20px;
-            border-radius: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-decoration: none;
-            color: white;
+            background: rgba(255, 68, 68, 0.15);
+            padding: 6px 16px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 68, 68, 0.3);
             cursor: pointer;
-            transition: 0.3s;
+            color: #ff4444;
+            font-size: 0.85rem;
         }
 
         .logout-btn:hover {
@@ -84,112 +81,133 @@
         }
 
         .main-content {
-            margin-top: 80px;
-            padding: 30px 40px;
+            margin-top: 70px;
+            padding: 20px;
             max-width: 800px;
             margin-left: auto;
             margin-right: auto;
         }
 
         .deposit-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #1e222d;
+            border-radius: 12px;
+            border: 1px solid #2a2e39;
             overflow: hidden;
         }
 
         .card-header {
-            padding: 25px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-bottom: 1px solid #2a2e39;
             text-align: center;
         }
 
         .card-header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
+            font-size: 1.5rem;
+            color: white;
         }
 
+        /* Address Sections */
         .address-section {
-            padding: 20px 25px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-bottom: 1px solid #2a2e39;
         }
 
         .address-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: #00d4ff;
         }
 
         .address-box {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
+            background: #2a2e39;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
             word-break: break-all;
             font-family: monospace;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+            color: #d1d4dc;
+            border: 1px solid #3a3e49;
         }
 
         .copy-btn {
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             border: none;
-            padding: 8px 20px;
-            border-radius: 8px;
+            padding: 6px 16px;
+            border-radius: 6px;
             cursor: pointer;
             color: white;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+            transition: 0.3s;
         }
 
         .copy-btn:hover {
             transform: translateY(-1px);
         }
 
+        /* Form Section */
         .form-section {
-            padding: 20px 25px;
+            padding: 20px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
+            margin-bottom: 6px;
+            color: #787b86;
+            font-size: 0.8rem;
         }
 
         .form-group input, .form-group select {
             width: 100%;
-            padding: 14px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
+            padding: 12px;
+            background: #2a2e39;
+            border: 1px solid #3a3e49;
+            border-radius: 8px;
             color: white;
-            font-size: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #00d4ff;
         }
 
         .file-input {
             padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
+            background: #2a2e39;
+            border: 1px solid #3a3e49;
+            border-radius: 8px;
             color: white;
+            width: 100%;
+        }
+
+        .file-input::-webkit-file-upload-button {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            margin-right: 10px;
         }
 
         .submit-btn {
             width: 100%;
             background: linear-gradient(135deg, #00ff88, #00cc6a);
             border: none;
-            padding: 14px;
-            border-radius: 10px;
+            padding: 12px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             color: white;
-            font-size: 1rem;
+            font-size: 0.9rem;
             margin-top: 10px;
+            transition: 0.3s;
         }
 
         .submit-btn:hover {
@@ -197,10 +215,10 @@
         }
 
         .info-text {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.7rem;
+            color: #787b86;
             text-align: center;
-            margin-top: 15px;
+            margin-top: 12px;
         }
 
         .modal {
@@ -210,45 +228,46 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.8);
             justify-content: center;
             align-items: center;
             z-index: 1000;
         }
 
         .modal-content {
-            background: linear-gradient(135deg, #1a1a3e, #0a0e27);
-            padding: 30px;
-            border-radius: 20px;
-            width: 380px;
+            background: #1e222d;
+            padding: 25px;
+            border-radius: 12px;
+            width: 360px;
             text-align: center;
+            border: 1px solid #2a2e39;
         }
 
         .modal-content h3 {
             color: #00ff88;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .modal-content p {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             line-height: 1.5;
+            font-size: 0.9rem;
         }
 
         .modal-btn {
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             border: none;
-            padding: 12px 30px;
+            padding: 10px 25px;
             border-radius: 8px;
             color: white;
             cursor: pointer;
-            margin-top: 10px;
         }
 
         @media (max-width: 768px) {
             .navbar {
-                padding: 15px 20px;
+                padding: 12px 20px;
                 flex-direction: column;
-                gap: 15px;
+                gap: 12px;
             }
             .nav-links {
                 gap: 20px;
@@ -256,7 +275,7 @@
                 justify-content: center;
             }
             .main-content {
-                padding: 20px;
+                padding: 15px;
             }
         }
     </style>
@@ -281,7 +300,6 @@
     <div class="deposit-card">
         <div class="card-header">
             <h1>💰 Deposit Funds</h1>
-            <p>Send funds to the address below</p>
         </div>
 
         <!-- ETH Address -->
@@ -328,7 +346,6 @@
 
             <button class="submit-btn" onclick="submitDeposit()">📤 Submit Deposit Request</button>
             
-            <!-- Updated info text -->
             <div class="info-text">⚠️ Your deposit will be approved after reviewing. Please upload valid proof of payment.</div>
         </div>
     </div>
