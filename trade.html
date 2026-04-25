@@ -12,20 +12,18 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            min-height: 100vh;
-            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #131722;
+            color: #d1d4dc;
         }
 
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 40px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 40px;
+            background: #1e222d;
+            border-bottom: 1px solid #2a2e39;
             position: fixed;
             top: 0;
             left: 0;
@@ -34,7 +32,7 @@
         }
 
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: bold;
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             -webkit-background-clip: text;
@@ -48,10 +46,10 @@
         }
 
         .nav-links a {
-            color: white;
+            color: #d1d4dc;
             text-decoration: none;
             transition: 0.3s;
-            font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .nav-links a:hover {
@@ -69,14 +67,13 @@
         }
 
         .logout-btn {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 20px;
-            border-radius: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-decoration: none;
-            color: white;
+            background: rgba(255, 68, 68, 0.15);
+            padding: 6px 16px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 68, 68, 0.3);
             cursor: pointer;
-            transition: 0.3s;
+            color: #ff4444;
+            font-size: 0.85rem;
         }
 
         .logout-btn:hover {
@@ -84,190 +81,169 @@
         }
 
         .main-content {
-            margin-top: 80px;
-            padding: 30px 40px;
+            margin-top: 70px;
+            padding: 20px;
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
         }
 
         .trade-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #1e222d;
+            border-radius: 12px;
+            border: 1px solid #2a2e39;
             overflow: hidden;
         }
 
         .card-header {
-            padding: 25px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-bottom: 1px solid #2a2e39;
             text-align: center;
         }
 
         .card-header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
+            font-size: 1.5rem;
+            color: white;
         }
 
-        .active-trade-banner {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2));
-            border: 2px solid #00d4ff;
-            border-radius: 12px;
-            padding: 15px;
-            margin: 15px 25px;
-            text-align: center;
-        }
-
-        .active-trade-banner .timer {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #00d4ff;
-            margin: 10px 0;
-        }
-
-        .trade-locked {
-            color: #ffaa00;
-            font-size: 0.85rem;
+        .card-header p {
+            color: #787b86;
+            font-size: 0.8rem;
         }
 
         .trade-type {
             display: flex;
-            margin: 20px 25px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
+            margin: 15px 20px;
+            background: #2a2e39;
+            border-radius: 10px;
             padding: 4px;
         }
 
         .trade-type-btn {
             flex: 1;
-            padding: 12px;
+            padding: 10px;
             text-align: center;
             cursor: pointer;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: 600;
             transition: 0.3s;
         }
 
         .trade-type-btn.buy { color: #00ff88; }
         .trade-type-btn.sell { color: #ff4444; }
-        .trade-type-btn.active { background: rgba(0, 212, 255, 0.2); }
+        .trade-type-btn.active { background: linear-gradient(135deg, #00d4ff, #7c3aed); color: white; }
 
         .crypto-selector {
-            margin: 0 25px 20px 25px;
+            margin: 0 20px 15px 20px;
         }
 
         .crypto-selector select {
             width: 100%;
-            padding: 14px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
+            padding: 12px;
+            background: #2a2e39;
+            border: 1px solid #3a3e49;
+            border-radius: 8px;
             color: white;
-            font-size: 1rem;
+            font-size: 0.9rem;
             cursor: pointer;
         }
 
         .coin-info {
-            background: rgba(0, 0, 0, 0.2);
-            margin: 0 25px 20px 25px;
+            background: #2a2e39;
+            margin: 0 20px 15px 20px;
             padding: 15px;
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .coin-name { font-size: 1.2rem; font-weight: bold; }
+        .coin-name { font-size: 1rem; font-weight: bold; color: white; }
         .coin-price { color: #00ff88; font-weight: bold; }
 
         .form-section {
-            padding: 0 25px 20px 25px;
+            padding: 0 20px 15px 20px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.85rem;
+            margin-bottom: 6px;
+            color: #787b86;
+            font-size: 0.8rem;
         }
 
         .form-group input {
             width: 100%;
-            padding: 14px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
+            padding: 12px;
+            background: #2a2e39;
+            border: 1px solid #3a3e49;
+            border-radius: 8px;
             color: white;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         .return-options {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 15px;
         }
 
         .return-option {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 12px 8px;
+            background: #2a2e39;
+            border: 1px solid #3a3e49;
+            border-radius: 8px;
+            padding: 10px 4px;
             text-align: center;
             cursor: pointer;
             transition: 0.3s;
         }
 
-        .return-option.disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
         .return-option:hover { background: rgba(0, 212, 255, 0.2); }
-        .return-option.selected { background: linear-gradient(135deg, #00d4ff, #7c3aed); }
+        .return-option.selected { background: linear-gradient(135deg, #00d4ff, #7c3aed); border-color: transparent; }
 
-        .return-time { font-size: 0.8rem; font-weight: bold; }
-        .return-rate { font-size: 0.7rem; color: #00ff88; margin-top: 4px; }
-        .return-min { font-size: 0.65rem; color: rgba(255, 255, 255, 0.5); margin-top: 4px; }
+        .return-time { font-size: 0.7rem; font-weight: bold; }
+        .return-rate { font-size: 0.65rem; color: #00ff88; margin-top: 4px; }
+        .return-min { font-size: 0.6rem; color: #787b86; margin-top: 4px; }
 
         .info-row {
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 10px 0;
+            border-bottom: 1px solid #2a2e39;
         }
 
-        .info-label { color: rgba(255, 255, 255, 0.6); }
+        .info-label { color: #787b86; font-size: 0.8rem; }
         .info-value { font-weight: 600; }
-        .info-value.highlight { color: #00ff88; font-size: 1.2rem; }
+        .info-value.highlight { color: #00ff88; font-size: 1.1rem; }
 
         .warning-message {
-            background: rgba(255, 68, 68, 0.2);
+            background: rgba(255, 68, 68, 0.15);
             border: 1px solid rgba(255, 68, 68, 0.3);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 20px;
-            color: #ff6666;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            color: #ff4444;
+            font-size: 0.8rem;
             display: none;
         }
 
         .action-buttons {
             display: flex;
-            gap: 15px;
-            padding: 20px 25px 25px;
+            gap: 12px;
+            padding: 15px 20px 20px;
         }
 
         .btn-cancel {
             flex: 1;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 14px;
-            border-radius: 10px;
+            background: #2a2e39;
+            border: 1px solid #3a3e49;
+            padding: 12px;
+            border-radius: 8px;
             cursor: pointer;
             color: white;
         }
@@ -276,15 +252,11 @@
             flex: 1;
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             border: none;
-            padding: 14px;
-            border-radius: 10px;
+            padding: 12px;
+            border-radius: 8px;
             cursor: pointer;
             color: white;
-        }
-
-        .btn-confirm:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+            font-weight: bold;
         }
 
         .modal {
@@ -294,33 +266,43 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(0, 0, 0, 0.8);
             justify-content: center;
             align-items: center;
             z-index: 1000;
         }
 
         .modal-content {
-            background: linear-gradient(135deg, #1a1a3e, #0a0e27);
-            padding: 30px;
-            border-radius: 20px;
-            width: 400px;
+            background: #1e222d;
+            padding: 25px;
+            border-radius: 12px;
+            width: 350px;
             text-align: center;
+            border: 1px solid #2a2e39;
         }
 
+        .modal-content h3 { margin-bottom: 15px; }
         .modal-btn {
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             border: none;
-            padding: 12px 30px;
+            padding: 10px 25px;
             border-radius: 8px;
             color: white;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         @media (max-width: 550px) {
             .return-options { grid-template-columns: repeat(2, 1fr); }
-            .main-content { padding: 20px; }
+            .navbar {
+                padding: 12px 20px;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -344,15 +326,7 @@
     <div class="trade-card">
         <div class="card-header">
             <h1>Confirm Your Trade</h1>
-            <p>Real-time prices from CoinGecko API</p>
-        </div>
-
-        <div id="activeTradeBanner" style="display: none;">
-            <div class="active-trade-banner">
-                <div>⏳ Active Trade in Progress</div>
-                <div class="timer" id="timerDisplay">0s</div>
-                <div class="trade-locked">🔒 New trades are locked until current trade completes</div>
-            </div>
+            <p>Review your trade details before confirming</p>
         </div>
 
         <div class="trade-type">
@@ -398,9 +372,9 @@
         <div class="coin-info">
             <div>
                 <div class="coin-name" id="coinName">Bitcoin (BTC)</div>
-                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">Live Price</div>
+                <div style="font-size: 0.7rem; color: #787b86;">Current Price</div>
             </div>
-            <div class="coin-price" id="coinPrice">Loading...</div>
+            <div class="coin-price" id="coinPrice">$0</div>
         </div>
 
         <div class="form-section">
@@ -409,8 +383,8 @@
                 <input type="number" id="amount" placeholder="Enter amount to trade" oninput="calculateReturn()">
             </div>
 
-            <label style="display: block; margin-bottom: 10px; color: rgba(255,255,255,0.7);">Select Duration</label>
-            <div class="return-options" id="durationOptions">
+            <label style="display: block; margin-bottom: 8px; color: #787b86; font-size: 0.8rem;">Select Duration</label>
+            <div class="return-options">
                 <div class="return-option" data-time="30" data-rate="12" data-min="100" onclick="selectDuration(this)">
                     <div class="return-time">30s</div><div class="return-rate">+12%</div><div class="return-min">Min $100</div>
                 </div>
@@ -450,7 +424,7 @@
 
         <div class="action-buttons">
             <button class="btn-cancel" onclick="cancelTrade()">Cancel</button>
-            <button class="btn-confirm" id="confirmBtn" onclick="confirmTrade()">Confirm Trade</button>
+            <button class="btn-confirm" onclick="confirmTrade()">Confirm Trade</button>
         </div>
     </div>
 </div>
@@ -471,33 +445,11 @@
     let selectedMinAmount = 0;
     let currentCoin = 'BTC';
     let currentCoinPrice = 0;
-    let activeTrade = false;
-    let activeTimer = null;
     
-    // CoinGecko API mapping
-    const coinGeckoIds = {
-        'BTC': 'bitcoin',
-        'ETH': 'ethereum',
-        'BNB': 'binancecoin',
-        'SOL': 'solana',
-        'XRP': 'ripple',
-        'ADA': 'cardano',
-        'AVAX': 'avalanche-2',
-        'DOGE': 'dogecoin',
-        'DOT': 'polkadot',
-        'LINK': 'chainlink',
-        'MATIC': 'polygon',
-        'ATOM': 'cosmos',
-        'FIL': 'filecoin',
-        'VET': 'vechain',
-        'UNI': 'uniswap',
-        'AAVE': 'aave',
-        'CRV': 'curve-dao-token',
-        'MKR': 'maker',
-        'COMP': 'compound-governance-token',
-        'SHIB': 'shiba-inu',
-        'PEPE': 'pepe',
-        'FLOKI': 'floki'
+    const coinPrices = {
+        BTC: 0, ETH: 0, BNB: 0, SOL: 0, XRP: 0, ADA: 0, AVAX: 0,
+        DOGE: 0, DOT: 0, LINK: 0, MATIC: 0, ATOM: 0, FIL: 0, VET: 0,
+        UNI: 0, AAVE: 0, CRV: 0, MKR: 0, COMP: 0, SHIB: 0, PEPE: 0, FLOKI: 0
     };
     
     const coinNames = {
@@ -508,18 +460,24 @@
         CRV: 'Curve DAO', MKR: 'Maker', COMP: 'Compound', SHIB: 'Shiba Inu',
         PEPE: 'Pepe', FLOKI: 'Floki'
     };
+    
+    const coinGeckoIds = {
+        'BTC': 'bitcoin', 'ETH': 'ethereum', 'BNB': 'binancecoin', 'SOL': 'solana',
+        'XRP': 'ripple', 'ADA': 'cardano', 'AVAX': 'avalanche-2', 'DOGE': 'dogecoin',
+        'DOT': 'polkadot', 'LINK': 'chainlink', 'MATIC': 'polygon', 'ATOM': 'cosmos',
+        'FIL': 'filecoin', 'VET': 'vechain', 'UNI': 'uniswap', 'AAVE': 'aave',
+        'CRV': 'curve-dao-token', 'MKR': 'maker', 'COMP': 'compound-governance-token',
+        'SHIB': 'shiba-inu', 'PEPE': 'pepe', 'FLOKI': 'floki'
+    };
 
-    // Fetch real-time price from CoinGecko
     async function fetchRealTimePrice(symbol) {
         const coinId = coinGeckoIds[symbol];
         if (!coinId) return null;
-        
         try {
             const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
             const data = await response.json();
             return data[coinId]?.usd || null;
         } catch (error) {
-            console.error('Error fetching price:', error);
             return null;
         }
     }
@@ -527,19 +485,12 @@
     async function changeCrypto() {
         const select = document.getElementById('cryptoSelect');
         currentCoin = select.value;
-        
-        // Show loading
-        document.getElementById('coinPrice').innerHTML = 'Loading...';
-        
         const realPrice = await fetchRealTimePrice(currentCoin);
         if (realPrice) {
             currentCoinPrice = realPrice;
-            document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
-        } else {
-            currentCoinPrice = 50000;
+            coinPrices[currentCoin] = realPrice;
             document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
         }
-        
         document.getElementById('coinName').innerHTML = `${coinNames[currentCoin]} (${currentCoin})`;
         calculateReturn();
     }
@@ -553,9 +504,7 @@
 
     function checkAuth() {
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-        if (!savedUser) {
-            window.location.href = 'index.html';
-        }
+        if (!savedUser) window.location.href = 'index.html';
         return savedUser ? JSON.parse(savedUser) : null;
     }
 
@@ -587,15 +536,13 @@
         if (type === 'buy') {
             buyBtn.classList.add('active');
             sellBtn.classList.remove('active');
-            document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
         } else {
             sellBtn.classList.add('active');
             buyBtn.classList.remove('active');
-            document.getElementById('availableAmount').innerHTML = '0 USDT (Coming Soon)';
         }
         calculateReturn();
     }
-    
+
     function selectDuration(element) {
         document.querySelectorAll('.return-option').forEach(opt => opt.classList.remove('selected'));
         element.classList.add('selected');
@@ -604,7 +551,7 @@
         selectedMinAmount = parseInt(element.getAttribute('data-min'));
         calculateReturn();
     }
-    
+
     function calculateReturn() {
         const amount = parseFloat(document.getElementById('amount').value);
         const warningMsg = document.getElementById('warningMsg');
@@ -625,7 +572,7 @@
         
         if (amount < selectedMinAmount) {
             warningMsg.style.display = 'block';
-            warningMsg.innerHTML = `⚠️ Minimum amount for ${selectedDuration}s is $${selectedMinAmount.toLocaleString()} USDT. You need $${(selectedMinAmount - amount).toLocaleString()} more.`;
+            warningMsg.innerHTML = `⚠️ Minimum amount for ${selectedDuration}s is $${selectedMinAmount.toLocaleString()} USDT.`;
             document.getElementById('expectedReturn').innerText = '0.00 USDT';
             document.getElementById('transactionFee').innerText = '0.00 USDT';
             document.getElementById('totalPay').innerText = '0.00 USDT';
@@ -641,7 +588,7 @@
         document.getElementById('transactionFee').innerHTML = `${transactionFee.toFixed(2)} USDT`;
         document.getElementById('totalPay').innerHTML = `${totalPayAmount.toFixed(2)} USDT`;
     }
-    
+
     function cancelTrade() {
         document.getElementById('amount').value = '';
         document.querySelectorAll('.return-option').forEach(opt => opt.classList.remove('selected'));
@@ -651,62 +598,8 @@
         calculateReturn();
         document.getElementById('warningMsg').style.display = 'none';
     }
-    
-    function startActiveTrade(remainingSeconds) {
-        activeTrade = true;
-        const banner = document.getElementById('activeTradeBanner');
-        const timerDisplay = document.getElementById('timerDisplay');
-        const amountInput = document.getElementById('amount');
-        const cryptoSelect = document.getElementById('cryptoSelect');
-        const confirmBtn = document.getElementById('confirmBtn');
-        const durationOptions = document.querySelectorAll('.return-option');
-        
-        banner.style.display = 'block';
-        amountInput.disabled = true;
-        cryptoSelect.disabled = true;
-        confirmBtn.disabled = true;
-        durationOptions.forEach(opt => opt.classList.add('disabled'));
-        
-        let remaining = remainingSeconds;
-        timerDisplay.innerText = `${remaining}s`;
-        
-        if (activeTimer) clearInterval(activeTimer);
-        
-        activeTimer = setInterval(() => {
-            remaining--;
-            timerDisplay.innerText = `${remaining}s`;
-            
-            if (remaining <= 0) {
-                clearInterval(activeTimer);
-                activeTimer = null;
-                
-                activeTrade = false;
-                banner.style.display = 'none';
-                amountInput.disabled = false;
-                cryptoSelect.disabled = false;
-                confirmBtn.disabled = false;
-                durationOptions.forEach(opt => opt.classList.remove('disabled'));
-                
-                const isWinMode = localStorage.getItem('globalTradeMode') === 'win';
-                
-                if (isWinMode) {
-                    document.getElementById('modalTitle').innerHTML = '✅ TRADE WON!';
-                    document.getElementById('modalMessage').innerHTML = `Your trade with ${selectedDuration}s duration has completed!<br><br>You won! Profit has been added to your balance.`;
-                } else {
-                    document.getElementById('modalTitle').innerHTML = '❌ TRADE LOST!';
-                    document.getElementById('modalMessage').innerHTML = `Your trade with ${selectedDuration}s duration has completed!<br><br>You lost your investment.`;
-                }
-                document.getElementById('resultModal').style.display = 'flex';
-            }
-        }, 1000);
-    }
-    
-    async function confirmTrade() {
-        if (activeTrade) {
-            alert('⚠️ You have an active trade! Please wait for it to complete.');
-            return;
-        }
-        
+
+    function confirmTrade() {
         const amount = parseFloat(document.getElementById('amount').value);
         
         if (isNaN(amount) || amount <= 0) {
@@ -727,45 +620,67 @@
         if (tradeType === 'buy') {
             const transactionFee = amount * 0.02;
             const totalPay = amount + transactionFee;
+            const expectedReturnAmount = amount * (selectedRate / 100);
             
             if (totalPay > userBalance) {
-                alert(`Insufficient balance! You need $${totalPay.toFixed(2)} USDT but only have $${userBalance.toFixed(2)} USDT`);
+                alert(`Insufficient balance! You need $${totalPay.toFixed(2)} USDT`);
                 return;
             }
             
             userBalance -= totalPay;
             saveUserBalance();
             
-            startActiveTrade(selectedDuration);
-            updateBalanceDisplay();
+            const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+            let userEmail = 'User';
+            if (savedUser) {
+                try {
+                    const user = JSON.parse(savedUser);
+                    userEmail = user.email || userEmail;
+                } catch(e) {}
+            }
             
-            document.getElementById('modalTitle').innerHTML = '⏳ TRADE PLACED!';
-            document.getElementById('modalMessage').innerHTML = `Your ${tradeType.toUpperCase()} trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration has been placed!<br><br>Amount: $${amount.toFixed(2)} USDT<br>Fee: $${transactionFee.toFixed(2)} USDT<br><br>Trade will complete in ${selectedDuration} seconds.`;
+            const tradeRecord = {
+                id: Date.now(),
+                userEmail: userEmail,
+                coin: currentCoin,
+                coinName: coinNames[currentCoin],
+                amount: amount,
+                duration: selectedDuration,
+                rate: selectedRate,
+                expectedProfit: expectedReturnAmount,
+                profit: 0,
+                status: 'pending',
+                date: new Date().toLocaleString(),
+                tradeType: 'buy'
+            };
+            
+            const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
+            history.unshift(tradeRecord);
+            localStorage.setItem('lunoTradeHistory', JSON.stringify(history));
+            
+            document.getElementById('modalTitle').innerHTML = '✅ TRADE PLACED!';
+            const msg = `Your ${tradeType.toUpperCase()} trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s duration has been placed!\n\nAmount: $${amount.toFixed(2)} USDT\nExpected Return: +${selectedRate}% ($${expectedReturnAmount.toFixed(2)} USDT)\nFee: $${transactionFee.toFixed(2)} USDT\n\nWaiting for admin to set WIN/LOSE.`;
+            document.getElementById('modalMessage').innerHTML = msg.replace(/\n/g, '<br>');
             document.getElementById('resultModal').style.display = 'flex';
             
             cancelTrade();
+            document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
         } else {
             alert('Sell feature coming soon!');
         }
     }
-    
-    function updateBalanceDisplay() {
-        document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
-    }
-    
+
     function closeModal() {
         document.getElementById('resultModal').style.display = 'none';
-        if (!activeTrade) {
-            window.location.href = 'profile.html';
-        }
+        window.location.href = 'profile.html';
     }
-    
+
     function logout() {
         localStorage.removeItem('lunoUser');
         sessionStorage.removeItem('lunoUser');
         window.location.href = 'index.html';
     }
-    
+
     function checkSelectedCrypto() {
         const selected = localStorage.getItem('selectedCrypto');
         if (selected) {
@@ -780,19 +695,7 @@
             } catch(e) {}
         }
     }
-    
-    // Refresh price every 10 seconds
-    setInterval(async () => {
-        if (currentCoin && !activeTrade) {
-            const realPrice = await fetchRealTimePrice(currentCoin);
-            if (realPrice) {
-                currentCoinPrice = realPrice;
-                document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
-                calculateReturn();
-            }
-        }
-    }, 10000);
-    
+
     displayUsername();
     loadUserBalance();
     changeCrypto();
