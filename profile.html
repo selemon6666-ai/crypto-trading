@@ -196,6 +196,42 @@
             color: white;
         }
 
+        /* File input styling */
+        .file-input {
+            width: 100%;
+            padding: 10px;
+            background: #2a2e39;
+            border: 1px solid #3a3e49;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .file-input::-webkit-file-upload-button {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 150px;
+            margin-top: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .info-text {
+            font-size: 0.7rem;
+            color: #787b86;
+            margin-top: 10px;
+            text-align: center;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -324,14 +360,54 @@
             </div>
         </div>
 
+        <!-- KYC Page with File Upload -->
         <div id="kycPage" class="page-content" style="display: none;">
             <div class="page-header"><h1>KYC Verification</h1><p>Verify your identity to unlock full trading features</p></div>
             <div class="profile-card">
                 <div class="card-title">✅ Identity Verification</div>
-                <div class="form-group"><label>Full Name (as on ID)</label><input type="text" id="kycFullName"></div>
-                <div class="form-group"><label>ID Type</label><select id="idType"><option>Passport</option><option>Driver's License</option><option>National ID</option></select></div>
-                <div class="form-group"><label>ID Number</label><input type="text" id="idNumber"></div>
+                
+                <div class="form-group">
+                    <label>Full Name (as on ID)</label>
+                    <input type="text" id="kycFullName" placeholder="Enter your full name as on ID">
+                </div>
+                
+                <div class="form-group">
+                    <label>ID Type</label>
+                    <select id="idType">
+                        <option value="passport">Passport</option>
+                        <option value="drivers">Driver's License</option>
+                        <option value="national">National ID Card</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>ID Number</label>
+                    <input type="text" id="idNumber" placeholder="Enter your ID number">
+                </div>
+                
+                <div class="form-group">
+                    <label>📎 Upload ID Document (Front Side)</label>
+                    <input type="file" id="kycFileFront" accept="image/*" class="file-input" onchange="previewImage(this, 'frontPreview')">
+                    <img id="frontPreview" class="image-preview" alt="Front ID Preview">
+                </div>
+                
+                <div class="form-group">
+                    <label>📎 Upload ID Document (Back Side)</label>
+                    <input type="file" id="kycFileBack" accept="image/*" class="file-input" onchange="previewImage(this, 'backPreview')">
+                    <img id="backPreview" class="image-preview" alt="Back ID Preview">
+                </div>
+                
+                <div class="form-group">
+                    <label>📎 Upload Selfie with ID</label>
+                    <input type="file" id="kycSelfie" accept="image/*" class="file-input" onchange="previewImage(this, 'selfiePreview')">
+                    <img id="selfiePreview" class="image-preview" alt="Selfie Preview">
+                </div>
+                
                 <button class="btn-save" onclick="submitKYC()">Submit Verification</button>
+                
+                <div class="info-text">
+                    ⚠️ Your documents are securely encrypted. KYC verification may take 24-48 hours.
+                </div>
             </div>
         </div>
 
@@ -371,6 +447,19 @@
 </div>
 
 <script>
+    // Preview image before upload
+    function previewImage(input, previewId) {
+        const preview = document.getElementById(previewId);
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     let userData = { 
         fullName: '', 
         email: '', 
@@ -399,7 +488,6 @@
         userData.balance = profile.balance;
         userData.kycStatus = profile.kycStatus || 'pending';
         
-        // Load trade history and calculate statistics
         loadTradeHistoryAndStats();
         updateUI();
     }
@@ -408,18 +496,13 @@
         const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
         userData.tradeHistory = history;
         
-        // Calculate statistics
         userData.totalTrades = history.length;
-        
-        // Count completed trades (won or lost)
-        const completedTrades = history.filter(t => t.status === 'won' || t.status === 'lost');
         const wonTrades = history.filter(t => t.status === 'won').length;
         
         userData.winRate = userData.totalTrades > 0 ? (wonTrades / userData.totalTrades * 100).toFixed(1) : 0;
         userData.totalVolume = history.reduce((sum, t) => sum + t.amount, 0);
         userData.totalProfit = history.reduce((sum, t) => sum + (t.profit || 0), 0);
         
-        // Update profile page stats
         const totalTradesElem = document.getElementById('totalTrades');
         const winRateElem = document.getElementById('winRate');
         const totalVolumeElem = document.getElementById('totalVolume');
@@ -470,7 +553,7 @@
                 <td>${trade.rate ? `+${trade.rate}%` : '-'}</td>
                 <td class="${profitClass}">${profitSymbol}$${(trade.profit || 0).toFixed(2)}</td>
                 <td class="${statusClass}">${statusText}</td>
-            </table>`;
+            </tr>`;
         });
         
         html += '</tbody></table>';
@@ -481,36 +564,58 @@
         const fullName = document.getElementById('kycFullName').value;
         const idType = document.getElementById('idType').value;
         const idNumber = document.getElementById('idNumber').value;
+        const frontFile = document.getElementById('kycFileFront').files[0];
+        const backFile = document.getElementById('kycFileBack').files[0];
+        const selfieFile = document.getElementById('kycSelfie').files[0];
         
         if (!fullName || !idNumber) {
-            alert('Please fill in all fields');
+            alert('Please fill in all required fields');
             return;
         }
         
-        // Save KYC request
+        if (!frontFile) {
+            alert('Please upload the front side of your ID');
+            return;
+        }
+        
+        let message = `KYC verification submitted!\n\nName: ${fullName}\nID Type: ${idType}\nID Number: ${idNumber}\n`;
+        message += `\nDocuments uploaded:\n- Front ID: ${frontFile.name}\n`;
+        if (backFile) message += `- Back ID: ${backFile.name}\n`;
+        if (selfieFile) message += `- Selfie: ${selfieFile.name}\n`;
+        message += `\nYour verification is under review, please wait a moment.`;
+        
+        alert(message);
+        
+        // Save KYC request to admin
         const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
         kycRequests.push({
             email: userData.email,
             fullName: fullName,
             idType: idType,
             idNumber: idNumber,
+            frontFileName: frontFile.name,
+            backFileName: backFile ? backFile.name : null,
+            selfieFileName: selfieFile ? selfieFile.name : null,
             date: new Date().toLocaleString(),
             status: 'pending'
         });
         localStorage.setItem('kycRequests', JSON.stringify(kycRequests));
         
-        alert(`✅ KYC verification submitted!\n\nName: ${fullName}\nID Type: ${idType}\nID Number: ${idNumber}\n\nYour verification is under review, please wait a moment.`);
-        
         // Reset form
         document.getElementById('kycFullName').value = '';
         document.getElementById('idNumber').value = '';
+        document.getElementById('kycFileFront').value = '';
+        document.getElementById('kycFileBack').value = '';
+        document.getElementById('kycSelfie').value = '';
+        document.getElementById('frontPreview').style.display = 'none';
+        document.getElementById('backPreview').style.display = 'none';
+        document.getElementById('selfiePreview').style.display = 'none';
     }
     
     function updateProfile() {
         const newName = document.getElementById('updateFullName').value;
         if (newName) {
             userData.fullName = newName;
-            // Update stored user data
             const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
             if (savedUser) {
                 const user = JSON.parse(savedUser);
@@ -525,19 +630,12 @@
         
         alert('✅ Profile updated successfully!');
         updateUI();
-        
-        // Clear password fields
         document.getElementById('newPassword').value = '';
         document.getElementById('confirmPassword').value = '';
     }
     
-    function openWithdrawModal() { 
-        document.getElementById('transactionModal').style.display = 'flex'; 
-    }
-    
-    function closeModal() { 
-        document.getElementById('transactionModal').style.display = 'none'; 
-    }
+    function openWithdrawModal() { document.getElementById('transactionModal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('transactionModal').style.display = 'none'; }
     
     function processWithdrawal() {
         const amount = parseFloat(document.getElementById('transactionAmount').value);
@@ -568,8 +666,6 @@
         
         alert(`✅ Withdrawal request of $${amount.toFixed(2)} submitted!\n\nYour withdrawal request is under review, please wait a moment.`);
         closeModal();
-        
-        // Reset form
         document.getElementById('transactionAmount').value = '';
         document.getElementById('withdrawAddress').value = '';
     }
@@ -580,7 +676,6 @@
         window.location.href = 'index.html';
     }
     
-    // Navigation
     document.querySelectorAll('.sidebar-item').forEach(item => {
         item.addEventListener('click', () => {
             const page = item.getAttribute('data-page');
@@ -595,7 +690,7 @@
             
             if (page === 'profile') {
                 document.getElementById('profilePage').style.display = 'block';
-                loadTradeHistoryAndStats(); // Refresh stats when returning to profile
+                loadTradeHistoryAndStats();
             }
             if (page === 'history') { 
                 document.getElementById('historyPage').style.display = 'block'; 
@@ -607,7 +702,6 @@
         });
     });
     
-    // Initialize
     loadUserData();
 </script>
 
