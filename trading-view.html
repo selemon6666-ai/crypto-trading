@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luno Trading - Trading View</title>
-    <!-- Use CDN that definitely works -->
-    <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.min.js"></script>
+    <title>Luno Trading - Advanced Trading View</title>
+    <!-- Lightweight Charts Library -->
+    <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
     <style>
         * {
             margin: 0;
@@ -56,7 +56,7 @@
             font-weight: 500;
         }
 
-        .nav-links a:hover {
+        .nav-links a:hover, .nav-links a.active {
             color: #00d4ff;
         }
 
@@ -85,9 +85,9 @@
             background: rgba(255, 68, 68, 0.3);
         }
 
+        /* Back Button */
         .back-button {
-            margin-top: 80px;
-            padding: 10px 20px;
+            margin: 80px 20px 0 20px;
         }
 
         .back-btn {
@@ -105,16 +105,17 @@
             background: rgba(0, 212, 255, 0.3);
         }
 
+        /* Main Trading Layout */
         .trading-container {
             padding: 20px;
             display: flex;
             gap: 20px;
-            flex-wrap: wrap;
+            min-height: calc(100vh - 80px);
         }
 
+        /* Chart Section */
         .chart-section {
             flex: 3;
-            min-width: 300px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 16px;
             padding: 15px;
@@ -138,18 +139,18 @@
         }
 
         .coin-symbol {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
         }
 
         .coin-price {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #00ff88;
         }
 
         .price-change {
-            font-size: 0.9rem;
+            font-size: 1rem;
             padding: 4px 10px;
             border-radius: 20px;
         }
@@ -164,6 +165,7 @@
             color: #ff4444;
         }
 
+        /* Timeframe Buttons */
         .timeframe-buttons {
             display: flex;
             gap: 8px;
@@ -187,20 +189,24 @@
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
         }
 
+        /* Chart Container */
         #chart-container {
             width: 100%;
             height: 450px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
         }
 
+        /* Right Panel */
         .right-panel {
             flex: 1;
-            min-width: 280px;
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        .stats-card, .trade-panel {
+        /* Price Stats Card */
+        .stats-card {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 16px;
             padding: 15px;
@@ -226,6 +232,14 @@
 
         .stat-value {
             font-weight: 600;
+        }
+
+        /* Trading Panel */
+        .trade-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .trade-type {
@@ -271,6 +285,11 @@
             margin-bottom: 10px;
         }
 
+        .trade-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
         .trade-btn {
             width: 100%;
             padding: 12px;
@@ -291,7 +310,10 @@
             color: white;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
+            .trading-container {
+                flex-direction: column;
+            }
             .navbar {
                 padding: 15px 20px;
                 flex-direction: column;
@@ -300,9 +322,6 @@
             .nav-links {
                 flex-wrap: wrap;
                 justify-content: center;
-            }
-            .trading-container {
-                flex-direction: column;
             }
         }
     </style>
@@ -328,6 +347,7 @@
 </div>
 
 <div class="trading-container">
+    <!-- Chart Section -->
     <div class="chart-section">
         <div class="chart-header">
             <div class="coin-info">
@@ -336,16 +356,18 @@
                 <span class="price-change" id="priceChange">0.00%</span>
             </div>
             <div class="timeframe-buttons">
-                <button class="timeframe-btn" data-days="1">1D</button>
-                <button class="timeframe-btn active" data-days="7">7D</button>
-                <button class="timeframe-btn" data-days="30">30D</button>
-                <button class="timeframe-btn" data-days="365">1Y</button>
+                <button class="timeframe-btn" data-timeframe="1">1H</button>
+                <button class="timeframe-btn active" data-timeframe="24">24H</button>
+                <button class="timeframe-btn" data-timeframe="7">7D</button>
+                <button class="timeframe-btn" data-timeframe="30">30D</button>
             </div>
         </div>
         <div id="chart-container"></div>
     </div>
 
+    <!-- Right Panel -->
     <div class="right-panel">
+        <!-- Price Stats -->
         <div class="stats-card">
             <div class="stats-title">Market Statistics</div>
             <div class="stat-row">
@@ -366,13 +388,15 @@
             </div>
         </div>
 
+        <!-- Trading Panel -->
         <div class="trade-panel">
             <div class="trade-type">
                 <button class="trade-type-btn buy active" onclick="setTradeType('buy')">BUY</button>
                 <button class="trade-type-btn sell" onclick="setTradeType('sell')">SELL</button>
             </div>
             <input type="number" id="tradeAmount" class="trade-input" placeholder="Amount (USDT)" oninput="updateTotal()">
-            <div class="stat-row">
+            <input type="text" id="tradePrice" class="trade-input" placeholder="Price" readonly>
+            <div class="stat-row" style="margin-top: 10px;">
                 <span class="stat-label">Total:</span>
                 <span class="stat-value" id="totalAmount">$0.00</span>
             </div>
@@ -385,7 +409,7 @@
     let chart = null;
     let lineSeries = null;
     let currentSymbol = 'BTC';
-    let currentDays = 7;
+    let currentTimeframe = '24';
     let tradeType = 'buy';
     let currentPrice = 0;
     
@@ -397,15 +421,16 @@
         'DOGE': 'dogecoin',
         'BNB': 'binancecoin',
         'XRP': 'ripple',
-        'ADA': 'cardano'
+        'ADA': 'cardano',
+        'AVAX': 'avalanche-2'
     };
     
-    // Get selected coin
+    // Get selected coin from URL
     function getSelectedCoin() {
         const params = new URLSearchParams(window.location.search);
         const symbol = params.get('symbol');
-        if (symbol && coinGeckoIds[symbol.toUpperCase()]) {
-            currentSymbol = symbol.toUpperCase();
+        if (symbol && coinGeckoIds[symbol]) {
+            currentSymbol = symbol;
         } else {
             const saved = localStorage.getItem('selectedCrypto');
             if (saved) {
@@ -418,8 +443,8 @@
         document.getElementById('coinSymbol').innerText = `${currentSymbol}/USDT`;
     }
     
-    // Fetch current price
-    async function fetchCurrentPrice() {
+    // Fetch real-time price
+    async function fetchRealTimePrice() {
         const coinId = coinGeckoIds[currentSymbol];
         if (!coinId) return;
         
@@ -431,34 +456,39 @@
             if (coinData) {
                 currentPrice = coinData.usd;
                 document.getElementById('currentPrice').innerText = `$${currentPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                document.getElementById('high24h').innerText = `$${(coinData.usd_24h_high || currentPrice).toLocaleString()}`;
-                document.getElementById('low24h').innerText = `$${(coinData.usd_24h_low || currentPrice).toLocaleString()}`;
-                document.getElementById('volume24h').innerText = `$${(coinData.usd_24h_vol || 0).toLocaleString()}`;
-                document.getElementById('marketCap').innerText = `$${(coinData.usd_market_cap || 0).toLocaleString()}`;
                 
                 const change = coinData.usd_24h_change || 0;
                 const changeElement = document.getElementById('priceChange');
                 changeElement.innerText = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
                 changeElement.className = `price-change ${change >= 0 ? 'positive' : 'negative'}`;
+                
+                document.getElementById('high24h').innerText = `$${(coinData.usd_24h_high || currentPrice).toLocaleString()}`;
+                document.getElementById('low24h').innerText = `$${(coinData.usd_24h_low || currentPrice).toLocaleString()}`;
+                document.getElementById('volume24h').innerText = `$${(coinData.usd_24h_vol || 0).toLocaleString()}`;
+                document.getElementById('marketCap').innerText = `$${(coinData.usd_market_cap || 0).toLocaleString()}`;
+                
+                document.getElementById('tradePrice').value = `$${currentPrice.toFixed(2)}`;
+                updateTotal();
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error fetching price:', error);
         }
     }
     
-    // Fetch historical data
+    // Fetch historical data for chart
     async function fetchHistoricalData() {
         const coinId = coinGeckoIds[currentSymbol];
         if (!coinId) return [];
         
         try {
-            const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${currentDays}`);
+            const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${currentTimeframe}`);
             const data = await response.json();
             
-            if (!data.prices || data.prices.length === 0) return generateMockData();
+            const prices = data.prices;
+            if (!prices || prices.length === 0) return [];
             
             // Format for chart
-            const chartData = data.prices.map(price => ({
+            const chartData = prices.map(price => ({
                 time: Math.floor(price[0] / 1000),
                 value: price[1]
             }));
@@ -473,16 +503,16 @@
     // Generate mock data if API fails
     function generateMockData() {
         const data = [];
-        let price = currentPrice || 50000;
+        let basePrice = 50000;
         const now = Math.floor(Date.now() / 1000);
-        const points = currentDays === 1 ? 24 : currentDays === 7 ? 168 : currentDays === 30 ? 720 : 8760;
+        const points = currentTimeframe === '1' ? 60 : currentTimeframe === '24' ? 144 : currentTimeframe === '7' ? 168 : 720;
         
         for (let i = points; i >= 0; i--) {
-            const change = (Math.random() - 0.5) * (price * 0.02);
-            price = Math.max(price + change, 1000);
+            const change = (Math.random() - 0.5) * 200;
+            basePrice += change;
             data.push({
                 time: now - (i * 3600),
-                value: price
+                value: Math.max(basePrice, 1000)
             });
         }
         return data;
@@ -496,22 +526,23 @@
             width: chartContainer.clientWidth,
             height: 450,
             layout: {
-                backgroundColor: '#1a1a2e',
-                textColor: '#ffffff',
+                backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                textColor: 'rgba(255, 255, 255, 0.8)',
             },
             grid: {
-                vertLines: { color: '#2a2a4a' },
-                horzLines: { color: '#2a2a4a' },
+                vertLines: { color: 'rgba(255, 255, 255, 0.05)' },
+                horzLines: { color: 'rgba(255, 255, 255, 0.05)' },
             },
             crosshair: {
                 mode: LightweightCharts.CrosshairMode.Normal,
             },
             rightPriceScale: {
-                borderColor: '#2a2a4a',
+                borderColor: 'rgba(255, 255, 255, 0.2)',
             },
             timeScale: {
-                borderColor: '#2a2a4a',
+                borderColor: 'rgba(255, 255, 255, 0.2)',
                 timeVisible: true,
+                secondsVisible: false,
             },
         });
         
@@ -521,27 +552,34 @@
             priceLineVisible: false,
         });
         
-        const data = await fetchHistoricalData();
-        lineSeries.setData(data);
+        const historicalData = await fetchHistoricalData();
+        if (historicalData.length > 0) {
+            lineSeries.setData(historicalData);
+        }
         
         window.addEventListener('resize', () => {
             chart.applyOptions({ width: chartContainer.clientWidth });
         });
     }
     
-    // Update chart
+    // Update chart with new data
     async function updateChart() {
         if (lineSeries) {
-            const data = await fetchHistoricalData();
-            lineSeries.setData(data);
+            const historicalData = await fetchHistoricalData();
+            if (historicalData.length > 0) {
+                lineSeries.setData(historicalData);
+            }
         }
     }
     
+    // Update total amount
     function updateTotal() {
         const amount = parseFloat(document.getElementById('tradeAmount').value) || 0;
-        document.getElementById('totalAmount').innerText = `$${amount.toFixed(2)}`;
+        const total = amount;
+        document.getElementById('totalAmount').innerText = `$${total.toFixed(2)}`;
     }
     
+    // Set trade type
     function setTradeType(type) {
         tradeType = type;
         const buyBtn = document.querySelector('.trade-type-btn.buy');
@@ -561,6 +599,7 @@
         }
     }
     
+    // Execute trade
     function executeTrade() {
         const amount = parseFloat(document.getElementById('tradeAmount').value);
         if (!amount || amount <= 0) {
@@ -568,15 +607,15 @@
             return;
         }
         
-        alert(`✅ Paper Trade Executed!\n\nAction: ${tradeType.toUpperCase()}\nAmount: ${amount} USDT\nPrice: $${currentPrice.toFixed(2)}\nTotal: $${amount.toFixed(2)}\n\nThis is a simulated trade. No real money involved.`);
+        alert(`${tradeType.toUpperCase()} order placed!\n\nAmount: ${amount} USDT\nPrice: $${currentPrice.toFixed(2)}\nTotal: $${(amount).toFixed(2)}\n\nThis is a paper trade for demonstration.`);
         
         document.getElementById('tradeAmount').value = '';
         updateTotal();
     }
     
-    // Timeframe change
-    async function changeTimeframe(days, btn) {
-        currentDays = parseInt(days);
+    // Timeframe change handler
+    async function changeTimeframe(timeframe, btn) {
+        currentTimeframe = timeframe;
         document.querySelectorAll('.timeframe-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         await updateChart();
@@ -593,6 +632,7 @@
         }
     }
     
+    // Check authentication
     function checkAuth() {
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
         if (!savedUser) {
@@ -606,23 +646,31 @@
         window.location.href = 'index.html';
     }
     
-    // Event listeners
+    // Setup event listeners
+    document.getElementById('tradeAmount').addEventListener('input', updateTotal);
+    
     document.querySelectorAll('.timeframe-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            changeTimeframe(btn.getAttribute('data-days'), btn);
+            changeTimeframe(btn.getAttribute('data-timeframe'), btn);
         });
     });
     
-    // Initialize everything
+    // Initialize
     checkAuth();
     displayUsername();
     getSelectedCoin();
-    fetchCurrentPrice();
     initChart();
+    fetchRealTimePrice();
     
-    // Update price every 30 seconds
-    setInterval(fetchCurrentPrice, 30000);
-    setInterval(updateChart, 60000);
+    // Update price every 10 seconds
+    setInterval(() => {
+        fetchRealTimePrice();
+    }, 10000);
+    
+    // Update chart every minute
+    setInterval(() => {
+        updateChart();
+    }, 60000);
 </script>
 
 </body>
