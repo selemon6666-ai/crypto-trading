@@ -15,8 +15,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #131722;
-            color: #d1d4dc;
+            background: #131722 !important;
+            color: #d1d4dc !important;
             overflow-x: hidden;
         }
 
@@ -26,8 +26,8 @@
             justify-content: space-between;
             align-items: center;
             padding: 8px 20px;
-            background: #1e222d;
-            border-bottom: 1px solid #2a2e39;
+            background: #1e222d !important;
+            border-bottom: 1px solid #2a2e39 !important;
             position: fixed;
             top: 0;
             left: 0;
@@ -50,14 +50,14 @@
         }
 
         .nav-links a {
-            color: #d1d4dc;
+            color: #d1d4dc !important;
             text-decoration: none;
             font-size: 0.85rem;
             transition: 0.3s;
         }
 
         .nav-links a:hover, .nav-links a.active {
-            color: #00d4ff;
+            color: #00d4ff !important;
         }
 
         .user-info {
@@ -67,7 +67,7 @@
         }
 
         .username {
-            color: #00d4ff;
+            color: #00d4ff !important;
             font-size: 0.85rem;
         }
 
@@ -78,7 +78,7 @@
             cursor: pointer;
             font-size: 0.8rem;
             border: 1px solid rgba(255, 68, 68, 0.3);
-            color: #ff4444;
+            color: #ff4444 !important;
         }
 
         .logout-btn:hover {
@@ -90,7 +90,7 @@
             margin-top: 50px;
             display: flex;
             height: calc(100vh - 50px);
-            background: #131722;
+            background: #131722 !important;
         }
 
         /* Left Panel - Chart Area */
@@ -98,14 +98,14 @@
             flex: 3;
             display: flex;
             flex-direction: column;
-            background: #131722;
+            background: #131722 !important;
             border-right: 1px solid #2a2e39;
         }
 
         /* Chart Header */
         .chart-header {
             padding: 12px 16px;
-            background: #1e222d;
+            background: #1e222d !important;
             border-bottom: 1px solid #2a2e39;
             display: flex;
             justify-content: space-between;
@@ -124,13 +124,13 @@
         .symbol {
             font-size: 1.5rem;
             font-weight: 600;
-            color: white;
+            color: white !important;
         }
 
         .price {
             font-size: 1.8rem;
             font-weight: 600;
-            color: #00ff88;
+            color: #00ff88 !important;
         }
 
         .change {
@@ -141,12 +141,12 @@
 
         .change.positive {
             background: rgba(0, 255, 136, 0.15);
-            color: #00ff88;
+            color: #00ff88 !important;
         }
 
         .change.negative {
             background: rgba(255, 68, 68, 0.15);
-            color: #ff4444;
+            color: #ff4444 !important;
         }
 
         /* Timeframes */
@@ -163,7 +163,7 @@
             border: none;
             padding: 6px 14px;
             border-radius: 6px;
-            color: #d1d4dc;
+            color: #d1d4dc !important;
             cursor: pointer;
             font-size: 0.75rem;
             font-weight: 500;
@@ -172,20 +172,20 @@
 
         .tf-btn:hover, .tf-btn.active {
             background: #00d4ff;
-            color: #131722;
+            color: #131722 !important;
         }
 
         /* Chart Container */
         #chart-container {
             flex: 1;
             width: 100%;
-            background: #131722;
+            background: #131722 !important;
         }
 
         /* Order Book Panel */
         .orderbook-panel {
-            width: 280px;
-            background: #1e222d;
+            width: 320px;
+            background: #1e222d !important;
             display: flex;
             flex-direction: column;
             border-right: 1px solid #2a2e39;
@@ -195,7 +195,7 @@
             padding: 12px 16px;
             font-size: 0.8rem;
             font-weight: 600;
-            color: #d1d4dc;
+            color: #d1d4dc !important;
             border-bottom: 1px solid #2a2e39;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -206,7 +206,7 @@
             grid-template-columns: 1fr 1fr 1fr;
             padding: 10px 12px;
             font-size: 0.7rem;
-            color: #787b86;
+            color: #787b86 !important;
             border-bottom: 1px solid #2a2e39;
         }
 
@@ -231,18 +231,18 @@
         }
 
         .orderbook-row.ask {
-            color: #ff4444;
+            color: #ff4444 !important;
         }
 
         .orderbook-row.bid {
-            color: #00ff88;
+            color: #00ff88 !important;
         }
 
         .spread {
             text-align: center;
             padding: 8px;
             font-size: 0.7rem;
-            color: #787b86;
+            color: #787b86 !important;
             border-top: 1px solid #2a2e39;
             border-bottom: 1px solid #2a2e39;
         }
@@ -250,7 +250,7 @@
         /* Right Panel - Trade & Stats */
         .trade-panel {
             width: 300px;
-            background: #1e222d;
+            background: #1e222d !important;
             display: flex;
             flex-direction: column;
         }
@@ -269,11 +269,12 @@
         }
 
         .stat-label {
-            color: #787b86;
+            color: #787b86 !important;
         }
 
         .stat-value {
             font-weight: 500;
+            color: #d1d4dc !important;
         }
 
         /* Trade Form */
@@ -300,19 +301,19 @@
 
         .trade-tab.buy {
             background: rgba(0, 255, 136, 0.1);
-            color: #00ff88;
+            color: #00ff88 !important;
             border: 1px solid rgba(0, 255, 136, 0.2);
         }
 
         .trade-tab.sell {
             background: rgba(255, 68, 68, 0.1);
-            color: #ff4444;
+            color: #ff4444 !important;
             border: 1px solid rgba(255, 68, 68, 0.2);
         }
 
         .trade-tab.active {
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
-            color: white;
+            color: white !important;
             border: none;
         }
 
@@ -322,7 +323,7 @@
 
         .input-label {
             font-size: 0.7rem;
-            color: #787b86;
+            color: #787b86 !important;
             margin-bottom: 4px;
             display: block;
         }
@@ -330,16 +331,20 @@
         .trade-input {
             width: 100%;
             padding: 10px;
-            background: #2a2e39;
+            background: #2a2e39 !important;
             border: 1px solid #3a3e49;
             border-radius: 6px;
-            color: white;
+            color: white !important;
             font-size: 0.85rem;
         }
 
         .trade-input:focus {
             outline: none;
             border-color: #00d4ff;
+        }
+
+        .trade-input::placeholder {
+            color: #787b86;
         }
 
         .percentage-buttons {
@@ -354,14 +359,14 @@
             background: #2a2e39;
             border: none;
             border-radius: 4px;
-            color: #d1d4dc;
+            color: #d1d4dc !important;
             cursor: pointer;
             font-size: 0.7rem;
         }
 
         .perc-btn:hover {
             background: #00d4ff;
-            color: #131722;
+            color: #131722 !important;
         }
 
         .total-row {
@@ -385,12 +390,12 @@
 
         .trade-action-btn.buy {
             background: linear-gradient(135deg, #00ff88, #00cc6a);
-            color: white;
+            color: white !important;
         }
 
         .trade-action-btn.sell {
             background: linear-gradient(135deg, #ff4444, #cc0000);
-            color: white;
+            color: white !important;
         }
 
         /* Scrollbar */
@@ -460,7 +465,7 @@
 
     <!-- Order Book Panel -->
     <div class="orderbook-panel">
-        <div class="panel-title">Order Book</div>
+        <div class="panel-title">ORDER BOOK</div>
         <div class="orderbook-header">
             <span>Price (USDT)</span>
             <span>Amount</span>
