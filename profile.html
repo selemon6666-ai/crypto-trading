@@ -12,20 +12,18 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            min-height: 100vh;
-            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #131722;
+            color: #d1d4dc;
         }
 
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 40px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 40px;
+            background: #1e222d;
+            border-bottom: 1px solid #2a2e39;
             position: fixed;
             top: 0;
             left: 0;
@@ -34,7 +32,7 @@
         }
 
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: bold;
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             -webkit-background-clip: text;
@@ -48,10 +46,10 @@
         }
 
         .nav-links a {
-            color: white;
+            color: #d1d4dc;
             text-decoration: none;
             transition: 0.3s;
-            font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .nav-links a:hover {
@@ -69,252 +67,129 @@
         }
 
         .logout-btn {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 20px;
-            border-radius: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-decoration: none;
-            color: white;
+            background: rgba(255, 68, 68, 0.15);
+            padding: 6px 16px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 68, 68, 0.3);
             cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 68, 68, 0.3);
+            color: #ff4444;
+            font-size: 0.85rem;
         }
 
         .main-container {
             display: flex;
-            margin-top: 70px;
-            min-height: calc(100vh - 70px);
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
         }
 
         .sidebar {
-            width: 280px;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px 0;
+            width: 260px;
+            background: #1e222d;
+            border-right: 1px solid #2a2e39;
+            padding: 20px 0;
             position: fixed;
-            height: calc(100vh - 70px);
+            height: calc(100vh - 60px);
             overflow-y: auto;
         }
 
         .sidebar-item {
-            padding: 15px 25px;
-            margin: 5px 15px;
-            border-radius: 12px;
+            padding: 12px 24px;
+            margin: 4px 12px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 12px;
+            color: #d1d4dc;
+            transition: 0.3s;
         }
 
         .sidebar-item:hover {
             background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
         }
 
         .sidebar-item.active {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2));
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(124, 58, 237, 0.15));
+            color: #00d4ff;
             border-left: 3px solid #00d4ff;
         }
 
         .content-area {
             flex: 1;
-            margin-left: 280px;
+            margin-left: 260px;
             padding: 30px 40px;
         }
 
-        .page-header {
-            margin-bottom: 30px;
-        }
-
-        .page-header h1 {
-            font-size: 2rem;
-        }
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { font-size: 1.8rem; color: white; }
+        .page-header p { color: #787b86; margin-top: 5px; }
 
         .profile-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 25px;
+            gap: 20px;
         }
 
         .profile-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #1e222d;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #2a2e39;
         }
 
-        .profile-card.full-width {
-            grid-column: span 2;
-        }
+        .profile-card.full-width { grid-column: span 2; }
 
         .card-title {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2a2e39;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            color: white;
         }
 
         .info-row {
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 10px 0;
+            border-bottom: 1px solid #2a2e39;
         }
 
-        .info-label {
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 500;
-        }
-
-        .info-value {
-            font-weight: 500;
-        }
-
-        .info-value.pending {
-            color: #ffaa00;
-        }
-
-        .balance-amount {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #00ff88;
-            margin: 15px 0;
-        }
-
-        .profit-loss {
-            font-size: 1.2rem;
-        }
-
-        .profit-loss.positive {
-            color: #00ff88;
-        }
-
-        .profit-loss.negative {
-            color: #ff4444;
-        }
+        .info-label { color: #787b86; }
+        .info-value { font-weight: 500; }
+        .balance-amount { font-size: 2rem; font-weight: bold; color: #00ff88; margin: 15px 0; }
 
         .action-buttons {
             display: flex;
-            gap: 15px;
-            margin-top: 20px;
+            gap: 12px;
+            margin-top: 15px;
         }
 
-        .btn-deposit {
-            background: linear-gradient(135deg, #00ff88, #00cc6a);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
+        .btn-deposit, .btn-withdraw, .btn-save {
+            padding: 10px 20px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
-            color: white;
-        }
-
-        .btn-withdraw {
-            background: linear-gradient(135deg, #ff4444, #cc0000);
             border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            color: white;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .btn-deposit { background: linear-gradient(135deg, #00ff88, #00cc6a); color: white; }
+        .btn-withdraw { background: linear-gradient(135deg, #ff4444, #cc0000); color: white; }
+        .btn-save { background: linear-gradient(135deg, #00d4ff, #7c3aed); color: white; }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #787b86; font-size: 0.8rem; }
         .form-group input, .form-group select {
             width: 100%;
-            padding: 12px 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            color: white;
-            font-size: 1rem;
-        }
-
-        .btn-save {
-            background: linear-gradient(135deg, #00d4ff, #7c3aed);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            color: white;
-        }
-
-        .kyc-badge {
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .kyc-badge.pending {
-            background: rgba(255, 170, 0, 0.2);
-            color: #ffaa00;
-            border: 1px solid rgba(255, 170, 0, 0.3);
-        }
-
-        .support-item {
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .history-table {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        .history-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .history-table th {
-            text-align: left;
-            padding: 12px;
-            color: rgba(255, 255, 255, 0.7);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .history-table td {
-            padding: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .history-status-completed { color: #00ff88; }
-        .history-status-pending { color: #ffaa00; }
-        .history-profit { color: #00ff88; }
-        .history-loss { color: #ff4444; }
-
-        .clear-history-btn {
-            background: rgba(255, 68, 68, 0.2);
-            border: 1px solid rgba(255, 68, 68, 0.3);
-            padding: 8px 16px;
+            padding: 10px 12px;
+            background: #2a2e39;
+            border: 1px solid #3a3e49;
             border-radius: 8px;
-            cursor: pointer;
-            color: #ff6666;
-            font-size: 0.8rem;
-            margin-left: auto;
+            color: white;
         }
 
         .modal {
@@ -331,19 +206,20 @@
         }
 
         .modal-content {
-            background: linear-gradient(135deg, #1a1a3e, #0a0e27);
-            padding: 30px;
-            border-radius: 20px;
-            width: 400px;
+            background: #1e222d;
+            padding: 25px;
+            border-radius: 12px;
+            width: 380px;
             text-align: center;
+            border: 1px solid #2a2e39;
         }
 
         .modal-content input {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             margin: 10px 0;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #2a2e39;
+            border: 1px solid #3a3e49;
             border-radius: 8px;
             color: white;
         }
@@ -351,7 +227,7 @@
         .modal-buttons {
             display: flex;
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         .modal-buttons button {
@@ -361,17 +237,16 @@
             cursor: pointer;
         }
 
-        .btn-confirm {
-            background: linear-gradient(135deg, #00d4ff, #7c3aed);
-            border: none;
-            color: white;
-        }
+        .btn-confirm { background: linear-gradient(135deg, #00d4ff, #7c3aed); border: none; color: white; }
+        .btn-cancel { background: #2a2e39; border: 1px solid #3a3e49; color: white; }
 
-        .btn-cancel {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-        }
+        .history-table { overflow-x: auto; }
+        .history-table table { width: 100%; border-collapse: collapse; }
+        .history-table th, .history-table td { padding: 12px; text-align: left; border-bottom: 1px solid #2a2e39; }
+        .history-table th { color: #787b86; font-weight: 500; }
+
+        .status-won { color: #00ff88; }
+        .status-lost { color: #ff4444; }
 
         @media (max-width: 768px) {
             .sidebar { width: 80px; }
@@ -401,48 +276,34 @@
 
 <div class="main-container">
     <div class="sidebar">
-        <div class="sidebar-item active" data-page="profile">
-            <span>👤</span> <span>User Profile</span>
-        </div>
-        <div class="sidebar-item" data-page="history">
-            <span>📜</span> <span>Trade History</span>
-        </div>
-        <div class="sidebar-item" data-page="kyc">
-            <span>✅</span> <span>KYC Verification</span>
-        </div>
-        <div class="sidebar-item" data-page="update">
-            <span>✏️</span> <span>Update Profile</span>
-        </div>
-        <div class="sidebar-item" data-page="support">
-            <span>💬</span> <span>Customer Support</span>
-        </div>
+        <div class="sidebar-item active" data-page="profile"><span>👤</span> <span>User Profile</span></div>
+        <div class="sidebar-item" data-page="history"><span>📜</span> <span>Trade History</span></div>
+        <div class="sidebar-item" data-page="kyc"><span>✅</span> <span>KYC Verification</span></div>
+        <div class="sidebar-item" data-page="update"><span>✏️</span> <span>Update Profile</span></div>
+        <div class="sidebar-item" data-page="support"><span>💬</span> <span>Customer Support</span></div>
     </div>
 
     <div class="content-area">
         <div id="profilePage" class="page-content">
-            <div class="page-header">
-                <h1>Profile</h1>
-                <p>View your personal information and account status</p>
-            </div>
+            <div class="page-header"><h1>Profile</h1><p>View your personal information and account status</p></div>
             <div class="profile-grid">
                 <div class="profile-card">
-                    <div class="card-title"><span>👤</span> Personal Information</div>
+                    <div class="card-title">👤 Personal Information</div>
                     <div class="info-row"><span class="info-label">Full Name:</span><span class="info-value" id="fullName">Loading...</span></div>
                     <div class="info-row"><span class="info-label">Email:</span><span class="info-value" id="email">Loading...</span></div>
                     <div class="info-row"><span class="info-label">Member Since:</span><span class="info-value" id="memberSince">Loading...</span></div>
                 </div>
                 <div class="profile-card">
-                    <div class="card-title"><span>💰</span> Account Balance</div>
+                    <div class="card-title">💰 Account Balance</div>
                     <div class="balance-amount" id="balance">$0</div>
-                    <div class="info-row"><span class="info-label">KYC Status:</span><span class="info-value pending" id="kycStatus">pending</span></div>
-                    <div class="info-row"><span class="info-label">Daily Profit/Loss:</span><span class="profit-loss positive" id="dailyPL">+0.00 USDT</span></div>
+                    <div class="info-row"><span class="info-label">KYC Status:</span><span class="info-value" id="kycStatus">pending</span></div>
                     <div class="action-buttons">
                         <button class="btn-deposit" onclick="window.location.href='deposit.html'">💰 Deposit</button>
                         <button class="btn-withdraw" onclick="openWithdrawModal()">💸 Withdraw Funds</button>
                     </div>
                 </div>
                 <div class="profile-card full-width">
-                    <div class="card-title"><span>📊</span> Trading Statistics</div>
+                    <div class="card-title">📊 Trading Statistics</div>
                     <div class="info-row"><span class="info-label">Total Trades:</span><span class="info-value" id="totalTrades">0</span></div>
                     <div class="info-row"><span class="info-label">Win Rate:</span><span class="info-value" id="winRate">0%</span></div>
                     <div class="info-row"><span class="info-label">Total Volume:</span><span class="info-value" id="totalVolume">$0</span></div>
@@ -452,60 +313,42 @@
         </div>
 
         <div id="historyPage" class="page-content" style="display: none;">
-            <div class="page-header">
-                <h1>Trade History</h1>
-                <p>View all your past trades and transactions</p>
-            </div>
+            <div class="page-header"><h1>Trade History</h1><p>View all your past trades</p></div>
             <div class="profile-card full-width">
-                <div class="card-title"><span>📜</span> All Trades <button class="clear-history-btn" onclick="clearHistory()">Clear All</button></div>
+                <div class="card-title">📜 All Trades</div>
                 <div class="history-table" id="historyTable"></div>
             </div>
         </div>
 
         <div id="kycPage" class="page-content" style="display: none;">
-            <div class="page-header">
-                <h1>KYC Verification</h1>
-                <p>Verify your identity to unlock full trading features</p>
-            </div>
+            <div class="page-header"><h1>KYC Verification</h1><p>Verify your identity to unlock full trading features</p></div>
             <div class="profile-card">
-                <div class="card-title"><span>✅</span> Identity Verification</div>
-                <div style="margin-bottom: 20px;">
-                    <span>Current Status:</span> 
-                    <span class="kyc-badge" id="kycStatusBadge" style="background: rgba(255, 170, 0, 0.2); color: #ffaa00;">Pending</span>
-                </div>
+                <div class="card-title">✅ Identity Verification</div>
                 <div class="form-group"><label>Full Name (as on ID)</label><input type="text" id="kycFullName"></div>
-                <div class="form-group"><label>ID Type</label><select id="idType"><option value="passport">Passport</option><option value="drivers">Driver's License</option><option value="national">National ID Card</option></select></div>
+                <div class="form-group"><label>ID Type</label><select id="idType"><option>Passport</option><option>Driver's License</option><option>National ID</option></select></div>
                 <div class="form-group"><label>ID Number</label><input type="text" id="idNumber"></div>
                 <button class="btn-save" onclick="submitKYC()">Submit Verification</button>
             </div>
         </div>
 
         <div id="updatePage" class="page-content" style="display: none;">
-            <div class="page-header">
-                <h1>Update Profile</h1>
-                <p>Update your personal information</p>
-            </div>
+            <div class="page-header"><h1>Update Profile</h1><p>Update your personal information</p></div>
             <div class="profile-card">
-                <div class="card-title"><span>✏️</span> Edit Information</div>
+                <div class="card-title">✏️ Edit Information</div>
                 <div class="form-group"><label>Full Name</label><input type="text" id="updateFullName"></div>
                 <div class="form-group"><label>Phone Number</label><input type="tel" id="phoneNumber"></div>
-                <div class="form-group"><label>Current Password</label><input type="password" id="currentPassword"></div>
                 <div class="form-group"><label>New Password</label><input type="password" id="newPassword"></div>
-                <div class="form-group"><label>Confirm New Password</label><input type="password" id="confirmPassword"></div>
+                <div class="form-group"><label>Confirm Password</label><input type="password" id="confirmPassword"></div>
                 <button class="btn-save" onclick="updateProfile()">Save Changes</button>
             </div>
         </div>
 
         <div id="supportPage" class="page-content" style="display: none;">
-            <div class="page-header">
-                <h1>Customer Support</h1>
-                <p>Get help with your account</p>
-            </div>
+            <div class="page-header"><h1>Customer Support</h1><p>Get help with your account</p></div>
             <div class="profile-card">
-                <div class="card-title"><span>💬</span> Contact Support</div>
-                <div class="support-item"><div class="support-icon">📧</div><div><h4>Email Support</h4><p>support@lunotrading.com</p></div></div>
-                <div class="support-item"><div class="support-icon">💬</div><div><h4>Live Chat</h4><p>Available 24/7</p><button class="btn-save" onclick="startChat()" style="margin-top:10px;">Start Chat</button></div></div>
-                <div class="support-item"><div class="support-icon">📞</div><div><h4>Phone Support</h4><p>+1 (800) 123-4567</p></div></div>
+                <div class="card-title">💬 Contact Support</div>
+                <div class="info-row"><span>📧</span><span>support@lunotrading.com</span></div>
+                <div class="info-row"><span>📞</span><span>+1 (800) 123-4567</span></div>
             </div>
         </div>
     </div>
@@ -513,9 +356,9 @@
 
 <div id="transactionModal" class="modal">
     <div class="modal-content">
-        <h3 id="modalTitle">Withdraw Funds</h3>
-        <input type="number" id="transactionAmount" placeholder="Enter amount in USD">
-        <input type="text" id="withdrawAddress" placeholder="Enter wallet address">
+        <h3>Withdraw Funds</h3>
+        <input type="number" id="transactionAmount" placeholder="Enter amount">
+        <input type="text" id="withdrawAddress" placeholder="Wallet address">
         <div class="modal-buttons">
             <button class="btn-confirm" onclick="processWithdrawal()">Confirm</button>
             <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -524,28 +367,13 @@
 </div>
 
 <script>
+    let userData = { fullName: '', email: '', balance: 0, kycStatus: 'pending', tradeHistory: [] };
+    
     function checkAuth() {
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-        if (!savedUser) {
-            window.location.href = 'index.html';
-        }
+        if (!savedUser) window.location.href = 'index.html';
         return savedUser ? JSON.parse(savedUser) : null;
     }
-
-    function displayUsername() {
-        const user = checkAuth();
-        if (user && user.fullName) {
-            document.getElementById('displayUsername').innerText = user.fullName.split(' ')[0];
-        } else if (user && user.email) {
-            document.getElementById('displayUsername').innerText = user.email.split('@')[0];
-        }
-    }
-
-    let userData = {
-        fullName: '', email: '', memberSince: new Date().toLocaleDateString(),
-        balance: 0, kycStatus: 'pending', totalTrades: 0, winRate: 0,
-        totalVolume: 0, totalProfit: 0, phoneNumber: '', tradeHistory: []
-    };
     
     function loadUserData() {
         const user = checkAuth();
@@ -553,179 +381,73 @@
             userData.email = user.email;
             userData.fullName = user.fullName || user.email.split('@')[0];
         }
-        const savedProfile = localStorage.getItem('lunoProfile');
-        if (savedProfile) {
-            const profile = JSON.parse(savedProfile);
-            userData.phoneNumber = profile.phoneNumber || '';
-            userData.kycStatus = profile.kycStatus || 'pending';
-            userData.balance = profile.balance || 0;
-        }
+        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 0}');
+        userData.balance = profile.balance;
+        userData.kycStatus = profile.kycStatus || 'pending';
         updateUI();
     }
-
+    
     function updateUI() {
         document.getElementById('fullName').innerText = userData.fullName;
         document.getElementById('email').innerText = userData.email;
-        document.getElementById('memberSince').innerText = userData.memberSince;
+        document.getElementById('memberSince').innerText = new Date().toLocaleDateString();
         document.getElementById('balance').innerText = `$${userData.balance.toFixed(2)}`;
         document.getElementById('kycStatus').innerText = userData.kycStatus;
-        
-        const kycBadge = document.getElementById('kycStatusBadge');
-        if (userData.kycStatus === 'verified') {
-            kycBadge.innerHTML = 'Verified ✅';
-            kycBadge.style.background = 'rgba(0, 255, 136, 0.2)';
-            kycBadge.style.color = '#00ff88';
-        } else {
-            kycBadge.innerHTML = 'Pending ⏳';
-            kycBadge.style.background = 'rgba(255, 170, 0, 0.2)';
-            kycBadge.style.color = '#ffaa00';
-        }
-        
         document.getElementById('displayUsername').innerText = userData.fullName.split(' ')[0];
-        document.getElementById('updateFullName').value = userData.fullName;
-        document.getElementById('phoneNumber').value = userData.phoneNumber || '';
-        document.getElementById('kycFullName').value = userData.fullName;
         loadTradeHistory();
-        updateTradeStats();
     }
-
+    
     function loadTradeHistory() {
-        const savedHistory = localStorage.getItem('lunoTradeHistory');
-        if (savedHistory) {
-            userData.tradeHistory = JSON.parse(savedHistory);
-        }
-        renderTradeHistory();
-    }
-
-    function renderTradeHistory() {
+        const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
         const container = document.getElementById('historyTable');
-        if (!container) return;
-        if (userData.tradeHistory.length === 0) {
-            container.innerHTML = '<div style="text-align:center;padding:40px;">📭 No trades yet. Start trading to see your history!</div>';
+        if (history.length === 0) {
+            container.innerHTML = '<div style="text-align:center;padding:40px;">📭 No trades yet</div>';
             return;
         }
-        let html = '<table><thead><tr><th>Date</th><th>Coin</th><th>Type</th><th>Amount</th><th>Duration</th><th>Return</th><th>Profit</th><th>Status</th></tr></thead><tbody>';
-        userData.tradeHistory.forEach(trade => {
-            const profitClass = trade.profit >= 0 ? 'history-profit' : 'history-loss';
-            const statusClass = trade.status === 'won' ? 'history-status-completed' : 'history-status-pending';
-            const typeClass = trade.tradeType === 'buy' ? '💰 BUY' : '💸 SELL';
-            html += `<tr><td>${trade.date}</td><td>${trade.coinName} (${trade.coin})</td><td>${typeClass}</td><td>$${trade.amount.toFixed(2)}</td><td>${trade.duration}s</td><td>+${trade.rate}%</td><td class="${profitClass}">${trade.profit >= 0 ? '+' : ''}$${trade.profit.toFixed(2)}</td><td class="${statusClass}">${trade.status}</td></tr>`;
+        let html = '<table><thead><tr><th>Date</th><th>Coin</th><th>Amount</th><th>Profit</th><th>Status</th></tr></thead><tbody>';
+        history.forEach(t => {
+            html += `<tr><td>${t.date}</td><td>${t.coinName}</td><td>$${t.amount.toFixed(2)}</td>
+                    <td class="${t.profit >= 0 ? 'status-won' : 'status-lost'}">${t.profit >= 0 ? '+' : ''}$${t.profit.toFixed(2)}</td>
+                    <td class="${t.status === 'won' ? 'status-won' : 'status-lost'}">${t.status}</td></tr>`;
         });
         html += '</tbody></table>';
         container.innerHTML = html;
     }
-
-    function updateTradeStats() {
-        const completedTrades = userData.tradeHistory.filter(t => t.status === 'won');
-        userData.totalTrades = completedTrades.length;
-        let totalProfit = 0, winningTrades = 0;
-        completedTrades.forEach(trade => { totalProfit += trade.profit; if (trade.profit > 0) winningTrades++; });
-        userData.totalProfit = totalProfit;
-        userData.winRate = userData.totalTrades > 0 ? (winningTrades / userData.totalTrades * 100).toFixed(1) : 0;
-        userData.totalVolume = userData.tradeHistory.reduce((sum, t) => sum + t.amount, 0);
-        document.getElementById('totalTrades').innerText = userData.totalTrades;
-        document.getElementById('winRate').innerText = userData.winRate + '%';
-        document.getElementById('totalVolume').innerText = `$${userData.totalVolume.toFixed(2)}`;
-        const profitElem = document.getElementById('totalProfit');
-        profitElem.innerText = `$${userData.totalProfit.toFixed(2)}`;
-        profitElem.style.color = userData.totalProfit >= 0 ? '#00ff88' : '#ff4444';
-    }
-
-    function clearHistory() {
-        if (confirm('Are you sure you want to clear all trade history?')) {
-            userData.tradeHistory = [];
-            localStorage.setItem('lunoTradeHistory', JSON.stringify([]));
-            renderTradeHistory();
-            updateTradeStats();
-        }
-    }
-
-    function saveUserData() {
-        localStorage.setItem('lunoProfile', JSON.stringify({
-            phoneNumber: userData.phoneNumber, kycStatus: userData.kycStatus, balance: userData.balance
-        }));
-    }
-
+    
     function submitKYC() {
-        const fullName = document.getElementById('kycFullName').value;
-        const idType = document.getElementById('idType').value;
-        const idNumber = document.getElementById('idNumber').value;
-        if (!fullName || !idNumber) { alert('Please fill in all fields'); return; }
-        alert(`KYC verification submitted!\n\nName: ${fullName}\nID Type: ${idType}\nID Number: ${idNumber}\n\nYour verification is under review, please wait a moment.`);
+        alert('✅ KYC verification submitted! Your verification is under review, please wait a moment.');
     }
-
+    
     function updateProfile() {
         const newName = document.getElementById('updateFullName').value;
         if (newName) userData.fullName = newName;
-        userData.phoneNumber = document.getElementById('phoneNumber').value;
-        const newPass = document.getElementById('newPassword').value;
-        const confirmPass = document.getElementById('confirmPassword').value;
-        if (newPass && newPass !== confirmPass) { alert('New passwords do not match!'); return; }
-        if (newPass) alert('Password changed successfully!');
-        saveUserData();
+        alert('✅ Profile updated successfully!');
         updateUI();
-        alert('Profile updated successfully!');
-        document.getElementById('currentPassword').value = '';
-        document.getElementById('newPassword').value = '';
-        document.getElementById('confirmPassword').value = '';
     }
-
-    function openWithdrawModal() {
-        document.getElementById('transactionModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-        document.getElementById('transactionModal').style.display = 'none';
-        document.getElementById('transactionAmount').value = '';
-        document.getElementById('withdrawAddress').value = '';
-    }
-
+    
+    function openWithdrawModal() { document.getElementById('transactionModal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('transactionModal').style.display = 'none'; }
+    
     function processWithdrawal() {
         const amount = parseFloat(document.getElementById('transactionAmount').value);
         const address = document.getElementById('withdrawAddress').value;
+        if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
+        if (!address) { alert('Enter wallet address'); return; }
+        if (amount > userData.balance) { alert('Insufficient balance!'); return; }
         
-        if (isNaN(amount) || amount <= 0) {
-            alert('Please enter a valid amount');
-            return;
-        }
-        if (!address) {
-            alert('Please enter a wallet address');
-            return;
-        }
-        if (amount > userData.balance) {
-            alert(`Insufficient balance! You have $${userData.balance.toFixed(2)}`);
-            return;
-        }
-        
-        const withdrawalRequests = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
-        withdrawalRequests.push({
-            userEmail: userData.email,
-            amount: amount,
-            address: address,
-            date: new Date().toLocaleString(),
-            status: 'pending'
-        });
-        localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawalRequests));
-        
-        alert(`✅ Withdrawal request of $${amount.toFixed(2)} submitted!\n\nYour withdrawal request is under review, please wait a moment.`);
+        const requests = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
+        requests.push({ userEmail: userData.email, amount, address, date: new Date().toLocaleString(), status: 'pending' });
+        localStorage.setItem('withdrawalRequests', JSON.stringify(requests));
+        alert('✅ Withdrawal request submitted! Your withdrawal request is under review, please wait a moment.');
         closeModal();
     }
-
-    function startChat() { alert('Live chat would open here. For demo, please email support@lunotrading.com'); }
-
-    function updateDailyPL() {
-        const pl = (Math.random() - 0.5) * 500;
-        const plElem = document.getElementById('dailyPL');
-        if (pl >= 0) { plElem.innerHTML = `+${pl.toFixed(2)} USDT`; plElem.className = 'profit-loss positive'; }
-        else { plElem.innerHTML = `${pl.toFixed(2)} USDT`; plElem.className = 'profit-loss negative'; }
-    }
-
+    
     function logout() {
         localStorage.removeItem('lunoUser');
         sessionStorage.removeItem('lunoUser');
         window.location.href = 'index.html';
     }
-
+    
     document.querySelectorAll('.sidebar-item').forEach(item => {
         item.addEventListener('click', () => {
             const page = item.getAttribute('data-page');
@@ -737,19 +459,14 @@
             document.getElementById('updatePage').style.display = 'none';
             document.getElementById('supportPage').style.display = 'none';
             if (page === 'profile') document.getElementById('profilePage').style.display = 'block';
-            if (page === 'history') { document.getElementById('historyPage').style.display = 'block'; renderTradeHistory(); }
+            if (page === 'history') { document.getElementById('historyPage').style.display = 'block'; loadTradeHistory(); }
             if (page === 'kyc') document.getElementById('kycPage').style.display = 'block';
             if (page === 'update') document.getElementById('updatePage').style.display = 'block';
             if (page === 'support') document.getElementById('supportPage').style.display = 'block';
         });
     });
-
-    window.onclick = function(event) { const modal = document.getElementById('transactionModal'); if (event.target === modal) closeModal(); };
-
-    displayUsername();
+    
     loadUserData();
-    updateDailyPL();
-    setInterval(updateDailyPL, 30000);
 </script>
 
 </body>
