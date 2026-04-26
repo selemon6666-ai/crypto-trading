@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - Trade</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase.js"></script>
     <style>
         * {
             margin: 0;
@@ -20,38 +19,22 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        /* Light Mode */
         body.light-mode {
             background: #ffffff;
             color: #1e222d;
         }
 
-        body.light-mode .navbar {
-            background: #ffffff;
-            border-bottom-color: #e0e0e0;
-        }
-
-        body.light-mode .nav-links a {
-            color: #1e222d;
-        }
-
+        body.light-mode .navbar,
         body.light-mode .trade-card {
             background: #ffffff;
             border-color: #e0e0e0;
-        }
-
-        body.light-mode .card-header {
-            border-bottom-color: #e0e0e0;
         }
 
         body.light-mode .card-header h1 {
             color: #1e222d;
         }
 
-        body.light-mode .trade-type {
-            background: #f0f0f0;
-        }
-
+        body.light-mode .coin-info,
         body.light-mode .crypto-selector select,
         body.light-mode .form-group input,
         body.light-mode .return-option {
@@ -60,30 +43,6 @@
             color: #1e222d;
         }
 
-        body.light-mode .coin-info {
-            background: #f5f5f5;
-        }
-
-        body.light-mode .coin-name {
-            color: #1e222d;
-        }
-
-        body.light-mode .info-row {
-            border-bottom-color: #e0e0e0;
-        }
-
-        body.light-mode .btn-cancel {
-            background: #f0f0f0;
-            border-color: #d0d0d0;
-            color: #1e222d;
-        }
-
-        body.light-mode .modal-content {
-            background: #ffffff;
-            border-color: #e0e0e0;
-        }
-
-        /* Navigation */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -140,11 +99,6 @@
             cursor: pointer;
             font-size: 0.8rem;
             border: 1px solid rgba(0, 212, 255, 0.3);
-            transition: 0.3s;
-        }
-
-        .theme-toggle:hover {
-            background: rgba(0, 212, 255, 0.3);
         }
 
         .logout-btn {
@@ -155,11 +109,6 @@
             cursor: pointer;
             color: #ff4444;
             font-size: 0.85rem;
-            transition: 0.3s;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 68, 68, 0.3);
         }
 
         .main-content {
@@ -175,7 +124,6 @@
             border-radius: 12px;
             border: 1px solid #2a2e39;
             overflow: hidden;
-            transition: background 0.3s, border 0.3s;
         }
 
         .card-header {
@@ -204,7 +152,6 @@
             cursor: pointer;
             border-radius: 8px;
             font-weight: 600;
-            transition: 0.3s;
         }
 
         .trade-type-btn.buy { color: #00ff88; }
@@ -225,11 +172,6 @@
             cursor: pointer;
         }
 
-        .crypto-selector select:focus {
-            outline: none;
-            border-color: #00d4ff;
-        }
-
         .coin-info {
             background: #2a2e39;
             margin: 0 20px 15px 20px;
@@ -237,7 +179,6 @@
             border-radius: 10px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
         }
 
         .coin-name { font-weight: bold; color: white; }
@@ -265,12 +206,6 @@
             border: 1px solid #3a3e49;
             border-radius: 8px;
             color: white;
-            font-size: 0.9rem;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #00d4ff;
         }
 
         .return-options {
@@ -287,11 +222,6 @@
             padding: 10px;
             text-align: center;
             cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .return-option:hover {
-            background: rgba(0, 212, 255, 0.2);
         }
 
         .return-option.selected {
@@ -319,7 +249,6 @@
             padding: 10px;
             margin-bottom: 15px;
             color: #ff4444;
-            font-size: 0.8rem;
             display: none;
         }
 
@@ -335,7 +264,6 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            transition: 0.3s;
         }
 
         .btn-cancel {
@@ -344,19 +272,10 @@
             color: white;
         }
 
-        .btn-cancel:hover {
-            background: #3a3e49;
-        }
-
         .btn-confirm {
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             border: none;
             color: white;
-        }
-
-        .btn-confirm:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
         }
 
         .modal {
@@ -378,11 +297,6 @@
             border-radius: 12px;
             width: 350px;
             text-align: center;
-            border: 1px solid #2a2e39;
-        }
-
-        .modal-content h3 {
-            margin-bottom: 15px;
         }
 
         .modal-btn {
@@ -393,30 +307,11 @@
             color: white;
             cursor: pointer;
             margin-top: 15px;
-            transition: 0.3s;
-        }
-
-        .modal-btn:hover {
-            transform: translateY(-1px);
         }
 
         @media (max-width: 550px) {
-            .return-options {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .navbar {
-                padding: 12px 20px;
-                flex-direction: column;
-                gap: 12px;
-            }
-            .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .user-info {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
+            .return-options { grid-template-columns: repeat(2, 1fr); }
+            .navbar { padding: 12px 20px; flex-direction: column; }
         }
     </style>
 </head>
@@ -532,6 +427,11 @@
 </div>
 
 <script>
+    // Supabase configuration
+    const SUPABASE_URL = 'https://zvfnqldeazdjokuqfegg.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Zm5xbGRlYXpkam9rdXFmZWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDI0OTMsImV4cCI6MjA5MjcxODQ5M30.MyYRk6SPO9PfFkWlNUYdZMVbcEqUOizNMiriMuZGJ8o';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     let userBalance = 0;
     let userId = null;
     let tradeType = 'buy';
@@ -544,13 +444,44 @@
     const coinPrices = { BTC: 65234, ETH: 3420, BNB: 580, SOL: 145, XRP: 0.62, ADA: 0.48, DOGE: 0.124, DOT: 7.25, LINK: 15.4, MATIC: 0.72, UNI: 8.15, AAVE: 98.5, SHIB: 0.000018 };
     const coinNames = { BTC: 'Bitcoin', ETH: 'Ethereum', BNB: 'Binance Coin', SOL: 'Solana', XRP: 'XRP', ADA: 'Cardano', DOGE: 'Dogecoin', DOT: 'Polkadot', LINK: 'Chainlink', MATIC: 'Polygon', UNI: 'Uniswap', AAVE: 'Aave', SHIB: 'Shiba Inu' };
 
-    async function loadUserData() {
-        const user = await supabaseClient.getCurrentUser();
-        if (user) {
+    // Load user balance from Supabase
+    async function loadUserBalance() {
+        try {
+            const { data: { user }, error: userError } = await supabase.auth.getUser();
+            
+            if (userError) throw userError;
+            
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
             userId = user.id;
-            const profile = await supabaseClient.getUserProfile();
-            userBalance = profile?.balance || 0;
+            
+            const { data: profile, error: profileError } = await supabase
+                .from('users')
+                .select('balance, full_name')
+                .eq('id', userId)
+                .single();
+            
+            if (profileError) {
+                userBalance = 0;
+            } else {
+                userBalance = profile?.balance || 0;
+            }
+            
             document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
+            
+            if (profile?.full_name) {
+                document.getElementById('displayUsername').innerText = profile.full_name.split(' ')[0];
+            } else {
+                document.getElementById('displayUsername').innerText = user.email.split('@')[0];
+            }
+            
+        } catch (error) {
+            console.error('Error loading user balance:', error);
+            userBalance = 0;
+            document.getElementById('availableAmount').innerHTML = '0 USDT';
         }
     }
 
@@ -642,9 +573,21 @@
     async function confirmTrade() {
         const amount = parseFloat(document.getElementById('amount').value);
         
-        if (isNaN(amount) || amount <= 0) { alert('Please enter a valid amount'); return; }
-        if (!selectedDuration) { alert('Please select a duration'); return; }
-        if (amount < selectedMinAmount) { alert(`Minimum amount for ${selectedDuration}s is $${selectedMinAmount.toLocaleString()} USDT`); return; }
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+        if (!selectedDuration) {
+            alert('Please select a duration');
+            return;
+        }
+        if (amount < selectedMinAmount) {
+            alert(`Minimum amount for ${selectedDuration}s is $${selectedMinAmount.toLocaleString()} USDT`);
+            return;
+        }
+        
+        // Reload balance to ensure it's up to date
+        await loadUserBalance();
         
         if (tradeType === 'buy') {
             const transactionFee = amount * 0.02;
@@ -652,18 +595,30 @@
             const expectedReturnAmount = amount * (selectedRate / 100);
             
             if (totalPay > userBalance) {
-                alert(`Insufficient balance! You need $${totalPay.toFixed(2)} USDT`);
+                alert(`Insufficient balance! You need $${totalPay.toFixed(2)} USDT but only have $${userBalance.toFixed(2)} USDT`);
                 return;
             }
             
             // Update balance in Supabase
             const newBalance = userBalance - totalPay;
-            await supabaseClient.updateBalance(userId, newBalance);
+            
+            const { error: updateError } = await supabase
+                .from('users')
+                .update({ balance: newBalance })
+                .eq('id', userId);
+            
+            if (updateError) {
+                console.error('Balance update error:', updateError);
+                alert('Error updating balance. Please try again.');
+                return;
+            }
+            
             userBalance = newBalance;
             
             // Create trade record
+            const tradeId = Date.now();
             const tradeData = {
-                id: Date.now(),
+                id: tradeId,
                 user_id: userId,
                 coin: currentCoin,
                 coin_name: coinNames[currentCoin],
@@ -672,10 +627,19 @@
                 rate: selectedRate,
                 expected_profit: expectedReturnAmount,
                 status: 'pending',
-                trade_type: 'buy'
+                trade_type: 'buy',
+                created_at: new Date().toISOString()
             };
             
-            await supabaseClient.createTrade(tradeData);
+            const { error: tradeError } = await supabase
+                .from('trades')
+                .insert(tradeData);
+            
+            if (tradeError) {
+                console.error('Trade creation error:', tradeError);
+                alert('Error creating trade. Please try again.');
+                return;
+            }
             
             document.getElementById('modalTitle').innerHTML = '✅ TRADE PLACED!';
             document.getElementById('modalMessage').innerHTML = `Your trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s has been placed! Waiting for admin.`;
@@ -694,7 +658,7 @@
     }
 
     async function logout() {
-        await supabaseClient.signOut();
+        await supabase.auth.signOut();
         localStorage.removeItem('lunoUser');
         sessionStorage.removeItem('lunoUser');
         window.location.href = 'index.html';
@@ -702,8 +666,7 @@
 
     function toggleTheme() {
         document.body.classList.toggle('light-mode');
-        const isLight = document.body.classList.contains('light-mode');
-        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
     }
 
     function checkTheme() {
@@ -712,28 +675,13 @@
         }
     }
 
-    async function displayUsername() {
-        const user = await supabaseClient.getCurrentUser();
-        if (user) {
-            const profile = await supabaseClient.getUserProfile();
-            document.getElementById('displayUsername').innerText = profile?.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'Trader';
-        }
-    }
-
-    async function checkAuth() {
-        const user = await supabaseClient.getCurrentUser();
-        if (!user) window.location.href = 'index.html';
-        return user;
-    }
-
+    // Initialize
     async function init() {
-        await checkAuth();
-        await displayUsername();
-        await loadUserData();
+        await loadUserBalance();
         changeCrypto();
         checkTheme();
     }
-
+    
     init();
 </script>
 
