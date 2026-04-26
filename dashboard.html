@@ -15,6 +15,36 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: #131722;
             color: #d1d4dc;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Light Mode */
+        body.light-mode {
+            background: #ffffff;
+            color: #1e222d;
+        }
+
+        body.light-mode .navbar {
+            background: #ffffff;
+            border-bottom-color: #e0e0e0;
+        }
+
+        body.light-mode .nav-links a {
+            color: #1e222d;
+        }
+
+        body.light-mode .stat-card {
+            background: #ffffff;
+            border-color: #e0e0e0;
+        }
+
+        body.light-mode .badge {
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+        }
+
+        body.light-mode .start-btn {
+            color: white;
         }
 
         /* Canvas Background */
@@ -25,6 +55,10 @@
             width: 100%;
             height: 100%;
             z-index: -2;
+        }
+
+        body.light-mode #canvas-bg {
+            opacity: 0.05;
         }
 
         /* Navigation */
@@ -77,6 +111,20 @@
             color: #00d4ff;
         }
 
+        .theme-toggle {
+            background: rgba(0, 212, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            transition: 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(0, 212, 255, 0.3);
+        }
+
         .logout-btn {
             background: rgba(255, 68, 68, 0.15);
             padding: 6px 16px;
@@ -85,6 +133,7 @@
             cursor: pointer;
             color: #ff4444;
             font-size: 0.85rem;
+            transition: 0.3s;
         }
 
         .logout-btn:hover {
@@ -118,6 +167,10 @@
             margin-bottom: 20px;
             line-height: 1.2;
             color: white;
+        }
+
+        body.light-mode h1 {
+            color: #1e222d;
         }
 
         .gradient-text {
@@ -166,6 +219,7 @@
             padding: 20px;
             border: 1px solid #2a2e39;
             text-align: center;
+            transition: background 0.3s, border 0.3s;
         }
 
         .stat-card .stat-label {
@@ -192,6 +246,10 @@
                 flex-wrap: wrap;
                 justify-content: center;
             }
+            .user-info {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
             h1 {
                 font-size: 2rem;
             }
@@ -215,6 +273,7 @@
     </div>
     <div class="user-info">
         <span class="username" id="displayUsername">Trader</span>
+        <div class="theme-toggle" onclick="toggleTheme()">🌓 Theme</div>
         <a href="#" class="logout-btn" onclick="logout()">Logout</a>
     </div>
 </nav>
@@ -293,6 +352,30 @@
     animate();
     window.addEventListener('resize', resizeCanvas);
     
+    // Theme Toggle
+    function toggleTheme() {
+        document.body.classList.toggle('light-mode');
+        const isLight = document.body.classList.contains('light-mode');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        
+        // Update canvas colors for theme
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        if (isLight) {
+            gradient.addColorStop(0, '#f5f5f5');
+            gradient.addColorStop(1, '#ffffff');
+        } else {
+            gradient.addColorStop(0, '#131722');
+            gradient.addColorStop(1, '#1e222d');
+        }
+    }
+    
+    function checkTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+        }
+    }
+    
     // Dashboard Functions
     function checkAuth() {
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
@@ -318,6 +401,7 @@
         document.getElementById('totalTrades').innerText = totalTrades;
         document.getElementById('winRate').innerText = winRate + '%';
         
+        // Simulated profit today (from trades today)
         const todayProfit = (Math.random() * 500 - 100).toFixed(2);
         const profitElem = document.getElementById('profitToday');
         if (todayProfit >= 0) {
@@ -329,15 +413,33 @@
         }
     }
     
-    function goToTrade() { window.location.href = 'trade.html'; }
+    function goToTrade() { 
+        window.location.href = 'trade.html'; 
+    }
+    
     function logout() {
         localStorage.removeItem('lunoUser');
         sessionStorage.removeItem('lunoUser');
         window.location.href = 'index.html';
     }
     
+    // Email notification simulation (for demo)
+    function checkForNotifications() {
+        const lastNotification = localStorage.getItem('lastDashboardNotification');
+        const now = new Date().toDateString();
+        if (lastNotification !== now) {
+            const user = checkAuth();
+            if (user && user.email) {
+                console.log(`📧 Welcome email would be sent to: ${user.email}`);
+                localStorage.setItem('lastDashboardNotification', now);
+            }
+        }
+    }
+    
     displayUsername();
     updateStats();
+    checkTheme();
+    checkForNotifications();
     setInterval(updateStats, 10000);
 </script>
 
