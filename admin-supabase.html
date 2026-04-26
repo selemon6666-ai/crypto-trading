@@ -7,12 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
     <style>
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #131722;
@@ -21,44 +16,8 @@
             transition: background 0.3s, color 0.3s;
         }
         
-        /* Light Mode */
-        body.light-mode {
-            background: #f0f2f5;
-            color: #1e222d;
-        }
+        .container { max-width: 1400px; margin: 0 auto; }
         
-        body.light-mode .stat-card,
-        body.light-mode .section,
-        body.light-mode .login-box {
-            background: #ffffff;
-            border-color: #e0e0e0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        
-        body.light-mode .login-box input {
-            background: #f5f5f5;
-            border-color: #d0d0d0;
-            color: #1e222d;
-        }
-        
-        body.light-mode th {
-            color: #666;
-        }
-        
-        body.light-mode td {
-            border-bottom-color: #e0e0e0;
-        }
-        
-        body.light-mode h1 {
-            color: #1e222d;
-        }
-        
-        .container { 
-            max-width: 1400px; 
-            margin: 0 auto; 
-        }
-        
-        /* Header with theme toggle */
         .admin-header {
             display: flex;
             justify-content: space-between;
@@ -68,16 +27,7 @@
             gap: 15px;
         }
         
-        h1 { 
-            color: white; 
-            margin: 0;
-        }
-        
-        .header-actions {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
+        h1 { color: white; margin: 0; }
         
         .theme-toggle {
             background: rgba(0, 212, 255, 0.15);
@@ -86,11 +36,6 @@
             cursor: pointer;
             font-size: 0.9rem;
             border: 1px solid rgba(0, 212, 255, 0.3);
-            transition: 0.3s;
-        }
-        
-        .theme-toggle:hover {
-            background: rgba(0, 212, 255, 0.3);
         }
         
         .logout-admin {
@@ -100,11 +45,6 @@
             cursor: pointer;
             color: #ff4444;
             border: 1px solid rgba(255, 68, 68, 0.3);
-            transition: 0.3s;
-        }
-        
-        .logout-admin:hover {
-            background: rgba(255, 68, 68, 0.3);
         }
         
         .stats {
@@ -120,20 +60,10 @@
             padding: 20px;
             text-align: center;
             border: 1px solid #2a2e39;
-            transition: background 0.3s, border 0.3s;
         }
         
-        .stat-number { 
-            font-size: 2rem; 
-            font-weight: bold; 
-            color: #00d4ff; 
-        }
-        
-        .stat-label {
-            font-size: 0.8rem;
-            color: #787b86;
-            margin-top: 5px;
-        }
+        .stat-number { font-size: 2rem; font-weight: bold; color: #00d4ff; }
+        .stat-label { font-size: 0.8rem; color: #787b86; margin-top: 5px; }
         
         .section {
             background: #1e222d;
@@ -141,38 +71,13 @@
             padding: 20px;
             margin-bottom: 20px;
             border: 1px solid #2a2e39;
-            transition: background 0.3s, border 0.3s;
         }
         
-        .section-title { 
-            font-size: 1.2rem; 
-            margin-bottom: 15px; 
-            color: white; 
-            font-weight: 600;
-        }
+        .section-title { font-size: 1.2rem; margin-bottom: 15px; color: white; font-weight: 600; }
         
-        .section-title span {
-            font-size: 0.8rem;
-            color: #787b86;
-            margin-left: 10px;
-        }
-        
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-        }
-        
-        th, td { 
-            padding: 12px 10px; 
-            text-align: left; 
-            border-bottom: 1px solid #2a2e39; 
-        }
-        
-        th { 
-            color: #787b86; 
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #2a2e39; }
+        th { color: #787b86; font-weight: 600; font-size: 0.8rem; }
         
         button {
             background: rgba(0, 212, 255, 0.2);
@@ -183,24 +88,10 @@
             color: #00d4ff;
             margin-right: 5px;
             transition: 0.2s;
-            font-size: 0.8rem;
         }
         
-        button:hover {
-            transform: translateY(-1px);
-        }
-        
-        .btn-win { 
-            background: rgba(0, 255, 136, 0.2); 
-            color: #00ff88; 
-            border-color: rgba(0, 255, 136, 0.3); 
-        }
-        
-        .btn-lose { 
-            background: rgba(255, 68, 68, 0.2); 
-            color: #ff4444; 
-            border-color: rgba(255, 68, 68, 0.3); 
-        }
+        .btn-win { background: rgba(0, 255, 136, 0.2); color: #00ff88; border-color: rgba(0, 255, 136, 0.3); }
+        .btn-lose { background: rgba(255, 68, 68, 0.2); color: #ff4444; border-color: rgba(255, 68, 68, 0.3); }
         
         .login-box {
             max-width: 400px;
@@ -212,11 +103,7 @@
             border: 1px solid #2a2e39;
         }
         
-        .login-box h2 {
-            margin-bottom: 20px;
-            color: white;
-        }
-        
+        .login-box h2 { margin-bottom: 20px; color: white; }
         .login-box input {
             width: 100%;
             padding: 12px;
@@ -227,12 +114,6 @@
             color: white;
             font-size: 1rem;
         }
-        
-        .login-box input:focus {
-            outline: none;
-            border-color: #00d4ff;
-        }
-        
         .login-box button {
             width: 100%;
             padding: 12px;
@@ -246,38 +127,11 @@
             margin-top: 10px;
         }
         
-        .admin-content { 
-            display: none; 
-        }
-        
-        .refresh-btn {
-            background: rgba(0, 212, 255, 0.15);
-            float: right;
-            margin-bottom: 10px;
-        }
-        
-        .no-data {
-            text-align: center;
-            padding: 30px;
-            color: #787b86;
-        }
+        .admin-content { display: none; }
+        .no-data { text-align: center; padding: 30px; color: #787b86; }
         
         @media (max-width: 768px) {
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-            }
-            .admin-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            th, td {
-                font-size: 0.75rem;
-                padding: 8px 5px;
-            }
-            .section {
-                overflow-x: auto;
-            }
+            .stats { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -293,10 +147,8 @@
     <div id="adminSection" class="admin-content">
         <div class="admin-header">
             <h1>👑 Luno Admin Panel (Supabase)</h1>
-            <div class="header-actions">
-                <div class="theme-toggle" onclick="toggleTheme()">🌓 Theme</div>
-                <div class="logout-admin" onclick="adminLogout()">🚪 Logout</div>
-            </div>
+            <div class="theme-toggle" onclick="toggleTheme()">🌓 Theme</div>
+            <div class="logout-admin" onclick="adminLogout()">🚪 Logout</div>
         </div>
         
         <div class="stats">
@@ -307,7 +159,7 @@
         </div>
         
         <div class="section">
-            <div class="section-title">💰 Pending Trades <span>(Set WIN or LOSE)</span></div>
+            <div class="section-title">💰 Pending Trades</div>
             <div id="pendingTradesList">Loading...</div>
         </div>
         
@@ -334,29 +186,47 @@
 </div>
 
 <script>
-    let adminUser = null;
     let refreshInterval = null;
 
+    // FIXED: Direct Supabase login without using supabaseClient.signIn
     async function adminLogin() {
         const email = document.getElementById('adminEmail').value;
         const password = document.getElementById('adminPassword').value;
         
         try {
-            const { user } = await supabaseClient.signIn(email, password);
-            adminUser = user;
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('adminSection').style.display = 'block';
-            loadAllData();
-            // Auto-refresh every 5 seconds
-            refreshInterval = setInterval(loadAllData, 5000);
+            console.log('Admin login attempt:', email);
+            
+            // Use Supabase directly - NOT supabaseClient
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            if (error) throw error;
+            
+            if (data && data.user) {
+                console.log('Admin login successful:', data.user.email);
+                
+                // Check if user is admin (you can add admin check here)
+                // For now, any logged-in user can access admin panel
+                
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('adminSection').style.display = 'block';
+                loadAllData();
+                
+                // Auto-refresh every 5 seconds
+                if (refreshInterval) clearInterval(refreshInterval);
+                refreshInterval = setInterval(loadAllData, 5000);
+            }
         } catch (error) {
+            console.error('Login error:', error);
             alert('Login failed: ' + error.message);
         }
     }
     
     async function adminLogout() {
         if (refreshInterval) clearInterval(refreshInterval);
-        await supabaseClient.signOut();
+        await supabase.auth.signOut();
         location.reload();
     }
     
@@ -371,8 +241,14 @@
     
     async function loadPendingTrades() {
         try {
-            const trades = await supabaseClient.getAllTrades();
-            const pending = trades.filter(t => t.status === 'pending');
+            const { data: trades, error } = await supabase
+                .from('trades')
+                .select('*, users(email, full_name)')
+                .order('created_at', { ascending: false });
+            
+            if (error) throw error;
+            
+            const pending = trades?.filter(t => t.status === 'pending') || [];
             const container = document.getElementById('pendingTradesList');
             
             if (pending.length === 0) {
@@ -380,7 +256,7 @@
                 return;
             }
             
-            let html = '</table><thead><tr><th>User</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Expected Return</th><th>Action</th></tr></thead><tbody>';
+            let html = '<td><thead><tr><th>User</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Expected Return</th><th>Action</th></tr></thead><tbody>';
             pending.forEach(trade => {
                 html += `<tr>
                     <td>${trade.users?.email || 'N/A'}</td>
@@ -389,41 +265,88 @@
                     <td>${trade.duration}s</td>
                     <td>+${trade.rate}% ($${trade.expected_profit})</td>
                     <td>
-                        <button class="btn-win" onclick="setOutcome(${trade.id}, 'win')">🏆 WIN</button>
-                        <button class="btn-lose" onclick="setOutcome(${trade.id}, 'lose')">💀 LOSE</button>
+                        <button class="btn-win" onclick="setTradeOutcome('${trade.id}', 'win')">🏆 WIN</button>
+                        <button class="btn-lose" onclick="setTradeOutcome('${trade.id}', 'lose')">💀 LOSE</button>
                     </td>
                 </tr>`;
             });
-            html += '</tbody></table>';
+            html += '</tbody></tr>';
             container.innerHTML = html;
         } catch(e) { console.error(e); }
     }
     
-    async function setOutcome(tradeId, outcome) {
-        await supabaseClient.setTradeOutcome(tradeId, outcome);
-        alert(`✅ Trade ${outcome.toUpperCase()}!`);
-        loadPendingTrades();
-        loadStats();
+    async function setTradeOutcome(tradeId, outcome) {
+        try {
+            // Get trade details
+            const { data: trade, error: tradeError } = await supabase
+                .from('trades')
+                .select('*')
+                .eq('id', tradeId)
+                .single();
+            
+            if (tradeError) throw tradeError;
+            
+            if (outcome === 'win') {
+                const profit = trade.expected_profit;
+                const totalReturn = trade.amount + profit;
+                
+                // Update trade status
+                await supabase
+                    .from('trades')
+                    .update({ status: 'won', profit: profit, completed_at: new Date() })
+                    .eq('id', tradeId);
+                
+                // Update user balance
+                const { data: user } = await supabase
+                    .from('users')
+                    .select('balance')
+                    .eq('id', trade.user_id)
+                    .single();
+                
+                await supabase
+                    .from('users')
+                    .update({ balance: (user.balance || 0) + totalReturn })
+                    .eq('id', trade.user_id);
+                    
+                alert(`✅ Trade WON! User earned $${profit.toFixed(2)} profit.`);
+            } else {
+                await supabase
+                    .from('trades')
+                    .update({ status: 'lost', profit: -trade.amount, completed_at: new Date() })
+                    .eq('id', tradeId);
+                    
+                alert(`❌ Trade LOST! User lost $${trade.amount.toFixed(2)}.`);
+            }
+            
+            loadPendingTrades();
+            loadStats();
+        } catch(e) { console.error(e); alert('Error: ' + e.message); }
     }
     
     async function loadPendingKYC() {
         try {
-            const kycRequests = await supabaseClient.getPendingKYC();
+            const { data: kycRequests, error } = await supabase
+                .from('kyc_requests')
+                .select('*, users(email, full_name)')
+                .eq('status', 'pending');
+            
+            if (error) throw error;
+            
             const container = document.getElementById('kycList');
             
-            if (kycRequests.length === 0) {
+            if (!kycRequests || kycRequests.length === 0) {
                 container.innerHTML = '<div class="no-data">No pending KYC requests</div>';
                 return;
             }
             
-            let html = '</table><thead><tr><th>User</th><th>Full Name</th><th>ID Type</th><th>ID Number</th><th>Action</th></tr></thead><tbody>';
+            let html = '<td><thead><tr><th>User</th><th>Full Name</th><th>ID Type</th><th>ID Number</th><th>Action</th></tr></thead><tbody>';
             kycRequests.forEach(req => {
                 html += `<tr>
                     <td>${req.users?.email || 'N/A'}</td>
                     <td>${req.full_name}</td>
                     <td>${req.id_type}</td>
                     <td>${req.id_number}</td>
-                    <td><button onclick="approveKYC(${req.id}, '${req.user_id}')">✅ Approve KYC</button></td>
+                    <td><button onclick="approveKYC('${req.id}', '${req.user_id}')">✅ Approve KYC</button></td>
                 </tr>`;
             });
             html += '</tbody></table>';
@@ -432,30 +355,47 @@
     }
     
     async function approveKYC(requestId, userId) {
-        await supabaseClient.approveKYC(requestId, userId);
-        alert('✅ KYC approved!');
-        loadPendingKYC();
-        loadStats();
+        try {
+            await supabase
+                .from('kyc_requests')
+                .update({ status: 'approved', reviewed_at: new Date() })
+                .eq('id', requestId);
+            
+            await supabase
+                .from('users')
+                .update({ kyc_status: 'verified' })
+                .eq('id', userId);
+            
+            alert('✅ KYC approved!');
+            loadPendingKYC();
+            loadStats();
+        } catch(e) { console.error(e); }
     }
     
     async function loadPendingDeposits() {
         try {
-            const deposits = await supabaseClient.getPendingDeposits();
+            const { data: deposits, error } = await supabase
+                .from('deposits')
+                .select('*, users(email, full_name)')
+                .eq('status', 'pending');
+            
+            if (error) throw error;
+            
             const container = document.getElementById('depositsList');
             
-            if (deposits.length === 0) {
+            if (!deposits || deposits.length === 0) {
                 container.innerHTML = '<div class="no-data">No pending deposits</div>';
                 return;
             }
             
-            let html = '<tr><thead><tr><th>User</th><th>Amount</th><th>Currency</th><th>Date</th><th>Action</th></td></thead><tbody>';
+            let html = '<tr><thead><tr><th>User</th><th>Amount</th><th>Currency</th><th>Date</th><th>Action</th></tr></thead><tbody>';
             deposits.forEach(dep => {
                 html += `<tr>
                     <td>${dep.users?.email || 'N/A'}</td>
                     <td>$${dep.amount}</td>
                     <td>${dep.currency}</td>
                     <td>${new Date(dep.created_at).toLocaleString()}</td>
-                    <td><button onclick="approveDeposit(${dep.id}, '${dep.user_id}', ${dep.amount})">💰 Approve Deposit</button></td>
+                    <td><button onclick="approveDeposit('${dep.id}', '${dep.user_id}', ${dep.amount})">💰 Approve Deposit</button></td>
                 </tr>`;
             });
             html += '</tbody></table>';
@@ -464,18 +404,41 @@
     }
     
     async function approveDeposit(depositId, userId, amount) {
-        await supabaseClient.approveDeposit(depositId, userId, amount);
-        alert(`✅ Deposit of $${amount} approved!`);
-        loadPendingDeposits();
-        loadStats();
+        try {
+            await supabase
+                .from('deposits')
+                .update({ status: 'approved', approved_at: new Date() })
+                .eq('id', depositId);
+            
+            const { data: user } = await supabase
+                .from('users')
+                .select('balance')
+                .eq('id', userId)
+                .single();
+            
+            await supabase
+                .from('users')
+                .update({ balance: (user.balance || 0) + amount })
+                .eq('id', userId);
+            
+            alert(`✅ Deposit of $${amount} approved!`);
+            loadPendingDeposits();
+            loadStats();
+        } catch(e) { console.error(e); }
     }
     
     async function loadPendingWithdrawals() {
         try {
-            const withdrawals = await supabaseClient.getPendingWithdrawals();
+            const { data: withdrawals, error } = await supabase
+                .from('withdrawals')
+                .select('*, users(email, full_name, balance)')
+                .eq('status', 'pending');
+            
+            if (error) throw error;
+            
             const container = document.getElementById('withdrawalsList');
             
-            if (withdrawals.length === 0) {
+            if (!withdrawals || withdrawals.length === 0) {
                 container.innerHTML = '<div class="no-data">No pending withdrawals</div>';
                 return;
             }
@@ -487,7 +450,7 @@
                     <td>$${wd.amount}</td>
                     <td>${wd.address.substring(0, 20)}...</td>
                     <td>${new Date(wd.created_at).toLocaleString()}</td>
-                    <td><button onclick="approveWithdrawal(${wd.id}, '${wd.user_id}', ${wd.amount})">💸 Approve Withdrawal</button></td>
+                    <td><button onclick="approveWithdrawal('${wd.id}', '${wd.user_id}', ${wd.amount})">💸 Approve Withdrawal</button></td>
                 </tr>`;
             });
             html += '</tbody></table>';
@@ -496,30 +459,58 @@
     }
     
     async function approveWithdrawal(withdrawalId, userId, amount) {
-        await supabaseClient.approveWithdrawal(withdrawalId, userId, amount);
-        alert(`✅ Withdrawal of $${amount} approved!`);
-        loadPendingWithdrawals();
-        loadStats();
+        try {
+            const { data: user } = await supabase
+                .from('users')
+                .select('balance')
+                .eq('id', userId)
+                .single();
+            
+            if ((user.balance || 0) < amount) {
+                alert('❌ Insufficient balance!');
+                return;
+            }
+            
+            await supabase
+                .from('withdrawals')
+                .update({ status: 'approved', approved_at: new Date() })
+                .eq('id', withdrawalId);
+            
+            await supabase
+                .from('users')
+                .update({ balance: (user.balance || 0) - amount })
+                .eq('id', userId);
+            
+            alert(`✅ Withdrawal of $${amount} approved!`);
+            loadPendingWithdrawals();
+            loadStats();
+        } catch(e) { console.error(e); }
     }
     
     async function loadAllUsers() {
         try {
-            const users = await supabaseClient.getAllUsers();
+            const { data: users, error } = await supabase
+                .from('users')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            if (error) throw error;
+            
             const container = document.getElementById('usersList');
             
-            if (users.length === 0) {
+            if (!users || users.length === 0) {
                 container.innerHTML = '<div class="no-data">No users found</div>';
                 return;
             }
             
-            let html = '<tr><thead><tr><th>Email</th><th>Full Name</th><th>Balance</th><th>KYC Status</th><th>Joined</th></tr></thead><tbody>';
+            let html = '<table><thead><tr><th>Email</th><th>Full Name</th><th>Balance</th><th>KYC Status</th><th>Joined</th></tr></thead><tbody>';
             users.forEach(user => {
-                const kycClass = user.kyc_status === 'verified' ? '✅ Verified' : '⏳ Pending';
+                const kycStatus = user.kyc_status === 'verified' ? '✅ Verified' : '⏳ Pending';
                 html += `<tr>
                     <td>${user.email}</td>
                     <td>${user.full_name || 'N/A'}</td>
                     <td>$${user.balance || 0}</td>
-                    <td>${kycClass}</td>
+                    <td>${kycStatus}</td>
                     <td>${new Date(user.created_at).toLocaleDateString()}</td>
                 </tr>`;
             });
@@ -530,15 +521,15 @@
     
     async function loadStats() {
         try {
-            const users = await supabaseClient.getAllUsers();
-            const trades = await supabaseClient.getAllTrades();
-            const kyc = await supabaseClient.getPendingKYC();
-            const deposits = await supabaseClient.getPendingDeposits();
+            const { data: users } = await supabase.from('users').select('*');
+            const { data: trades } = await supabase.from('trades').select('*');
+            const { data: kyc } = await supabase.from('kyc_requests').select('*').eq('status', 'pending');
+            const { data: deposits } = await supabase.from('deposits').select('*').eq('status', 'pending');
             
-            document.getElementById('totalUsers').innerText = users.length;
-            document.getElementById('pendingTrades').innerText = trades.filter(t => t.status === 'pending').length;
-            document.getElementById('pendingKYC').innerText = kyc.length;
-            document.getElementById('pendingDeposits').innerText = deposits.length;
+            document.getElementById('totalUsers').innerText = users?.length || 0;
+            document.getElementById('pendingTrades').innerText = trades?.filter(t => t.status === 'pending').length || 0;
+            document.getElementById('pendingKYC').innerText = kyc?.length || 0;
+            document.getElementById('pendingDeposits').innerText = deposits?.length || 0;
         } catch(e) { console.error(e); }
     }
     
