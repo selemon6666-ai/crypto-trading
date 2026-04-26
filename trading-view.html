@@ -27,24 +27,18 @@
         body.light-mode .navbar,
         body.light-mode .chart-panel,
         body.light-mode .stats-card,
-        body.light-mode .trade-card {
+        body.light-mode .trade-card,
+        body.light-mode .orderbook-card {
             background: #ffffff;
             border-color: #e0e0e0;
         }
 
-        body.light-mode .tf-btn,
-        body.light-mode .trade-input,
-        body.light-mode .perc-btn {
-            background: #f0f0f0;
-            color: #1e222d;
-        }
-
-        /* Add all your existing CSS here - keeping dark mode default */
+        /* Navbar */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 40px;
+            padding: 8px 24px;
             background: #1e222d;
             border-bottom: 1px solid #2a2e39;
             position: fixed;
@@ -55,7 +49,7 @@
         }
 
         .logo {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: bold;
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             -webkit-background-clip: text;
@@ -65,14 +59,14 @@
 
         .nav-links {
             display: flex;
-            gap: 30px;
+            gap: 24px;
         }
 
         .nav-links a {
             color: #d1d4dc;
             text-decoration: none;
+            font-size: 0.85rem;
             transition: 0.3s;
-            font-size: 0.9rem;
         }
 
         .nav-links a:hover {
@@ -82,110 +76,99 @@
         .user-info {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
         }
 
         .username {
             color: #00d4ff;
-        }
-
-        .logout-btn {
-            background: rgba(255, 68, 68, 0.15);
-            padding: 6px 16px;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 68, 68, 0.3);
-            cursor: pointer;
-            color: #ff4444;
             font-size: 0.85rem;
         }
 
         .theme-toggle {
             background: rgba(0, 212, 255, 0.15);
-            padding: 6px 12px;
+            padding: 4px 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             border: 1px solid rgba(0, 212, 255, 0.3);
         }
 
-        .back-button {
-            margin: 65px 20px 0 20px;
-        }
-
-        .back-btn {
-            background: rgba(0, 212, 255, 0.15);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            padding: 6px 16px;
+        .logout-btn {
+            background: rgba(255, 68, 68, 0.15);
+            padding: 4px 14px;
             border-radius: 6px;
             cursor: pointer;
-            color: #00d4ff;
-            text-decoration: none;
-            display: inline-block;
+            color: #ff4444;
             font-size: 0.8rem;
+            border: 1px solid rgba(255, 68, 68, 0.3);
         }
 
-        .trading-container {
-            padding: 15px 20px;
+        /* Main Trading Layout - Coinbase Style */
+        .trading-layout {
             display: flex;
-            gap: 20px;
-            min-height: calc(100vh - 60px);
+            margin-top: 50px;
+            height: calc(100vh - 50px);
         }
 
-        .chart-panel {
+        /* Left Section - Chart */
+        .chart-section {
             flex: 3;
-            background: #1e222d;
-            border-radius: 12px;
-            border: 1px solid #2a2e39;
-            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #2a2e39;
         }
 
+        /* Chart Header */
         .chart-header {
+            padding: 12px 20px;
+            background: #1e222d;
+            border-bottom: 1px solid #2a2e39;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
             flex-wrap: wrap;
             gap: 10px;
         }
 
-        .symbol-info {
+        .coin-details {
             display: flex;
             align-items: baseline;
-            gap: 15px;
+            gap: 16px;
             flex-wrap: wrap;
         }
 
-        .symbol {
-            font-size: 1.3rem;
+        .coin-name {
+            font-size: 1.2rem;
             font-weight: 600;
             color: white;
         }
 
-        .price {
-            font-size: 1.5rem;
+        .coin-price {
+            font-size: 1.8rem;
             font-weight: bold;
             color: #00ff88;
         }
 
-        .change {
+        .price-change {
             font-size: 0.85rem;
             padding: 4px 10px;
-            border-radius: 16px;
+            border-radius: 20px;
         }
 
-        .change.positive {
+        .price-change.up {
             background: rgba(0, 255, 136, 0.15);
             color: #00ff88;
         }
 
-        .change.negative {
+        .price-change.down {
             background: rgba(255, 68, 68, 0.15);
             color: #ff4444;
         }
 
+        /* Timeframes */
         .timeframes {
             display: flex;
-            gap: 5px;
+            gap: 4px;
             background: #2a2e39;
             padding: 4px;
             border-radius: 8px;
@@ -199,6 +182,7 @@
             color: #d1d4dc;
             cursor: pointer;
             font-size: 0.7rem;
+            transition: 0.2s;
         }
 
         .tf-btn:hover, .tf-btn.active {
@@ -206,80 +190,121 @@
             color: #131722;
         }
 
+        /* Chart Container */
         #chart-container {
             width: 100%;
-            height: 400px;
+            height: 450px;
+            background: #131722;
         }
 
-        .indicators-panel {
-            margin-top: 15px;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
+        /* Depth Chart */
+        .depth-container {
+            height: 150px;
+            margin-top: 10px;
             padding: 10px;
-            background: #2a2e39;
-            border-radius: 8px;
+            background: #1e222d;
+            border-top: 1px solid #2a2e39;
         }
 
-        .indicator {
-            font-size: 0.7rem;
+        #depth-chart {
+            width: 100%;
+            height: 100%;
         }
 
-        .indicator-label {
-            color: #787b86;
-        }
-
-        .indicator-value {
-            font-weight: bold;
-            margin-left: 5px;
-        }
-
-        .info-panel {
+        /* Middle Section - Order Book */
+        .orderbook-section {
             width: 320px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-        }
-
-        .stats-card, .trade-card, .alerts-card, .address-card {
+            border-right: 1px solid #2a2e39;
             background: #1e222d;
-            border-radius: 12px;
-            border: 1px solid #2a2e39;
-            padding: 15px;
         }
 
-        .card-title {
-            font-size: 0.7rem;
-            color: #787b86;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
+        .orderbook-header {
+            padding: 12px;
+            text-align: center;
             font-size: 0.8rem;
+            font-weight: 600;
             border-bottom: 1px solid #2a2e39;
         }
 
+        .orderbook-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 8px 12px;
+            font-size: 0.7rem;
+            color: #787b86;
+            border-bottom: 1px solid #2a2e39;
+        }
+
+        .orderbook-asks {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 40%;
+        }
+
+        .orderbook-bids {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 40%;
+        }
+
+        .orderbook-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-family: monospace;
+        }
+
+        .orderbook-row.ask { color: #ff4444; }
+        .orderbook-row.bid { color: #00ff88; }
+
+        .orderbook-spread {
+            text-align: center;
+            padding: 8px;
+            font-size: 0.7rem;
+            color: #787b86;
+            border-top: 1px solid #2a2e39;
+            border-bottom: 1px solid #2a2e39;
+        }
+
+        /* Right Section - Trade Panel */
+        .trade-section {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            background: #1e222d;
+        }
+
+        /* Market Stats */
+        .market-stats {
+            padding: 12px;
+            border-bottom: 1px solid #2a2e39;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 0.75rem;
+        }
+
+        /* Trade Tabs */
         .trade-tabs {
             display: flex;
+            margin: 12px;
             gap: 8px;
-            margin-bottom: 12px;
         }
 
         .trade-tab {
             flex: 1;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
         }
 
         .trade-tab.buy {
@@ -300,24 +325,29 @@
             border: none;
         }
 
-        .trade-input {
+        /* Order Form */
+        .order-form {
+            padding: 0 12px;
+        }
+
+        .order-input {
             width: 100%;
             padding: 10px;
             background: #2a2e39;
             border: 1px solid #3a3e49;
-            border-radius: 6px;
+            border-radius: 8px;
             color: white;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-size: 0.85rem;
         }
 
-        .perc-buttons {
+        .percent-buttons {
             display: flex;
             gap: 6px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
-        .perc-btn {
+        .percent-btn {
             flex: 1;
             padding: 5px;
             background: #2a2e39;
@@ -328,82 +358,73 @@
             font-size: 0.7rem;
         }
 
-        .trade-action-btn {
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            margin: 10px 0;
+            border-top: 1px solid #2a2e39;
+        }
+
+        .place-order-btn {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 0.9rem;
             margin-top: 10px;
         }
 
-        .trade-action-btn.buy {
+        .place-order-btn.buy {
             background: linear-gradient(135deg, #00ff88, #00cc6a);
             color: white;
         }
 
-        .trade-action-btn.sell {
+        .place-order-btn.sell {
             background: linear-gradient(135deg, #ff4444, #cc0000);
             color: white;
         }
 
-        .alert-item {
-            padding: 8px 0;
-            border-bottom: 1px solid #2a2e39;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Recent Trades */
+        .recent-trades {
+            margin-top: 15px;
+            padding: 12px;
+            border-top: 1px solid #2a2e39;
         }
 
-        .remove-alert {
-            background: rgba(255, 68, 68, 0.2);
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            color: #ff4444;
+        .recent-trades-title {
+            font-size: 0.7rem;
+            color: #787b86;
+            margin-bottom: 8px;
+        }
+
+        .trade-history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
             font-size: 0.7rem;
         }
 
-        .add-alert {
-            width: 100%;
-            padding: 8px;
-            background: linear-gradient(135deg, #00d4ff, #7c3aed);
-            border: none;
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-            margin-top: 10px;
-            font-size: 0.8rem;
-        }
-
-        .address-item {
-            padding: 8px 0;
-            border-bottom: 1px solid #2a2e39;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .address-text {
-            font-size: 0.7rem;
-            font-family: monospace;
-            word-break: break-all;
-            flex: 1;
-        }
-
-        @media (max-width: 900px) {
-            .trading-container {
-                flex-direction: column;
+        @media (max-width: 1200px) {
+            .orderbook-section {
+                width: 280px;
             }
-            .info-panel {
-                width: 100%;
+            .trade-section {
+                width: 280px;
             }
-            .navbar {
-                padding: 10px 20px;
-                flex-direction: column;
-                gap: 8px;
+        }
+
+        @media (max-width: 1000px) {
+            .orderbook-section {
+                display: none;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .trade-section {
+                width: 260px;
             }
         }
     </style>
@@ -425,97 +446,95 @@
     </div>
 </nav>
 
-<div class="back-button">
-    <a href="markets.html" class="back-btn">← Back to Markets</a>
-</div>
-
-<div class="trading-container">
-    <div class="chart-panel">
+<div class="trading-layout">
+    <!-- Left: Chart Section -->
+    <div class="chart-section">
         <div class="chart-header">
-            <div class="symbol-info">
-                <span class="symbol" id="coinSymbol">BTC/USDT</span>
-                <span class="price" id="currentPrice">$0.00</span>
-                <span class="change" id="priceChange">0.00%</span>
+            <div class="coin-details">
+                <span class="coin-name" id="coinName">BTC/USDT</span>
+                <span class="coin-price" id="currentPrice">$0.00</span>
+                <span class="price-change" id="priceChange">0.00%</span>
             </div>
             <div class="timeframes">
-                <button class="tf-btn" data-timeframe="1">1H</button>
-                <button class="tf-btn active" data-timeframe="24">24H</button>
-                <button class="tf-btn" data-timeframe="7">7D</button>
-                <button class="tf-btn" data-timeframe="30">30D</button>
+                <button class="tf-btn" data-timeframe="1">1m</button>
+                <button class="tf-btn" data-timeframe="5">5m</button>
+                <button class="tf-btn" data-timeframe="15">15m</button>
+                <button class="tf-btn active" data-timeframe="60">1h</button>
+                <button class="tf-btn" data-timeframe="240">4h</button>
+                <button class="tf-btn" data-timeframe="1440">1d</button>
+                <button class="tf-btn" data-timeframe="10080">1w</button>
             </div>
         </div>
         <div id="chart-container"></div>
-        <div class="indicators-panel" id="indicatorsPanel">
-            <div class="indicator">RSI: <span id="rsiValue" class="indicator-value">--</span></div>
-            <div class="indicator">MACD: <span id="macdValue" class="indicator-value">--</span></div>
-            <div class="indicator">Signal: <span id="signalValue" class="indicator-value">--</span></div>
-            <div class="indicator">Volume: <span id="volumeValue" class="indicator-value">--</span></div>
+        <div class="depth-container">
+            <canvas id="depth-chart"></canvas>
         </div>
     </div>
 
-    <div class="info-panel">
-        <div class="stats-card">
-            <div class="card-title">Market Statistics</div>
-            <div class="stat-row"><span>24h High</span><span id="high24h">$0.00</span></div>
-            <div class="stat-row"><span>24h Low</span><span id="low24h">$0.00</span></div>
-            <div class="stat-row"><span>24h Volume</span><span id="volume24h">$0</span></div>
-            <div class="stat-row"><span>Market Cap</span><span id="marketCap">$0</span></div>
+    <!-- Middle: Order Book -->
+    <div class="orderbook-section">
+        <div class="orderbook-header">📖 Order Book</div>
+        <div class="orderbook-columns">
+            <span>Price (USDT)</span>
+            <span>Amount</span>
+            <span>Total</span>
+        </div>
+        <div class="orderbook-asks" id="orderbookAsks"></div>
+        <div class="orderbook-spread" id="orderbookSpread"></div>
+        <div class="orderbook-bids" id="orderbookBids"></div>
+    </div>
+
+    <!-- Right: Trade Panel -->
+    <div class="trade-section">
+        <div class="market-stats">
+            <div class="stat-item"><span>24h High</span><span id="high24h">$0.00</span></div>
+            <div class="stat-item"><span>24h Low</span><span id="low24h">$0.00</span></div>
+            <div class="stat-item"><span>24h Volume</span><span id="volume24h">$0</span></div>
+            <div class="stat-item"><span>Market Cap</span><span id="marketCap">$0</span></div>
         </div>
 
-        <div class="trade-card">
-            <div class="trade-tabs">
-                <div class="trade-tab buy active" onclick="setTradeType('buy')">BUY</div>
-                <div class="trade-tab sell" onclick="setTradeType('sell')">SELL</div>
+        <div class="trade-tabs">
+            <div class="trade-tab buy active" onclick="setTradeType('buy')">Buy</div>
+            <div class="trade-tab sell" onclick="setTradeType('sell')">Sell</div>
+        </div>
+
+        <div class="order-form">
+            <input type="number" id="tradeAmount" class="order-input" placeholder="Amount (USDT)" oninput="updateTotal()">
+            <div class="percent-buttons">
+                <button class="percent-btn" onclick="setPercentage(25)">25%</button>
+                <button class="percent-btn" onclick="setPercentage(50)">50%</button>
+                <button class="percent-btn" onclick="setPercentage(75)">75%</button>
+                <button class="percent-btn" onclick="setPercentage(100)">100%</button>
             </div>
-            <input type="number" id="tradeAmount" class="trade-input" placeholder="Amount (USDT)" oninput="updateTotal()">
-            <div class="perc-buttons">
-                <button class="perc-btn" onclick="setPercentage(25)">25%</button>
-                <button class="perc-btn" onclick="setPercentage(50)">50%</button>
-                <button class="perc-btn" onclick="setPercentage(75)">75%</button>
-                <button class="perc-btn" onclick="setPercentage(100)">100%</button>
-            </div>
-            <div class="stat-row" style="margin-top: 5px;">
-                <span>Total:</span>
+            <input type="text" id="tradePrice" class="order-input" placeholder="Market Price" readonly>
+            <div class="total-row">
+                <span>Total</span>
                 <span id="totalAmount">$0.00</span>
             </div>
-            <button class="trade-action-btn buy" id="tradeActionBtn" onclick="executeTrade()">BUY</button>
+            <button class="place-order-btn buy" id="tradeActionBtn" onclick="executeTrade()">Buy</button>
         </div>
 
-        <div class="alerts-card">
-            <div class="card-title">
-                Price Alerts
-                <button class="add-alert" onclick="addPriceAlert()">+ Add Alert</button>
-            </div>
-            <div id="alertsList"></div>
-        </div>
-
-        <div class="address-card">
-            <div class="card-title">
-                Saved Addresses
-                <button class="add-alert" onclick="addAddress()">+ Add Address</button>
-            </div>
-            <div id="addressesList"></div>
+        <div class="recent-trades">
+            <div class="recent-trades-title">🕐 Recent Trades</div>
+            <div id="recentTradesList"></div>
         </div>
     </div>
 </div>
 
 <script>
+    // Chart variables
     let chart = null;
     let candleSeries = null;
-    let volumeSeries = null;
+    let depthChart = null;
     let currentSymbol = 'BTC';
-    let currentTimeframe = '24';
+    let currentTimeframe = '60';
     let tradeType = 'buy';
     let currentPrice = 0;
     let userBalance = 0;
-    let chartData = [];
+    let priceHistory = [];
+    let recentTrades = [];
     
-    // Price alerts
-    let priceAlerts = JSON.parse(localStorage.getItem('priceAlerts') || '[]');
-    
-    // Saved addresses
-    let savedAddresses = JSON.parse(localStorage.getItem('savedAddresses') || '[]');
-    
+    // Coin mappings
     const coinNames = {
         'BTC': 'Bitcoin', 'ETH': 'Ethereum', 'SOL': 'Solana', 'DOGE': 'Dogecoin',
         'BNB': 'Binance Coin', 'XRP': 'XRP', 'ADA': 'Cardano', 'AVAX': 'Avalanche'
@@ -526,6 +545,7 @@
         'BNB': 580.20, 'XRP': 0.62, 'ADA': 0.48, 'AVAX': 38.75
     };
     
+    // Get selected coin
     function getSelectedCoin() {
         const params = new URLSearchParams(window.location.search);
         const symbol = params.get('symbol');
@@ -539,9 +559,10 @@
                 } catch(e) {}
             }
         }
-        document.getElementById('coinSymbol').innerText = `${currentSymbol}/USDT`;
+        document.getElementById('coinName').innerText = `${currentSymbol}/USDT`;
     }
     
+    // Fetch price and update UI
     async function fetchRealTimePrice() {
         if (fallbackPrices[currentSymbol]) {
             currentPrice = fallbackPrices[currentSymbol];
@@ -557,13 +578,14 @@
                     currentPrice = data[coinId].usd;
                     const change = data[coinId].usd_24h_change || 0;
                     document.getElementById('currentPrice').innerText = `$${currentPrice.toLocaleString()}`;
-                    document.getElementById('priceChange').innerText = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
-                    document.getElementById('priceChange').className = `change ${change >= 0 ? 'positive' : 'negative'}`;
+                    const changeElem = document.getElementById('priceChange');
+                    changeElem.innerText = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+                    changeElem.className = `price-change ${change >= 0 ? 'up' : 'down'}`;
                     document.getElementById('volume24h').innerText = `$${(data[coinId].usd_24h_vol || 0).toLocaleString()}`;
                     document.getElementById('marketCap').innerText = `$${(data[coinId].usd_market_cap || 0).toLocaleString()}`;
-                    
-                    // Check price alerts
-                    checkPriceAlerts(currentPrice);
+                    document.getElementById('tradePrice').value = currentPrice.toFixed(2);
+                    updateOrderBook(currentPrice);
+                    updateDepthChart(currentPrice);
                 }
             }
         } catch(e) { console.log('Background fetch failed'); }
@@ -572,99 +594,162 @@
         document.getElementById('low24h').innerText = `$${(currentPrice * 0.98).toLocaleString()}`;
     }
     
-    function checkPriceAlerts(price) {
-        priceAlerts.forEach((alert, index) => {
-            if (alert.price <= price && !alert.triggered) {
-                alert.triggered = true;
-                alert(`🔔 Price Alert!\n${alert.symbol} reached $${price.toLocaleString()}`);
-                localStorage.setItem('priceAlerts', JSON.stringify(priceAlerts));
-                renderAlerts();
-            }
-        });
-    }
-    
-    function calculateIndicators(data) {
-        if (!data || data.length < 14) return;
+    // Update order book
+    function updateOrderBook(price) {
+        const spread = price * 0.001;
+        const bidPrice = price - spread;
+        const askPrice = price + spread;
         
-        // Calculate RSI
-        let gains = 0, losses = 0;
-        for (let i = data.length - 14; i < data.length - 1; i++) {
-            const change = data[i + 1].value - data[i].value;
-            if (change >= 0) gains += change;
-            else losses -= change;
+        document.getElementById('orderbookSpread').innerHTML = `Spread: $${spread.toFixed(2)} (${(spread/price*100).toFixed(3)}%)`;
+        
+        const asksContainer = document.getElementById('orderbookAsks');
+        const bidsContainer = document.getElementById('orderbookBids');
+        
+        let asksHtml = '';
+        let bidsHtml = '';
+        
+        for (let i = 1; i <= 10; i++) {
+            const ask = askPrice + (i * spread);
+            const amount = (Math.random() * 0.8 + 0.2).toFixed(4);
+            const total = (ask * amount).toFixed(0);
+            asksHtml += `<div class="orderbook-row ask"><span>${ask.toFixed(2)}</span><span>${amount}</span><span>${parseInt(total).toLocaleString()}</span></div>`;
         }
-        const avgGain = gains / 14;
-        const avgLoss = losses / 14;
-        const rs = avgGain / avgLoss;
-        const rsi = 100 - (100 / (1 + rs));
-        document.getElementById('rsiValue').innerText = rsi.toFixed(2);
         
-        // MACD approximation
-        const ema12 = data[data.length - 1].value * 0.15 + data[data.length - 2].value * 0.85;
-        const ema26 = data[data.length - 1].value * 0.07 + data[data.length - 2].value * 0.93;
-        const macd = ema12 - ema26;
-        document.getElementById('macdValue').innerText = macd.toFixed(2);
-        document.getElementById('signalValue').innerText = (macd * 0.8).toFixed(2);
+        for (let i = 1; i <= 10; i++) {
+            const bid = bidPrice - (i * spread);
+            const amount = (Math.random() * 0.8 + 0.2).toFixed(4);
+            const total = (bid * amount).toFixed(0);
+            bidsHtml += `<div class="orderbook-row bid"><span>${bid.toFixed(2)}</span><span>${amount}</span><span>${parseInt(total).toLocaleString()}</span></div>`;
+        }
         
-        // Volume
-        const volume = Math.random() * 1000000;
-        document.getElementById('volumeValue').innerText = volume.toFixed(0);
+        asksContainer.innerHTML = asksHtml;
+        bidsContainer.innerHTML = bidsHtml;
     }
     
-    function generateMockChartData() {
-        const data = [];
-        let basePrice = fallbackPrices[currentSymbol] || 50000;
-        const now = Math.floor(Date.now() / 1000);
-        const points = currentTimeframe === '1' ? 24 : currentTimeframe === '24' ? 48 : currentTimeframe === '7' ? 168 : 720;
+    // Update depth chart
+    function updateDepthChart(price) {
+        const canvas = document.getElementById('depth-chart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+        canvas.width = width;
+        canvas.height = height;
         
-        for (let i = points; i >= 0; i--) {
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw bid side (green)
+        ctx.fillStyle = 'rgba(0, 255, 136, 0.3)';
+        for (let i = 0; i < 20; i++) {
+            const x = i * (width / 40);
+            const h = height * (1 - i / 40);
+            ctx.fillRect(x, height - h, width / 40, h);
+        }
+        
+        // Draw ask side (red)
+        ctx.fillStyle = 'rgba(255, 68, 68, 0.3)';
+        for (let i = 0; i < 20; i++) {
+            const x = width / 2 + i * (width / 40);
+            const h = height * (1 - (20 - i) / 40);
+            ctx.fillRect(x, height - h, width / 40, h);
+        }
+        
+        // Draw center line
+        ctx.beginPath();
+        ctx.strokeStyle = '#00d4ff';
+        ctx.lineWidth = 2;
+        ctx.moveTo(width / 2, 0);
+        ctx.lineTo(width / 2, height);
+        ctx.stroke();
+    }
+    
+    // Generate candlestick data
+    function generateChartData(timeframe) {
+        const data = [];
+        const basePrice = currentPrice || fallbackPrices[currentSymbol] || 50000;
+        const now = Math.floor(Date.now() / 1000);
+        const intervals = timeframe === '1' ? 60 : timeframe === '5' ? 60 : 
+                         timeframe === '15' ? 96 : timeframe === '60' ? 168 : 
+                         timeframe === '240' ? 180 : timeframe === '1440' ? 90 : 52;
+        const intervalSeconds = timeframe === '1' ? 60 : timeframe === '5' ? 300 :
+                                timeframe === '15' ? 900 : timeframe === '60' ? 3600 :
+                                timeframe === '240' ? 14400 : timeframe === '1440' ? 86400 : 604800;
+        
+        let currentTime = now - (intervals * intervalSeconds);
+        let price = basePrice;
+        
+        for (let i = 0; i <= intervals; i++) {
             const change = (Math.random() - 0.5) * (basePrice * 0.01);
-            basePrice += change;
+            const open = price;
+            const close = price + change;
+            const high = Math.max(open, close) + Math.random() * (basePrice * 0.005);
+            const low = Math.min(open, close) - Math.random() * (basePrice * 0.005);
+            
             data.push({
-                time: now - (i * 3600),
-                open: basePrice - (Math.random() * 100),
-                high: basePrice + (Math.random() * 150),
-                low: basePrice - (Math.random() * 150),
-                close: basePrice,
-                value: basePrice
+                time: currentTime,
+                open: open,
+                high: high,
+                low: low,
+                close: close
             });
+            
+            price = close;
+            currentTime += intervalSeconds;
         }
         return data;
     }
     
+    // Initialize chart
     async function initChart() {
         const container = document.getElementById('chart-container');
         
         chart = LightweightCharts.createChart(container, {
             width: container.clientWidth,
-            height: 400,
-            layout: { backgroundColor: '#131722', textColor: '#d1d4dc' },
-            grid: { vertLines: { color: '#2a2e39' }, horzLines: { color: '#2a2e39' } },
+            height: 450,
+            layout: {
+                backgroundColor: '#131722',
+                textColor: '#d1d4dc',
+            },
+            grid: {
+                vertLines: { color: '#2a2e39' },
+                horzLines: { color: '#2a2e39' },
+            },
+            crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
             rightPriceScale: { borderColor: '#2a2e39' },
             timeScale: { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false },
         });
         
         candleSeries = chart.addCandlestickSeries({
-            upColor: '#00ff88', downColor: '#ff4444',
-            borderDownColor: '#ff4444', borderUpColor: '#00ff88',
-            wickDownColor: '#ff4444', wickUpColor: '#00ff88',
+            upColor: '#00ff88',
+            downColor: '#ff4444',
+            borderDownColor: '#ff4444',
+            borderUpColor: '#00ff88',
+            wickDownColor: '#ff4444',
+            wickUpColor: '#00ff88',
         });
         
-        volumeSeries = chart.addHistogramSeries({
-            color: '#26a69a', priceFormat: { type: 'volume' }, priceScaleId: '',
+        const chartData = generateChartData(currentTimeframe);
+        candleSeries.setData(chartData);
+        
+        window.addEventListener('resize', () => {
+            chart.applyOptions({ width: container.clientWidth });
+            updateDepthChart(currentPrice);
         });
-        
-        const mockData = generateMockChartData();
-        chartData = mockData;
-        candleSeries.setData(mockData.map(d => ({ time: d.time, open: d.open, high: d.high, low: d.low, close: d.close })));
-        calculateIndicators(mockData);
-        
-        window.addEventListener('resize', () => chart.applyOptions({ width: container.clientWidth }));
     }
     
+    // Update chart on timeframe change
+    function updateChart() {
+        if (candleSeries) {
+            const chartData = generateChartData(currentTimeframe);
+            candleSeries.setData(chartData);
+        }
+    }
+    
+    // Trade functions
     function updateTotal() {
         const amount = parseFloat(document.getElementById('tradeAmount').value) || 0;
         document.getElementById('totalAmount').innerText = `$${amount.toFixed(2)}`;
+        addToRecentTrades(amount);
     }
     
     function setPercentage(percent) {
@@ -678,29 +763,45 @@
         const buyTab = document.querySelector('.trade-tab.buy');
         const sellTab = document.querySelector('.trade-tab.sell');
         const actionBtn = document.getElementById('tradeActionBtn');
+        
         if (type === 'buy') {
             buyTab.classList.add('active');
             sellTab.classList.remove('active');
-            actionBtn.className = 'trade-action-btn buy';
-            actionBtn.innerText = 'BUY';
+            actionBtn.className = 'place-order-btn buy';
+            actionBtn.innerText = 'Buy';
         } else {
             sellTab.classList.add('active');
             buyTab.classList.remove('active');
-            actionBtn.className = 'trade-action-btn sell';
-            actionBtn.innerText = 'SELL';
+            actionBtn.className = 'place-order-btn sell';
+            actionBtn.innerText = 'Sell';
         }
+    }
+    
+    function addToRecentTrades(amount) {
+        const trade = {
+            price: currentPrice,
+            amount: amount,
+            type: tradeType,
+            time: new Date().toLocaleTimeString()
+        };
+        recentTrades.unshift(trade);
+        if (recentTrades.length > 10) recentTrades.pop();
+        
+        const container = document.getElementById('recentTradesList');
+        container.innerHTML = recentTrades.map(t => `
+            <div class="trade-history-item">
+                <span style="color: ${t.type === 'buy' ? '#00ff88' : '#ff4444'}">${t.type.toUpperCase()}</span>
+                <span>${t.amount} USDT</span>
+                <span>$${t.price.toFixed(2)}</span>
+                <span>${t.time}</span>
+            </div>
+        `).join('');
     }
     
     function executeTrade() {
         const amount = parseFloat(document.getElementById('tradeAmount').value);
-        if (!amount || amount <= 0) { alert('Enter valid amount'); return; }
+        if (!amount || amount <= 0) { alert('Please enter a valid amount'); return; }
         if (amount > userBalance && tradeType === 'buy') { alert(`Insufficient balance! You have $${userBalance.toFixed(2)}`); return; }
-        
-        // Send email notification (simulated)
-        const user = JSON.parse(localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser') || '{}');
-        console.log(`📧 Email notification sent to ${user.email}: ${tradeType.toUpperCase()} order ${amount} USDT of ${currentSymbol}`);
-        
-        alert(`${tradeType.toUpperCase()} order placed!\n\nAmount: ${amount} USDT\nPrice: $${currentPrice.toFixed(2)}\n\nEmail notification sent.`);
         
         if (tradeType === 'buy') {
             userBalance -= amount;
@@ -708,79 +809,18 @@
             profile.balance = userBalance;
             localStorage.setItem('lunoProfile', JSON.stringify(profile));
         }
+        
+        alert(`${tradeType.toUpperCase()} order placed!\n\nAmount: ${amount} USDT\nPrice: $${currentPrice.toFixed(2)}`);
         document.getElementById('tradeAmount').value = '';
         updateTotal();
     }
     
-    function addPriceAlert() {
-        const price = prompt('Enter alert price (USDT):');
-        if (price && !isNaN(price)) {
-            priceAlerts.push({ symbol: currentSymbol, price: parseFloat(price), triggered: false });
-            localStorage.setItem('priceAlerts', JSON.stringify(priceAlerts));
-            renderAlerts();
-            alert(`✅ Alert set for ${currentSymbol} at $${parseFloat(price).toLocaleString()}`);
-        }
-    }
-    
-    function removeAlert(index) {
-        priceAlerts.splice(index, 1);
-        localStorage.setItem('priceAlerts', JSON.stringify(priceAlerts));
-        renderAlerts();
-    }
-    
-    function renderAlerts() {
-        const container = document.getElementById('alertsList');
-        if (priceAlerts.length === 0) {
-            container.innerHTML = '<div style="text-align:center;padding:10px;color:#787b86;">No alerts set</div>';
-            return;
-        }
-        container.innerHTML = priceAlerts.map((alert, i) => `
-            <div class="alert-item">
-                <span>${alert.symbol} @ $${alert.price.toLocaleString()}</span>
-                <button class="remove-alert" onclick="removeAlert(${i})">Remove</button>
-            </div>
-        `).join('');
-    }
-    
-    function addAddress() {
-        const address = prompt('Enter wallet address:');
-        const label = prompt('Enter label (e.g., "Exchange", "Personal Wallet"):');
-        if (address && label) {
-            savedAddresses.push({ address, label });
-            localStorage.setItem('savedAddresses', JSON.stringify(savedAddresses));
-            renderAddresses();
-        }
-    }
-    
-    function removeAddress(index) {
-        savedAddresses.splice(index, 1);
-        localStorage.setItem('savedAddresses', JSON.stringify(savedAddresses));
-        renderAddresses();
-    }
-    
-    function renderAddresses() {
-        const container = document.getElementById('addressesList');
-        if (savedAddresses.length === 0) {
-            container.innerHTML = '<div style="text-align:center;padding:10px;color:#787b86;">No saved addresses</div>';
-            return;
-        }
-        container.innerHTML = savedAddresses.map((addr, i) => `
-            <div class="address-item">
-                <div class="address-text">
-                    <strong>${addr.label}</strong><br>
-                    ${addr.address.substring(0, 20)}...
-                </div>
-                <button class="remove-alert" onclick="removeAddress(${i})">Remove</button>
-            </div>
-        `).join('');
-    }
-    
+    // Theme toggle
     function toggleTheme() {
         document.body.classList.toggle('light-mode');
         const isLight = document.body.classList.contains('light-mode');
         localStorage.setItem('theme', isLight ? 'light' : 'dark');
         
-        // Update chart theme
         if (chart) {
             chart.applyOptions({
                 layout: { backgroundColor: isLight ? '#ffffff' : '#131722', textColor: isLight ? '#1e222d' : '#d1d4dc' },
@@ -794,6 +834,7 @@
         if (savedTheme === 'light') document.body.classList.add('light-mode');
     }
     
+    // Auth functions
     function checkAuth() {
         const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
         if (!savedUser) window.location.href = 'index.html';
@@ -816,19 +857,30 @@
         window.location.href = 'index.html';
     }
     
+    // Event listeners
+    document.querySelectorAll('.tf-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentTimeframe = this.getAttribute('data-timeframe');
+            updateChart();
+        });
+    });
+    
     document.getElementById('tradeAmount').addEventListener('input', updateTotal);
     
+    // Initialize
     checkAuth();
     displayUsername();
     loadUserBalance();
     getSelectedCoin();
     initChart();
     fetchRealTimePrice();
-    renderAlerts();
-    renderAddresses();
     checkTheme();
     
     setInterval(fetchRealTimePrice, 15000);
+    setInterval(() => updateOrderBook(currentPrice), 5000);
+    setInterval(() => updateDepthChart(currentPrice), 5000);
 </script>
 
 </body>
