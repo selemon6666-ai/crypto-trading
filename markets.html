@@ -19,6 +19,26 @@
             color: #d1d4dc;
         }
 
+        body.light-mode {
+            background: #ffffff;
+            color: #1e222d;
+        }
+
+        body.light-mode .navbar {
+            background: #ffffff;
+            border-bottom-color: #e0e0e0;
+        }
+
+        body.light-mode .nav-links a {
+            color: #1e222d;
+        }
+
+        body.light-mode .market-table,
+        body.light-mode .stat-card {
+            background: #ffffff;
+            border-color: #e0e0e0;
+        }
+
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -87,6 +107,10 @@
             font-size: 0.85rem;
         }
 
+        .logout-btn:hover {
+            background: rgba(255, 68, 68, 0.3);
+        }
+
         .main-content {
             margin-top: 70px;
             padding: 20px 30px;
@@ -103,6 +127,10 @@
             font-size: 1.8rem;
             font-weight: 600;
             color: white;
+        }
+
+        body.light-mode .page-header h1 {
+            color: #1e222d;
         }
 
         .page-header p {
@@ -130,6 +158,12 @@
             font-size: 0.9rem;
         }
 
+        body.light-mode .search-input {
+            background: #f0f0f0;
+            border-color: #d0d0d0;
+            color: #1e222d;
+        }
+
         .category-filters {
             display: flex;
             gap: 10px;
@@ -146,6 +180,12 @@
             color: #d1d4dc;
             transition: 0.3s;
             font-size: 0.8rem;
+        }
+
+        body.light-mode .filter-btn {
+            background: #f0f0f0;
+            border-color: #d0d0d0;
+            color: #1e222d;
         }
 
         .filter-btn:hover, .filter-btn.active {
@@ -208,6 +248,10 @@
             color: white;
         }
 
+        body.light-mode .coin-name {
+            color: #1e222d;
+        }
+
         .coin-symbol {
             font-size: 0.7rem;
             color: #787b86;
@@ -219,9 +263,17 @@
             color: white;
         }
 
+        body.light-mode .coin-price {
+            color: #1e222d;
+        }
+
         .market-cap {
             color: #d1d4dc;
             font-size: 0.85rem;
+        }
+
+        body.light-mode .market-cap {
+            color: #1e222d;
         }
 
         .change-positive {
@@ -279,6 +331,12 @@
             color: #00d4ff;
         }
 
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #787b86;
+        }
+
         @media (max-width: 768px) {
             .navbar {
                 padding: 12px 20px;
@@ -290,9 +348,13 @@
                 flex-wrap: wrap;
                 justify-content: center;
             }
+            .user-info {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
             .main-content {
                 padding: 15px;
-                margin-top: 100px;
+                margin-top: 120px;
             }
             .table-header {
                 display: none;
@@ -432,7 +494,7 @@
         }
 
         if (filteredCoins.length === 0) {
-            marketList.innerHTML = '<div class="no-results" style="text-align:center;padding:40px;">No cryptocurrencies found.</div>';
+            marketList.innerHTML = '<div class="no-results">No cryptocurrencies found. Try a different search.</div>';
             return;
         }
 
@@ -467,23 +529,64 @@
         document.getElementById('activeCoins').innerText = cryptocurrencies.length;
     }
 
-    function checkAuth() {
-        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-        if (!savedUser) window.location.href = 'index.html';
-        return savedUser ? JSON.parse(savedUser) : null;
+    // UPDATED AUTH CHECK - Uses Supabase
+    async function checkAuth() {
+        try {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (error || !user) {
+                console.log('No user found, redirecting to login');
+                window.location.href = 'index.html';
+                return null;
+            }
+            return user;
+        } catch (e) {
+            console.error('Auth check error:', e);
+            window.location.href = 'index.html';
+            return null;
+        }
     }
 
-    function displayUsername() {
-        const user = checkAuth();
-        if (user && user.fullName) {
-            document.getElementById('displayUsername').innerText = user.fullName.split(' ')[0];
-        } else if (user && user.email) {
+    // UPDATED DISPLAY USERNAME - Fetches from Supabase
+    async function displayUsername() {
+        const user = await checkAuth();
+        if (!user) return;
+        
+        try {
+            const { data: profile, error } = await supabase
+                .from('users')
+                .select('full_name')
+                .eq('id', user.id)
+                .single();
+            
+            if (profile && profile.full_name) {
+                document.getElementById('displayUsername').innerText = profile.full_name.split(' ')[0];
+                // Also update localStorage for other pages
+                const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+                if (savedUser) {
+                    const userData = JSON.parse(savedUser);
+                    userData.fullName = profile.full_name;
+                    if (localStorage.getItem('lunoUser')) {
+                        localStorage.setItem('lunoUser', JSON.stringify(userData));
+                    } else {
+                        sessionStorage.setItem('lunoUser', JSON.stringify(userData));
+                    }
+                }
+            } else {
+                document.getElementById('displayUsername').innerText = user.email.split('@')[0];
+            }
+        } catch (e) {
             document.getElementById('displayUsername').innerText = user.email.split('@')[0];
         }
     }
 
+    // UPDATED LOGOUT
     async function logout() {
-        await supabaseClient.signOut();
+        console.log('Logging out...');
+        try {
+            await supabase.auth.signOut();
+        } catch (e) {
+            console.error('Logout error:', e);
+        }
         localStorage.removeItem('lunoUser');
         sessionStorage.removeItem('lunoUser');
         window.location.href = 'index.html';
@@ -515,6 +618,7 @@
         renderMarketList();
     });
 
+    // Initialize
     displayUsername();
     renderMarketList();
     updateStats();
