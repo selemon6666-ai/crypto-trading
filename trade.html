@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - Trade</title>
+    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
@@ -137,6 +138,11 @@
             color: white;
         }
 
+        .card-header p {
+            color: #787b86;
+            font-size: 0.8rem;
+        }
+
         .trade-type {
             display: flex;
             margin: 15px 20px;
@@ -222,6 +228,11 @@
             padding: 10px;
             text-align: center;
             cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .return-option:hover {
+            background: rgba(0, 212, 255, 0.2);
         }
 
         .return-option.selected {
@@ -264,6 +275,7 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
+            transition: 0.3s;
         }
 
         .btn-cancel {
@@ -272,10 +284,18 @@
             color: white;
         }
 
+        .btn-cancel:hover {
+            background: #3a3e49;
+        }
+
         .btn-confirm {
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             border: none;
             color: white;
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-1px);
         }
 
         .modal {
@@ -413,7 +433,7 @@
 
         <div class="action-buttons">
             <button class="btn-cancel" onclick="cancelTrade()">Cancel</button>
-            <button class="btn-confirm" onclick="confirmTrade()">Confirm Trade</button>
+            <button class="btn-confirm" id="confirmTradeBtn" onclick="confirmTrade()">Confirm Trade</button>
         </div>
     </div>
 </div>
@@ -447,16 +467,24 @@
     // Load user balance from Supabase
     async function loadUserBalance() {
         try {
+            console.log('Loading user balance...');
+            
             const { data: { user }, error: userError } = await supabase.auth.getUser();
             
-            if (userError) throw userError;
+            if (userError) {
+                console.error('Auth error:', userError);
+                window.location.href = 'index.html';
+                return;
+            }
             
             if (!user) {
+                console.log('No user found');
                 window.location.href = 'index.html';
                 return;
             }
             
             userId = user.id;
+            console.log('User ID:', userId);
             
             const { data: profile, error: profileError } = await supabase
                 .from('users')
@@ -465,9 +493,11 @@
                 .single();
             
             if (profileError) {
+                console.error('Profile fetch error:', profileError);
                 userBalance = 0;
             } else {
                 userBalance = profile?.balance || 0;
+                console.log('User balance loaded:', userBalance);
             }
             
             document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
@@ -479,7 +509,7 @@
             }
             
         } catch (error) {
-            console.error('Error loading user balance:', error);
+            console.error('Error in loadUserBalance:', error);
             userBalance = 0;
             document.getElementById('availableAmount').innerHTML = '0 USDT';
         }
@@ -571,6 +601,8 @@
     }
 
     async function confirmTrade() {
+        console.log('Confirm trade called');
+        
         const amount = parseFloat(document.getElementById('amount').value);
         
         if (isNaN(amount) || amount <= 0) {
@@ -586,7 +618,6 @@
             return;
         }
         
-        // Reload balance to ensure it's up to date
         await loadUserBalance();
         
         if (tradeType === 'buy') {
@@ -594,12 +625,13 @@
             const totalPay = amount + transactionFee;
             const expectedReturnAmount = amount * (selectedRate / 100);
             
+            console.log('Balance check:', { userBalance, totalPay });
+            
             if (totalPay > userBalance) {
                 alert(`Insufficient balance! You need $${totalPay.toFixed(2)} USDT but only have $${userBalance.toFixed(2)} USDT`);
                 return;
             }
             
-            // Update balance in Supabase
             const newBalance = userBalance - totalPay;
             
             const { error: updateError } = await supabase
@@ -615,7 +647,6 @@
             
             userBalance = newBalance;
             
-            // Create trade record
             const tradeId = Date.now();
             const tradeData = {
                 id: tradeId,
