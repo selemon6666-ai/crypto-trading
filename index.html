@@ -408,7 +408,7 @@
         }
     }
 
-    // FIXED LOGIN FUNCTION
+    // FIXED LOGIN FUNCTION - Using supabase directly
     async function handleLogin(event) {
         event.preventDefault();
         
@@ -427,6 +427,13 @@
         
         try {
             console.log('Attempting login for:', email);
+            
+            // Check if supabase is defined
+            if (typeof supabase === 'undefined') {
+                errorMsg.style.display = 'block';
+                errorMsg.innerHTML = '❌ Database connection error. Please refresh the page.';
+                return false;
+            }
             
             const { data, error } = await supabase.auth.signInWithPassword({
                 email: email,
