@@ -308,6 +308,25 @@
             display: none;
         }
 
+        .resend-section {
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .resend-link {
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .resend-link:hover {
+            color: #7c3aed;
+            text-decoration: underline;
+        }
+
         @media (max-width: 768px) {
             .brand-section {
                 display: none;
@@ -332,6 +351,9 @@
         <p class="subtitle">Enter your credentials to access your account</p>
 
         <div id="errorMsg" class="error-msg"></div>
+        <div id="resendSection" class="resend-section">
+            <a href="#" class="resend-link" onclick="resendVerification()">📧 Resend verification email</a>
+        </div>
 
         <form id="loginForm" onsubmit="return handleLogin(event)">
             <div class="input-group">
@@ -408,7 +430,42 @@
         }
     }
 
-    // FIXED LOGIN FUNCTION - Using supabase directly
+    // Resend verification email
+    async function resendVerification() {
+        const email = document.getElementById('email').value;
+        
+        if (!email) {
+            alert('⚠️ Please enter your email address first');
+            return;
+        }
+        
+        try {
+            const { error } = await supabase.auth.resend({
+                type: 'signup',
+                email: email,
+                options: {
+                    emailRedirectTo: window.location.href
+                }
+            });
+            
+            if (error) throw error;
+            
+            alert('✅ Verification email resent! Please check your inbox (and spam folder).');
+        } catch (error) {
+            console.error('Resend error:', error);
+            alert(`❌ ${error.message}`);
+        }
+    }
+
+    // Show resend button when email verification error occurs
+    function showResendButton() {
+        document.getElementById('resendSection').style.display = 'block';
+    }
+
+    function hideResendButton() {
+        document.getElementById('resendSection').style.display = 'none';
+    }
+
     async function handleLogin(event) {
         event.preventDefault();
         
@@ -418,6 +475,7 @@
         const errorMsg = document.getElementById('errorMsg');
         
         errorMsg.style.display = 'none';
+        hideResendButton();
         
         if (!email || !password) {
             errorMsg.style.display = 'block';
@@ -428,19 +486,22 @@
         try {
             console.log('Attempting login for:', email);
             
-            // Check if supabase is defined
-            if (typeof supabase === 'undefined') {
-                errorMsg.style.display = 'block';
-                errorMsg.innerHTML = '❌ Database connection error. Please refresh the page.';
-                return false;
-            }
-            
             const { data, error } = await supabase.auth.signInWithPassword({
                 email: email,
                 password: password
             });
             
-            if (error) throw error;
+            if (error) {
+                if (error.message.includes('Email not confirmed')) {
+                    errorMsg.style.display = 'block';
+                    errorMsg.innerHTML = '❌ Please verify your email before logging in.';
+                    showResendButton();
+                } else {
+                    errorMsg.style.display = 'block';
+                    errorMsg.innerHTML = `❌ ${error.message}`;
+                }
+                return false;
+            }
             
             if (data && data.user) {
                 console.log('Login successful:', data.user.email);
@@ -452,7 +513,6 @@
                     .eq('id', data.user.id)
                     .single();
                 
-                // Store session data
                 const sessionData = {
                     uid: data.user.id,
                     email: data.user.email,
@@ -463,42 +523,29 @@
                 
                 if (rememberMe) {
                     localStorage.setItem('lunoUser', JSON.stringify(sessionData));
-                    console.log('Session saved to localStorage');
                 } else {
                     sessionStorage.setItem('lunoUser', JSON.stringify(sessionData));
-                    console.log('Session saved to sessionStorage');
                 }
                 
-                // Redirect to dashboard
                 window.location.href = 'dashboard.html';
             }
             
         } catch (error) {
             console.error('Login error:', error.message);
             errorMsg.style.display = 'block';
-            
-            if (error.message.includes('Invalid login credentials')) {
-                errorMsg.innerHTML = '❌ Invalid email or password. Please try again.';
-            } else if (error.message.includes('Email not confirmed')) {
-                errorMsg.innerHTML = '❌ Please verify your email before logging in.';
-            } else {
-                errorMsg.innerHTML = `❌ ${error.message}`;
-            }
+            errorMsg.innerHTML = `❌ ${error.message}`;
         }
         
         return false;
     }
     
-    // Check if user is already logged in
     async function checkExistingSession() {
         try {
-            // Check local/session storage first
             const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
             if (savedUser) {
                 try {
                     const user = JSON.parse(savedUser);
                     if (user.loggedIn) {
-                        // Verify with Supabase
                         const { data: { user: supabaseUser } } = await supabase.auth.getUser();
                         if (supabaseUser) {
                             window.location.href = 'dashboard.html';
