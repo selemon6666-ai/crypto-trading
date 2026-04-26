@@ -135,6 +135,7 @@
             border: 1px solid #3a3e49;
             border-radius: 8px;
             color: white;
+            cursor: pointer;
         }
 
         .coin-info {
@@ -144,6 +145,7 @@
             border-radius: 10px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
         .coin-name { font-weight: bold; color: white; }
@@ -171,6 +173,7 @@
             border: 1px solid #3a3e49;
             border-radius: 8px;
             color: white;
+            font-size: 0.9rem;
         }
 
         .return-options {
@@ -187,6 +190,11 @@
             padding: 10px;
             text-align: center;
             cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .return-option:hover {
+            background: rgba(0, 212, 255, 0.2);
         }
 
         .return-option.selected {
@@ -277,6 +285,8 @@
         @media (max-width: 550px) {
             .return-options { grid-template-columns: repeat(2, 1fr); }
             .navbar { padding: 12px 20px; flex-direction: column; }
+            .nav-links { flex-wrap: wrap; justify-content: center; }
+            .user-info { flex-wrap: wrap; justify-content: center; }
         }
     </style>
 </head>
@@ -349,20 +359,20 @@
             </div>
 
             <label style="display: block; margin-bottom: 8px; color: #787b86;">Select Duration</label>
-            <div class="return-options">
-                <div class="return-option" data-time="30" data-rate="12" data-min="100" onclick="selectDuration(this)">
+            <div class="return-options" id="durationOptions">
+                <div class="return-option" data-time="30" data-rate="12" data-min="100">
                     <div class="return-time">30s</div><div class="return-rate">+12%</div><div class="return-min">Min $100</div>
                 </div>
-                <div class="return-option" data-time="60" data-rate="18" data-min="15000" onclick="selectDuration(this)">
+                <div class="return-option" data-time="60" data-rate="18" data-min="15000">
                     <div class="return-time">60s</div><div class="return-rate">+18%</div><div class="return-min">Min $15K</div>
                 </div>
-                <div class="return-option" data-time="90" data-rate="25" data-min="60000" onclick="selectDuration(this)">
+                <div class="return-option" data-time="90" data-rate="25" data-min="60000">
                     <div class="return-time">90s</div><div class="return-rate">+25%</div><div class="return-min">Min $60K</div>
                 </div>
-                <div class="return-option" data-time="180" data-rate="32" data-min="200000" onclick="selectDuration(this)">
+                <div class="return-option" data-time="180" data-rate="32" data-min="200000">
                     <div class="return-time">180s</div><div class="return-rate">+32%</div><div class="return-min">Min $200K</div>
                 </div>
-                <div class="return-option" data-time="300" data-rate="45" data-min="900000" onclick="selectDuration(this)">
+                <div class="return-option" data-time="300" data-rate="45" data-min="900000">
                     <div class="return-time">300s</div><div class="return-rate">+45%</div><div class="return-min">Min $900K</div>
                 </div>
             </div>
@@ -403,10 +413,18 @@
     let selectedRate = 0;
     let selectedMinAmount = 0;
     let currentCoin = 'BTC';
-    let currentCoinPrice = 0;
+    let currentCoinPrice = 65234;
 
-    const coinPrices = { BTC: 65234, ETH: 3420, BNB: 580, SOL: 145, XRP: 0.62, ADA: 0.48, DOGE: 0.124, DOT: 7.25, LINK: 15.4, MATIC: 0.72, UNI: 8.15, AAVE: 98.5, SHIB: 0.000018 };
-    const coinNames = { BTC: 'Bitcoin', ETH: 'Ethereum', BNB: 'Binance Coin', SOL: 'Solana', XRP: 'XRP', ADA: 'Cardano', DOGE: 'Dogecoin', DOT: 'Polkadot', LINK: 'Chainlink', MATIC: 'Polygon', UNI: 'Uniswap', AAVE: 'Aave', SHIB: 'Shiba Inu' };
+    const coinPrices = {
+        BTC: 65234, ETH: 3420, BNB: 580, SOL: 145, XRP: 0.62, ADA: 0.48,
+        DOGE: 0.124, DOT: 7.25, LINK: 15.4, MATIC: 0.72, UNI: 8.15, AAVE: 98.5, SHIB: 0.000018
+    };
+    
+    const coinNames = {
+        BTC: 'Bitcoin', ETH: 'Ethereum', BNB: 'Binance Coin', SOL: 'Solana',
+        XRP: 'XRP', ADA: 'Cardano', DOGE: 'Dogecoin', DOT: 'Polkadot',
+        LINK: 'Chainlink', MATIC: 'Polygon', UNI: 'Uniswap', AAVE: 'Aave', SHIB: 'Shiba Inu'
+    };
 
     // Load user balance
     async function loadUserBalance() {
@@ -437,6 +455,25 @@
         }
     }
 
+    // Set up duration click handlers
+    function setupDurationClickHandlers() {
+        const durationOptions = document.querySelectorAll('.return-option');
+        durationOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selected class from all
+                durationOptions.forEach(opt => opt.classList.remove('selected'));
+                // Add selected class to clicked
+                this.classList.add('selected');
+                // Store values
+                selectedDuration = parseInt(this.getAttribute('data-time'));
+                selectedRate = parseInt(this.getAttribute('data-rate'));
+                selectedMinAmount = parseInt(this.getAttribute('data-min'));
+                // Recalculate
+                calculateReturn();
+            });
+        });
+    }
+
     function changeCrypto() {
         const select = document.getElementById('cryptoSelect');
         currentCoin = select.value;
@@ -464,15 +501,6 @@
             sellBtn.classList.add('active');
             buyBtn.classList.remove('active');
         }
-        calculateReturn();
-    }
-
-    function selectDuration(element) {
-        document.querySelectorAll('.return-option').forEach(opt => opt.classList.remove('selected'));
-        element.classList.add('selected');
-        selectedDuration = parseInt(element.getAttribute('data-time'));
-        selectedRate = parseInt(element.getAttribute('data-rate'));
-        selectedMinAmount = parseInt(element.getAttribute('data-min'));
         calculateReturn();
     }
 
@@ -541,6 +569,7 @@
         if (tradeType === 'buy') {
             const transactionFee = amount * 0.02;
             const totalPay = amount + transactionFee;
+            const expectedReturnAmount = amount * (selectedRate / 100);
             
             if (totalPay > userBalance) {
                 alert(`Insufficient balance! You need $${totalPay.toFixed(2)} USDT but only have $${userBalance.toFixed(2)} USDT`);
@@ -562,7 +591,7 @@
                 amount: amount,
                 duration: selectedDuration,
                 rate: selectedRate,
-                expected_profit: amount * (selectedRate / 100),
+                expected_profit: expectedReturnAmount,
                 status: 'pending',
                 trade_type: 'buy'
             });
@@ -590,9 +619,13 @@
         window.location.href = 'index.html';
     }
 
-    // Initialize
-    loadUserBalance();
-    changeCrypto();
+    // Initialize everything when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Page loaded, initializing...');
+        loadUserBalance();
+        changeCrypto();
+        setupDurationClickHandlers();
+    });
 </script>
 
 </body>
