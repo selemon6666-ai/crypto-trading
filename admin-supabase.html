@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luno Admin - Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #131722;
+            color: #d1d4dc;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: white; margin-bottom: 20px; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #1e222d;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #2a2e39;
+        }
+        .stat-number { font-size: 2rem; font-weight: bold; color: #00d4ff; }
+        .section {
+            background: #1e222d;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #2a2e39;
+        }
+        .section-title { font-size: 1.2rem; margin-bottom: 15px; color: white; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #2a2e39; }
+        th { color: #787b86; }
+        button {
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #00d4ff;
+            margin-right: 5px;
+        }
+        .btn-win { background: rgba(0, 255, 136, 0.2); color: #00ff88; border-color: rgba(0, 255, 136, 0.3); }
+        .btn-lose { background: rgba(255, 68, 68, 0.2); color: #ff4444; border-color: rgba(255, 68, 68, 0.3); }
+        .login-box {
+            max-width: 400px;
+            margin: 100px auto;
+            background: #1e222d;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #2a2e39;
+            border: 1px solid #3a3e49;
+            border-radius: 6px;
+            color: white;
+        }
+        .login-box button {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+        }
+        .admin-content { display: none; }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <div id="loginSection" class="login-box">
+        <h2>🔐 Admin Login</h2>
+        <input type="email" id="adminEmail" placeholder="Admin Email" value="admin@luno.com">
+        <input type="password" id="adminPassword" placeholder="Password" value="admin123">
+        <button onclick="adminLogin()">Login</button>
+    </div>
+
+    <div id="adminSection" class="admin-content">
+        <h1>👑 Luno Admin Panel (Supabase)</h1>
+        
+        <div class="stats">
+            <div class="stat-card"><div class="stat-number" id="totalUsers">0</div><div>Total Users</div></div>
+            <div class="stat-card"><div class="stat-number" id="pendingTrades">0</div><div>Pending Trades</div></div>
+            <div class="stat-card"><div class="stat-number" id="pendingKYC">0</div><div>Pending KYC</div></div>
+            <div class="stat-card"><div class="stat-number" id="pendingDeposits">0</div><div>Pending Deposits</div></div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">💰 Pending Trades</div>
+            <div id="pendingTradesList">Loading...</div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">✅ Pending KYC Requests</div>
+            <div id="kycList">Loading...</div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">💰 Pending Deposits</div>
+            <div id="depositsList">Loading...</div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">💸 Pending Withdrawals</div>
+            <div id="withdrawalsList">Loading...</div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">👥 All Users</div>
+            <div id="usersList">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let adminUser = null;
+
+    async function adminLogin() {
+        const email = document.getElementById('adminEmail').value;
+        const password = document.getElementById('adminPassword').value;
+        
+        try {
+            const { user } = await supabaseClient.signIn(email, password);
+            adminUser = user;
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('adminSection').style.display = 'block';
+            loadAllData();
+            setInterval(loadAllData, 5000);
+        } catch (error) {
+            alert('Login failed: ' + error.message);
+        }
+    }
+    
+    async function loadAllData() {
+        await loadPendingTrades();
+        await loadPendingKYC();
+        await loadPendingDeposits();
+        await loadPendingWithdrawals();
+        await loadAllUsers();
+        await loadStats();
+    }
+    
+    async function loadPendingTrades() {
+        try {
+            const trades = await supabaseClient.getAllTrades();
+            const pending = trades.filter(t => t.status === 'pending');
+            const container = document.getElementById('pendingTradesList');
+            
+            if (pending.length === 0) {
+                container.innerHTML = '<p>No pending trades</p>';
+                return;
+            }
+            
+            let html = '<table><thead><tr><th>User</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Expected Return</th><th>Action</th><tr></thead><tbody>';
+            pending.forEach(trade => {
+                html += `<tr>
+                    <td>${trade.users?.email || 'N/A'}</td>
+                    <td>${trade.coin_name} (${trade.coin})</td>
+                    <td>$${trade.amount}</td>
+                    <td>${trade.duration}s</td>
+                    <td>+${trade.rate}% ($${trade.expected_profit})</td>
+                    <td>
+                        <button class="btn-win" onclick="setOutcome(${trade.id}, 'win')">WIN</button>
+                        <button class="btn-lose" onclick="setOutcome(${trade.id}, 'lose')">LOSE</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        } catch(e) { console.error(e); }
+    }
+    
+    async function setOutcome(tradeId, outcome) {
+        await supabaseClient.setTradeOutcome(tradeId, outcome);
+        alert(`Trade ${outcome.toUpperCase()}!`);
+        loadPendingTrades();
+        loadStats();
+    }
+    
+    async function loadPendingKYC() {
+        try {
+            const kycRequests = await supabaseClient.getPendingKYC();
+            const container = document.getElementById('kycList');
+            
+            if (kycRequests.length === 0) {
+                container.innerHTML = '<p>No pending KYC requests</p>';
+                return;
+            }
+            
+            let html = '<td><thead><tr><th>User</th><th>Full Name</th><th>ID Type</th><th>ID Number</th><th>Action</th></tr></thead><tbody>';
+            kycRequests.forEach(req => {
+                html += `<tr>
+                    <td>${req.users?.email || 'N/A'}</td>
+                    <td>${req.full_name}</td>
+                    <td>${req.id_type}</td>
+                    <td>${req.id_number}</td>
+                    <td><button onclick="approveKYC(${req.id}, '${req.user_id}')">Approve</button></td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        } catch(e) { console.error(e); }
+    }
+    
+    async function approveKYC(requestId, userId) {
+        await supabaseClient.approveKYC(requestId, userId);
+        alert('KYC approved!');
+        loadPendingKYC();
+        loadStats();
+    }
+    
+    async function loadPendingDeposits() {
+        try {
+            const deposits = await supabaseClient.getPendingDeposits();
+            const container = document.getElementById('depositsList');
+            
+            if (deposits.length === 0) {
+                container.innerHTML = '<p>No pending deposits</p>';
+                return;
+            }
+            
+            let html = '<table><thead><tr><th>User</th><th>Amount</th><th>Currency</th><th>Date</th><th>Action</th></tr></thead><tbody>';
+            deposits.forEach(dep => {
+                html += `<tr>
+                    <td>${dep.users?.email || 'N/A'}</td>
+                    <td>$${dep.amount}</td>
+                    <td>${dep.currency}</td>
+                    <td>${new Date(dep.created_at).toLocaleString()}</td>
+                    <td><button onclick="approveDeposit(${dep.id}, '${dep.user_id}', ${dep.amount})">Approve</button></td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        } catch(e) { console.error(e); }
+    }
+    
+    async function approveDeposit(depositId, userId, amount) {
+        await supabaseClient.approveDeposit(depositId, userId, amount);
+        alert('Deposit approved!');
+        loadPendingDeposits();
+        loadStats();
+    }
+    
+    async function loadPendingWithdrawals() {
+        try {
+            const withdrawals = await supabaseClient.getPendingWithdrawals();
+            const container = document.getElementById('withdrawalsList');
+            
+            if (withdrawals.length === 0) {
+                container.innerHTML = '<p>No pending withdrawals</p>';
+                return;
+            }
+            
+            let html = '<table><thead><tr><th>User</th><th>Amount</th><th>Address</th><th>Date</th><th>Action</th></tr></thead><tbody>';
+            withdrawals.forEach(wd => {
+                html += `<tr>
+                    <td>${wd.users?.email || 'N/A'}</td>
+                    <td>$${wd.amount}</td>
+                    <td>${wd.address.substring(0, 20)}...</td>
+                    <td>${new Date(wd.created_at).toLocaleString()}</td>
+                    <td><button onclick="approveWithdrawal(${wd.id}, '${wd.user_id}', ${wd.amount})">Approve</button></td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        } catch(e) { console.error(e); }
+    }
+    
+    async function approveWithdrawal(withdrawalId, userId, amount) {
+        await supabaseClient.approveWithdrawal(withdrawalId, userId, amount);
+        alert('Withdrawal approved!');
+        loadPendingWithdrawals();
+        loadStats();
+    }
+    
+    async function loadAllUsers() {
+        try {
+            const users = await supabaseClient.getAllUsers();
+            const container = document.getElementById('usersList');
+            
+            if (users.length === 0) {
+                container.innerHTML = '<p>No users found</p>';
+                return;
+            }
+            
+            let html = '</table><thead><tr><th>Email</th><th>Full Name</th><th>Balance</th><th>KYC Status</th><th>Joined</th></tr></thead><tbody>';
+            users.forEach(user => {
+                html += `<tr>
+                    <td>${user.email}</td>
+                    <td>${user.full_name || 'N/A'}</td>
+                    <td>$${user.balance || 0}</td>
+                    <td>${user.kyc_status || 'pending'}</td>
+                    <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        } catch(e) { console.error(e); }
+    }
+    
+    async function loadStats() {
+        try {
+            const users = await supabaseClient.getAllUsers();
+            const trades = await supabaseClient.getAllTrades();
+            const kyc = await supabaseClient.getPendingKYC();
+            const deposits = await supabaseClient.getPendingDeposits();
+            
+            document.getElementById('totalUsers').innerText = users.length;
+            document.getElementById('pendingTrades').innerText = trades.filter(t => t.status === 'pending').length;
+            document.getElementById('pendingKYC').innerText = kyc.length;
+            document.getElementById('pendingDeposits').innerText = deposits.length;
+        } catch(e) { console.error(e); }
+    }
+</script>
+</body>
+</html>
