@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - Trade</title>
-    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
@@ -17,31 +16,6 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: #131722;
             color: #d1d4dc;
-            transition: background 0.3s, color 0.3s;
-        }
-
-        body.light-mode {
-            background: #ffffff;
-            color: #1e222d;
-        }
-
-        body.light-mode .navbar,
-        body.light-mode .trade-card {
-            background: #ffffff;
-            border-color: #e0e0e0;
-        }
-
-        body.light-mode .card-header h1 {
-            color: #1e222d;
-        }
-
-        body.light-mode .coin-info,
-        body.light-mode .crypto-selector select,
-        body.light-mode .form-group input,
-        body.light-mode .return-option {
-            background: #f5f5f5;
-            border-color: #d0d0d0;
-            color: #1e222d;
         }
 
         .navbar {
@@ -93,15 +67,6 @@
             color: #00d4ff;
         }
 
-        .theme-toggle {
-            background: rgba(0, 212, 255, 0.15);
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            border: 1px solid rgba(0, 212, 255, 0.3);
-        }
-
         .logout-btn {
             background: rgba(255, 68, 68, 0.15);
             padding: 6px 16px;
@@ -138,11 +103,6 @@
             color: white;
         }
 
-        .card-header p {
-            color: #787b86;
-            font-size: 0.8rem;
-        }
-
         .trade-type {
             display: flex;
             margin: 15px 20px;
@@ -175,7 +135,6 @@
             border: 1px solid #3a3e49;
             border-radius: 8px;
             color: white;
-            cursor: pointer;
         }
 
         .coin-info {
@@ -228,11 +187,6 @@
             padding: 10px;
             text-align: center;
             cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .return-option:hover {
-            background: rgba(0, 212, 255, 0.2);
         }
 
         .return-option.selected {
@@ -275,7 +229,6 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            transition: 0.3s;
         }
 
         .btn-cancel {
@@ -284,18 +237,10 @@
             color: white;
         }
 
-        .btn-cancel:hover {
-            background: #3a3e49;
-        }
-
         .btn-confirm {
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             border: none;
             color: white;
-        }
-
-        .btn-confirm:hover {
-            transform: translateY(-1px);
         }
 
         .modal {
@@ -347,7 +292,6 @@
     </div>
     <div class="user-info">
         <span class="username" id="displayUsername">Trader</span>
-        <div class="theme-toggle" onclick="toggleTheme()">🌓 Theme</div>
         <a href="#" class="logout-btn" onclick="logout()">Logout</a>
     </div>
 </nav>
@@ -448,9 +392,9 @@
 
 <script>
     // Supabase configuration
-    const SUPABASE_URL = 'https://zvfnqldeazdjokuqfegg.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Zm5xbGRlYXpkam9rdXFmZWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDI0OTMsImV4cCI6MjA5MjcxODQ5M30.MyYRk6SPO9PfFkWlNUYdZMVbcEqUOizNMiriMuZGJ8o';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabaseUrl = 'https://zvfnqldeazdjokuqfegg.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Zm5xbGRlYXpkam9rdXFmZWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDI0OTMsImV4cCI6MjA5MjcxODQ5M30.MyYRk6SPO9PfFkWlNUYdZMVbcEqUOizNMiriMuZGJ8o';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
     let userBalance = 0;
     let userId = null;
@@ -464,42 +408,23 @@
     const coinPrices = { BTC: 65234, ETH: 3420, BNB: 580, SOL: 145, XRP: 0.62, ADA: 0.48, DOGE: 0.124, DOT: 7.25, LINK: 15.4, MATIC: 0.72, UNI: 8.15, AAVE: 98.5, SHIB: 0.000018 };
     const coinNames = { BTC: 'Bitcoin', ETH: 'Ethereum', BNB: 'Binance Coin', SOL: 'Solana', XRP: 'XRP', ADA: 'Cardano', DOGE: 'Dogecoin', DOT: 'Polkadot', LINK: 'Chainlink', MATIC: 'Polygon', UNI: 'Uniswap', AAVE: 'Aave', SHIB: 'Shiba Inu' };
 
-    // Load user balance from Supabase
+    // Load user balance
     async function loadUserBalance() {
         try {
-            console.log('Loading user balance...');
-            
-            const { data: { user }, error: userError } = await supabase.auth.getUser();
-            
-            if (userError) {
-                console.error('Auth error:', userError);
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (error || !user) {
                 window.location.href = 'index.html';
                 return;
             }
-            
-            if (!user) {
-                console.log('No user found');
-                window.location.href = 'index.html';
-                return;
-            }
-            
             userId = user.id;
-            console.log('User ID:', userId);
             
-            const { data: profile, error: profileError } = await supabase
+            const { data: profile } = await supabase
                 .from('users')
                 .select('balance, full_name')
                 .eq('id', userId)
                 .single();
             
-            if (profileError) {
-                console.error('Profile fetch error:', profileError);
-                userBalance = 0;
-            } else {
-                userBalance = profile?.balance || 0;
-                console.log('User balance loaded:', userBalance);
-            }
-            
+            userBalance = profile?.balance || 0;
             document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
             
             if (profile?.full_name) {
@@ -507,11 +432,8 @@
             } else {
                 document.getElementById('displayUsername').innerText = user.email.split('@')[0];
             }
-            
         } catch (error) {
-            console.error('Error in loadUserBalance:', error);
-            userBalance = 0;
-            document.getElementById('availableAmount').innerHTML = '0 USDT';
+            console.error('Error:', error);
         }
     }
 
@@ -601,8 +523,6 @@
     }
 
     async function confirmTrade() {
-        console.log('Confirm trade called');
-        
         const amount = parseFloat(document.getElementById('amount').value);
         
         if (isNaN(amount) || amount <= 0) {
@@ -618,37 +538,23 @@
             return;
         }
         
-        await loadUserBalance();
-        
         if (tradeType === 'buy') {
             const transactionFee = amount * 0.02;
             const totalPay = amount + transactionFee;
-            const expectedReturnAmount = amount * (selectedRate / 100);
-            
-            console.log('Balance check:', { userBalance, totalPay });
             
             if (totalPay > userBalance) {
                 alert(`Insufficient balance! You need $${totalPay.toFixed(2)} USDT but only have $${userBalance.toFixed(2)} USDT`);
                 return;
             }
             
+            // Deduct balance
             const newBalance = userBalance - totalPay;
-            
-            const { error: updateError } = await supabase
-                .from('users')
-                .update({ balance: newBalance })
-                .eq('id', userId);
-            
-            if (updateError) {
-                console.error('Balance update error:', updateError);
-                alert('Error updating balance. Please try again.');
-                return;
-            }
-            
+            await supabase.from('users').update({ balance: newBalance }).eq('id', userId);
             userBalance = newBalance;
             
+            // Create trade record
             const tradeId = Date.now();
-            const tradeData = {
+            await supabase.from('trades').insert({
                 id: tradeId,
                 user_id: userId,
                 coin: currentCoin,
@@ -656,21 +562,10 @@
                 amount: amount,
                 duration: selectedDuration,
                 rate: selectedRate,
-                expected_profit: expectedReturnAmount,
+                expected_profit: amount * (selectedRate / 100),
                 status: 'pending',
-                trade_type: 'buy',
-                created_at: new Date().toISOString()
-            };
-            
-            const { error: tradeError } = await supabase
-                .from('trades')
-                .insert(tradeData);
-            
-            if (tradeError) {
-                console.error('Trade creation error:', tradeError);
-                alert('Error creating trade. Please try again.');
-                return;
-            }
+                trade_type: 'buy'
+            });
             
             document.getElementById('modalTitle').innerHTML = '✅ TRADE PLACED!';
             document.getElementById('modalMessage').innerHTML = `Your trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s has been placed! Waiting for admin.`;
@@ -695,25 +590,9 @@
         window.location.href = 'index.html';
     }
 
-    function toggleTheme() {
-        document.body.classList.toggle('light-mode');
-        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-    }
-
-    function checkTheme() {
-        if (localStorage.getItem('theme') === 'light') {
-            document.body.classList.add('light-mode');
-        }
-    }
-
     // Initialize
-    async function init() {
-        await loadUserBalance();
-        changeCrypto();
-        checkTheme();
-    }
-    
-    init();
+    loadUserBalance();
+    changeCrypto();
 </script>
 
 </body>
