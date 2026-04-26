@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
     <style>
         * {
             margin: 0;
@@ -406,7 +408,8 @@
         }
     }
 
-    function handleLogin(event) {
+    // FIXED LOGIN FUNCTION
+    async function handleLogin(event) {
         event.preventDefault();
         
         const email = document.getElementById('email').value;
@@ -414,38 +417,91 @@
         const rememberMe = document.getElementById('rememberMe').checked;
         const errorMsg = document.getElementById('errorMsg');
         
-        const registeredUser = localStorage.getItem('lunoRegisteredUser');
+        errorMsg.style.display = 'none';
         
-        if (registeredUser) {
-            const user = JSON.parse(registeredUser);
+        if (!email || !password) {
+            errorMsg.style.display = 'block';
+            errorMsg.innerHTML = '❌ Please enter email and password';
+            return false;
+        }
+        
+        try {
+            console.log('Attempting login for:', email);
             
-            if (email === user.email && password === user.password) {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            if (error) throw error;
+            
+            if (data && data.user) {
+                console.log('Login successful:', data.user.email);
+                
+                // Get user profile from database
+                const { data: profile, error: profileError } = await supabase
+                    .from('users')
+                    .select('full_name, balance')
+                    .eq('id', data.user.id)
+                    .single();
+                
+                // Store session data
                 const sessionData = {
-                    email: email,
-                    fullName: user.fullName,
+                    uid: data.user.id,
+                    email: data.user.email,
+                    fullName: profile?.full_name || data.user.email.split('@')[0],
                     loggedIn: true,
                     loginTime: new Date().toISOString()
                 };
                 
                 if (rememberMe) {
                     localStorage.setItem('lunoUser', JSON.stringify(sessionData));
+                    console.log('Session saved to localStorage');
                 } else {
                     sessionStorage.setItem('lunoUser', JSON.stringify(sessionData));
+                    console.log('Session saved to sessionStorage');
                 }
                 
+                // Redirect to dashboard
                 window.location.href = 'dashboard.html';
-                return false;
+            }
+            
+        } catch (error) {
+            console.error('Login error:', error.message);
+            errorMsg.style.display = 'block';
+            
+            if (error.message.includes('Invalid login credentials')) {
+                errorMsg.innerHTML = '❌ Invalid email or password. Please try again.';
+            } else if (error.message.includes('Email not confirmed')) {
+                errorMsg.innerHTML = '❌ Please verify your email before logging in.';
+            } else {
+                errorMsg.innerHTML = `❌ ${error.message}`;
             }
         }
         
-        errorMsg.style.display = 'block';
-        errorMsg.innerHTML = '❌ Invalid email or password. Please try again or <a href="register.html" style="color:#00d4ff;">Sign Up</a>';
-        
-        setTimeout(() => {
-            errorMsg.style.display = 'none';
-        }, 3000);
-        
         return false;
+    }
+    
+    // Check if user is already logged in
+    async function checkExistingSession() {
+        try {
+            // Check local/session storage first
+            const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
+            if (savedUser) {
+                try {
+                    const user = JSON.parse(savedUser);
+                    if (user.loggedIn) {
+                        // Verify with Supabase
+                        const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+                        if (supabaseUser) {
+                            window.location.href = 'dashboard.html';
+                        }
+                    }
+                } catch(e) {}
+            }
+        } catch(e) {
+            console.log('Session check error:', e);
+        }
     }
     
     function handleForgotPassword() {
@@ -457,6 +513,7 @@
     }
     
     createParticles();
+    checkExistingSession();
 </script>
 
 </body>
