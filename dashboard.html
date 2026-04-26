@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
     <style>
         * {
             margin: 0;
@@ -352,6 +354,27 @@
     animate();
     window.addEventListener('resize', resizeCanvas);
     
+    // FIXED LOGOUT FUNCTION
+    async function logout() {
+        console.log('Logging out...');
+        try {
+            // Sign out from Supabase
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error('Supabase sign out error:', error);
+            }
+        } catch (e) {
+            console.error('Logout error:', e);
+        }
+        
+        // Clear local storage
+        localStorage.removeItem('lunoUser');
+        sessionStorage.removeItem('lunoUser');
+        
+        // Redirect to login page
+        window.location.href = 'index.html';
+    }
+    
     // Theme Toggle
     function toggleTheme() {
         document.body.classList.toggle('light-mode');
@@ -377,39 +400,87 @@
     }
     
     // Dashboard Functions
-    function checkAuth() {
-        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-        if (!savedUser) window.location.href = 'index.html';
-        return savedUser ? JSON.parse(savedUser) : null;
+    async function checkAuth() {
+        try {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (error || !user) {
+                console.log('No user found, redirecting to login');
+                window.location.href = 'index.html';
+                return null;
+            }
+            return user;
+        } catch (e) {
+            console.error('Auth check error:', e);
+            window.location.href = 'index.html';
+            return null;
+        }
     }
     
-    function displayUsername() {
-        const user = checkAuth();
-        if (user && user.fullName) document.getElementById('displayUsername').innerText = user.fullName.split(' ')[0];
-        else if (user && user.email) document.getElementById('displayUsername').innerText = user.email.split('@')[0];
+    async function displayUsername() {
+        const user = await checkAuth();
+        if (!user) return;
+        
+        try {
+            const { data: profile, error } = await supabase
+                .from('users')
+                .select('full_name')
+                .eq('id', user.id)
+                .single();
+            
+            if (profile && profile.full_name) {
+                document.getElementById('displayUsername').innerText = profile.full_name.split(' ')[0];
+            } else {
+                document.getElementById('displayUsername').innerText = user.email.split('@')[0];
+            }
+        } catch (e) {
+            document.getElementById('displayUsername').innerText = user.email.split('@')[0];
+        }
     }
     
-    function updateStats() {
-        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 0}');
-        document.getElementById('balance').innerText = `$${profile.balance.toLocaleString()}`;
+    async function updateStats() {
+        const user = await checkAuth();
+        if (!user) return;
         
-        const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
-        const totalTrades = history.length;
-        const wonTrades = history.filter(t => t.status === 'won').length;
-        const winRate = totalTrades > 0 ? (wonTrades / totalTrades * 100).toFixed(1) : 0;
-        
-        document.getElementById('totalTrades').innerText = totalTrades;
-        document.getElementById('winRate').innerText = winRate + '%';
-        
-        // Simulated profit today (from trades today)
-        const todayProfit = (Math.random() * 500 - 100).toFixed(2);
-        const profitElem = document.getElementById('profitToday');
-        if (todayProfit >= 0) {
-            profitElem.innerHTML = `+$${todayProfit}`;
-            profitElem.style.color = '#00ff88';
-        } else {
-            profitElem.innerHTML = `-$${Math.abs(todayProfit)}`;
-            profitElem.style.color = '#ff4444';
+        try {
+            // Get user balance
+            const { data: profile, error: profileError } = await supabase
+                .from('users')
+                .select('balance')
+                .eq('id', user.id)
+                .single();
+            
+            if (profile) {
+                document.getElementById('balance').innerText = `$${(profile.balance || 0).toLocaleString()}`;
+            }
+            
+            // Get trade statistics
+            const { data: trades, error: tradesError } = await supabase
+                .from('trades')
+                .select('*')
+                .eq('user_id', user.id);
+            
+            if (!tradesError && trades) {
+                const totalTrades = trades.length;
+                const wonTrades = trades.filter(t => t.status === 'won').length;
+                const winRate = totalTrades > 0 ? (wonTrades / totalTrades * 100).toFixed(1) : 0;
+                
+                document.getElementById('totalTrades').innerText = totalTrades;
+                document.getElementById('winRate').innerText = winRate + '%';
+            }
+            
+            // Simulated profit today (for demo)
+            const todayProfit = (Math.random() * 500 - 100).toFixed(2);
+            const profitElem = document.getElementById('profitToday');
+            if (todayProfit >= 0) {
+                profitElem.innerHTML = `+$${todayProfit}`;
+                profitElem.style.color = '#00ff88';
+            } else {
+                profitElem.innerHTML = `-$${Math.abs(todayProfit)}`;
+                profitElem.style.color = '#ff4444';
+            }
+            
+        } catch (error) {
+            console.error('Error updating stats:', error);
         }
     }
     
@@ -417,30 +488,20 @@
         window.location.href = 'trade.html'; 
     }
     
-    function logout() {
-        localStorage.removeItem('lunoUser');
-        sessionStorage.removeItem('lunoUser');
-        window.location.href = 'index.html';
+    // Initialize dashboard
+    async function init() {
+        await checkAuth();
+        await displayUsername();
+        await updateStats();
+        checkTheme();
     }
     
-    // Email notification simulation (for demo)
-    function checkForNotifications() {
-        const lastNotification = localStorage.getItem('lastDashboardNotification');
-        const now = new Date().toDateString();
-        if (lastNotification !== now) {
-            const user = checkAuth();
-            if (user && user.email) {
-                console.log(`📧 Welcome email would be sent to: ${user.email}`);
-                localStorage.setItem('lastDashboardNotification', now);
-            }
-        }
-    }
+    // Refresh stats every 30 seconds
+    setInterval(async () => {
+        await updateStats();
+    }, 30000);
     
-    displayUsername();
-    updateStats();
-    checkTheme();
-    checkForNotifications();
-    setInterval(updateStats, 10000);
+    init();
 </script>
 
 </body>
