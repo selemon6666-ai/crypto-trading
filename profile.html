@@ -171,6 +171,7 @@
         }
 
         .info-label { color: #787b86; }
+        .info-value { font-weight: 500; color: #d1d4dc; }
         .balance-amount { font-size: 2rem; font-weight: bold; color: #00ff88; margin: 15px 0; }
 
         .action-buttons {
@@ -299,14 +300,14 @@
             <div class="profile-grid">
                 <div class="profile-card">
                     <div class="card-title">👤 Personal Information</div>
-                    <div class="info-row"><span class="info-label">Full Name:</span><span id="fullName">Loading...</span></div>
-                    <div class="info-row"><span class="info-label">Email:</span><span id="email">Loading...</span></div>
-                    <div class="info-row"><span class="info-label">Member Since:</span><span id="memberSince">Loading...</span></div>
+                    <div class="info-row"><span class="info-label">Full Name:</span><span class="info-value" id="fullName">-</span></div>
+                    <div class="info-row"><span class="info-label">Email:</span><span class="info-value" id="email">-</span></div>
+                    <div class="info-row"><span class="info-label">Member Since:</span><span class="info-value" id="memberSince">-</span></div>
                 </div>
                 <div class="profile-card">
                     <div class="card-title">💰 Account Balance</div>
                     <div class="balance-amount" id="balance">$0</div>
-                    <div class="info-row"><span class="info-label">KYC Status:</span><span id="kycStatus">pending</span></div>
+                    <div class="info-row"><span class="info-label">KYC Status:</span><span class="info-value" id="kycStatus">pending</span></div>
                     <div class="action-buttons">
                         <button class="btn-deposit" onclick="window.location.href='deposit.html'">💰 Deposit</button>
                         <button class="btn-withdraw" onclick="openWithdrawModal()">💸 Withdraw Funds</button>
@@ -314,10 +315,10 @@
                 </div>
                 <div class="profile-card full-width">
                     <div class="card-title">📊 Trading Statistics</div>
-                    <div class="info-row"><span class="info-label">Total Trades:</span><span id="totalTrades">0</span></div>
-                    <div class="info-row"><span class="info-label">Win Rate:</span><span id="winRate">0%</span></div>
-                    <div class="info-row"><span class="info-label">Total Volume:</span><span id="totalVolume">$0</span></div>
-                    <div class="info-row"><span class="info-label">Total Profit:</span><span id="totalProfit">$0</span></div>
+                    <div class="info-row"><span class="info-label">Total Trades:</span><span class="info-value" id="totalTrades">0</span></div>
+                    <div class="info-row"><span class="info-label">Win Rate:</span><span class="info-value" id="winRate">0%</span></div>
+                    <div class="info-row"><span class="info-label">Total Volume:</span><span class="info-value" id="totalVolume">$0</span></div>
+                    <div class="info-row"><span class="info-label">Total Profit:</span><span class="info-value" id="totalProfit">$0</span></div>
                 </div>
             </div>
         </div>
@@ -381,66 +382,174 @@
 
 <script>
     let userId = null;
-    let userData = {};
+    let userProfile = null;
+
+    // Helper function to safely get value
+    function getValue(obj, path, defaultValue = '-') {
+        return obj?.[path] || defaultValue;
+    }
 
     async function loadUserData() {
-        const user = await supabaseClient.getCurrentUser();
-        if (user) {
+        try {
+            console.log('Loading user data...');
+            
+            // Get current authenticated user
+            const { data: { user }, error: userError } = await supabase.auth.getUser();
+            
+            if (userError) {
+                console.error('Auth error:', userError);
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            if (!user) {
+                console.log('No user found, redirecting to login');
+                window.location.href = 'index.html';
+                return;
+            }
+            
             userId = user.id;
-            const profile = await supabaseClient.getUserProfile();
-            userData = profile;
+            console.log('User ID:', userId);
             
-            document.getElementById('fullName').innerText = profile?.full_name || 'N/A';
-            document.getElementById('email').innerText = user.email;
-            document.getElementById('memberSince').innerText = new Date(profile?.created_at).toLocaleDateString() || new Date().toLocaleDateString();
-            document.getElementById('balance').innerText = `$${profile?.balance?.toLocaleString() || 0}`;
-            document.getElementById('kycStatus').innerText = profile?.kyc_status || 'pending';
-            document.getElementById('displayUsername').innerText = profile?.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'Trader';
-            document.getElementById('updateFullName').value = profile?.full_name || '';
+            // Fetch user profile from users table
+            const { data: profile, error: profileError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', userId)
+                .single();
             
+            if (profileError) {
+                console.error('Profile fetch error:', profileError);
+                // Try to create profile if not exists
+                const { error: insertError } = await supabase
+                    .from('users')
+                    .insert([{
+                        id: userId,
+                        email: user.email,
+                        full_name: user.user_metadata?.full_name || user.email.split('@')[0],
+                        balance: 0,
+                        kyc_status: 'pending'
+                    }]);
+                
+                if (insertError) {
+                    console.error('Profile creation error:', insertError);
+                } else {
+                    // Reload profile
+                    const { data: newProfile } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('id', userId)
+                        .single();
+                    userProfile = newProfile;
+                }
+            } else {
+                userProfile = profile;
+            }
+            
+            console.log('User profile:', userProfile);
+            
+            // Update UI with data
+            if (userProfile) {
+                document.getElementById('fullName').innerText = userProfile.full_name || user.email.split('@')[0];
+                document.getElementById('email').innerText = user.email;
+                document.getElementById('memberSince').innerText = userProfile.created_at ? new Date(userProfile.created_at).toLocaleDateString() : new Date().toLocaleDateString();
+                document.getElementById('balance').innerText = `$${(userProfile.balance || 0).toLocaleString()}`;
+                document.getElementById('kycStatus').innerText = userProfile.kyc_status || 'pending';
+                document.getElementById('displayUsername').innerText = (userProfile.full_name || user.email).split(' ')[0];
+                document.getElementById('updateFullName').value = userProfile.full_name || '';
+            } else {
+                document.getElementById('fullName').innerText = user.email.split('@')[0];
+                document.getElementById('email').innerText = user.email;
+                document.getElementById('memberSince').innerText = new Date().toLocaleDateString();
+                document.getElementById('balance').innerText = '$0';
+                document.getElementById('kycStatus').innerText = 'pending';
+                document.getElementById('displayUsername').innerText = user.email.split('@')[0];
+            }
+            
+            // Load trade history and stats
             await loadTradeHistory();
             await updateTradeStats();
+            
+        } catch (error) {
+            console.error('Error loading user data:', error);
+            // Show fallback data
+            document.getElementById('fullName').innerText = 'User';
+            document.getElementById('email').innerText = 'user@example.com';
+            document.getElementById('memberSince').innerText = new Date().toLocaleDateString();
+            document.getElementById('balance').innerText = '$0';
+            document.getElementById('kycStatus').innerText = 'pending';
         }
     }
 
     async function loadTradeHistory() {
-        const trades = await supabaseClient.getUserTrades();
-        const container = document.getElementById('historyTable');
-        
-        if (trades.length === 0) {
-            container.innerHTML = '<div style="text-align:center;padding:40px;">No trades yet.</div>';
-            return;
+        try {
+            const { data: trades, error } = await supabase
+                .from('trades')
+                .select('*')
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false });
+            
+            if (error) {
+                console.error('Trade history error:', error);
+                return;
+            }
+            
+            const container = document.getElementById('historyTable');
+            
+            if (!trades || trades.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:40px;">No trades yet.</div>';
+                return;
+            }
+            
+            let html = '</table><thead><tr><th>Date</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Profit</th><th>Status</th></tr></thead><tbody>';
+            trades.forEach(trade => {
+                const profitClass = (trade.profit || 0) >= 0 ? 'status-won' : 'status-lost';
+                html += `<tr>
+                    <td>${new Date(trade.created_at).toLocaleString()}</td>
+                    <td>${trade.coin_name} (${trade.coin})</td>
+                    <td>$${trade.amount}</td>
+                    <td>${trade.duration}s</td>
+                    <td class="${profitClass}">${(trade.profit || 0) >= 0 ? '+' : ''}$${trade.profit || 0}</td>
+                    <td class="${trade.status === 'won' ? 'status-won' : 'status-lost'}">${trade.status || 'pending'}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+            
+        } catch (error) {
+            console.error('Error loading trade history:', error);
         }
-        
-        let html = '<table><thead><td><th>Date</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Profit</th><th>Status</th></tr></thead><tbody>';
-        trades.forEach(trade => {
-            const profitClass = trade.profit >= 0 ? 'status-won' : 'status-lost';
-            html += `<tr>
-                <td>${new Date(trade.created_at).toLocaleString()}</td>
-                <td>${trade.coin_name} (${trade.coin})</td>
-                <td>$${trade.amount}</td>
-                <td>${trade.duration}s</td>
-                <td class="${profitClass}">${trade.profit >= 0 ? '+' : ''}$${trade.profit || 0}</td>
-                <td class="${trade.status === 'won' ? 'status-won' : 'status-lost'}">${trade.status}</td>
-            </tr>`;
-        });
-        html += '</tbody></table>';
-        container.innerHTML = html;
     }
 
     async function updateTradeStats() {
-        const trades = await supabaseClient.getUserTrades();
-        const totalTrades = trades.length;
-        const wonTrades = trades.filter(t => t.status === 'won').length;
-        const winRate = totalTrades > 0 ? (wonTrades / totalTrades * 100).toFixed(1) : 0;
-        const totalVolume = trades.reduce((sum, t) => sum + t.amount, 0);
-        const totalProfit = trades.reduce((sum, t) => sum + (t.profit || 0), 0);
-        
-        document.getElementById('totalTrades').innerText = totalTrades;
-        document.getElementById('winRate').innerText = winRate + '%';
-        document.getElementById('totalVolume').innerText = `$${totalVolume.toFixed(2)}`;
-        document.getElementById('totalProfit').innerText = `${totalProfit >= 0 ? '+' : ''}$${totalProfit.toFixed(2)}`;
-        document.getElementById('totalProfit').style.color = totalProfit >= 0 ? '#00ff88' : '#ff4444';
+        try {
+            const { data: trades, error } = await supabase
+                .from('trades')
+                .select('*')
+                .eq('user_id', userId);
+            
+            if (error) {
+                console.error('Trade stats error:', error);
+                return;
+            }
+            
+            if (!trades) return;
+            
+            const totalTrades = trades.length;
+            const wonTrades = trades.filter(t => t.status === 'won').length;
+            const winRate = totalTrades > 0 ? (wonTrades / totalTrades * 100).toFixed(1) : 0;
+            const totalVolume = trades.reduce((sum, t) => sum + (t.amount || 0), 0);
+            const totalProfit = trades.reduce((sum, t) => sum + (t.profit || 0), 0);
+            
+            document.getElementById('totalTrades').innerText = totalTrades;
+            document.getElementById('winRate').innerText = winRate + '%';
+            document.getElementById('totalVolume').innerText = `$${totalVolume.toFixed(2)}`;
+            document.getElementById('totalProfit').innerText = `${totalProfit >= 0 ? '+' : ''}$${totalProfit.toFixed(2)}`;
+            document.getElementById('totalProfit').style.color = totalProfit >= 0 ? '#00ff88' : '#ff4444';
+            
+        } catch (error) {
+            console.error('Error updating trade stats:', error);
+        }
     }
 
     async function submitKYC() {
@@ -453,25 +562,48 @@
             return;
         }
         
-        await supabaseClient.createKYCRequest({
-            user_id: userId,
-            full_name: fullName,
-            id_type: idType,
-            id_number: idNumber,
-            status: 'pending'
-        });
+        const { error } = await supabase
+            .from('kyc_requests')
+            .insert([{
+                user_id: userId,
+                full_name: fullName,
+                id_type: idType,
+                id_number: idNumber,
+                status: 'pending'
+            }]);
         
-        alert('✅ KYC verification submitted! Your verification is under review, please wait a moment.');
-        document.getElementById('kycFullName').value = '';
-        document.getElementById('idNumber').value = '';
+        if (error) {
+            console.error('KYC submission error:', error);
+            alert('Error submitting KYC. Please try again.');
+        } else {
+            alert('✅ KYC verification submitted! Your verification is under review, please wait a moment.');
+            document.getElementById('kycFullName').value = '';
+            document.getElementById('idNumber').value = '';
+            document.getElementById('kycFront').value = '';
+            document.getElementById('kycBack').value = '';
+            document.getElementById('kycSelfie').value = '';
+        }
     }
 
     async function updateProfile() {
         const newName = document.getElementById('updateFullName').value;
-        if (newName) {
-            await supabase.from('users').update({ full_name: newName }).eq('id', userId);
+        
+        if (!newName) {
+            alert('Please enter a name');
+            return;
+        }
+        
+        const { error } = await supabase
+            .from('users')
+            .update({ full_name: newName })
+            .eq('id', userId);
+        
+        if (error) {
+            console.error('Profile update error:', error);
+            alert('Error updating profile');
+        } else {
             alert('✅ Profile updated successfully!');
-            loadUserData();
+            loadUserData(); // Reload data
         }
     }
 
@@ -479,26 +611,49 @@
         const amount = parseFloat(document.getElementById('transactionAmount').value);
         const address = document.getElementById('withdrawAddress').value;
         
-        if (isNaN(amount) || amount <= 0) { alert('Enter valid amount'); return; }
-        if (!address) { alert('Enter wallet address'); return; }
-        if (amount > userData.balance) { alert('Insufficient balance!'); return; }
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+        if (!address) {
+            alert('Please enter a wallet address');
+            return;
+        }
+        if (amount > (userProfile?.balance || 0)) {
+            alert(`Insufficient balance! You have $${(userProfile?.balance || 0).toFixed(2)}`);
+            return;
+        }
         
-        await supabaseClient.createWithdrawal({
-            user_id: userId,
-            amount: amount,
-            address: address,
-            status: 'pending'
-        });
+        const { error } = await supabase
+            .from('withdrawals')
+            .insert([{
+                user_id: userId,
+                amount: amount,
+                address: address,
+                status: 'pending'
+            }]);
         
-        alert(`✅ Withdrawal request of $${amount.toFixed(2)} submitted! Your withdrawal request is under review, please wait a moment.`);
-        closeModal();
+        if (error) {
+            console.error('Withdrawal error:', error);
+            alert('Error submitting withdrawal');
+        } else {
+            alert(`✅ Withdrawal request of $${amount.toFixed(2)} submitted! Your withdrawal request is under review, please wait a moment.`);
+            closeModal();
+        }
     }
 
-    function openWithdrawModal() { document.getElementById('transactionModal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('transactionModal').style.display = 'none'; }
+    function openWithdrawModal() { 
+        document.getElementById('transactionModal').style.display = 'flex'; 
+    }
+    
+    function closeModal() { 
+        document.getElementById('transactionModal').style.display = 'none';
+        document.getElementById('transactionAmount').value = '';
+        document.getElementById('withdrawAddress').value = '';
+    }
 
     async function logout() {
-        await supabaseClient.signOut();
+        await supabase.auth.signOut();
         localStorage.removeItem('lunoUser');
         sessionStorage.removeItem('lunoUser');
         window.location.href = 'index.html';
@@ -510,27 +665,39 @@
     }
 
     function checkTheme() {
-        if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+        }
     }
 
+    // Navigation
     document.querySelectorAll('.sidebar-item').forEach(item => {
         item.addEventListener('click', () => {
             const page = item.getAttribute('data-page');
             document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
+            
             document.getElementById('profilePage').style.display = 'none';
             document.getElementById('historyPage').style.display = 'none';
             document.getElementById('kycPage').style.display = 'none';
             document.getElementById('updatePage').style.display = 'none';
             document.getElementById('supportPage').style.display = 'none';
-            if (page === 'profile') document.getElementById('profilePage').style.display = 'block';
-            if (page === 'history') { document.getElementById('historyPage').style.display = 'block'; loadTradeHistory(); }
+            
+            if (page === 'profile') {
+                document.getElementById('profilePage').style.display = 'block';
+                loadUserData();
+            }
+            if (page === 'history') { 
+                document.getElementById('historyPage').style.display = 'block'; 
+                loadTradeHistory(); 
+            }
             if (page === 'kyc') document.getElementById('kycPage').style.display = 'block';
             if (page === 'update') document.getElementById('updatePage').style.display = 'block';
             if (page === 'support') document.getElementById('supportPage').style.display = 'block';
         });
     });
 
+    // Initialize
     loadUserData();
     checkTheme();
 </script>
