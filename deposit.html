@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - Deposit</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
     <style>
         * {
             margin: 0;
@@ -66,6 +68,15 @@
             color: #00d4ff;
         }
 
+        .theme-toggle {
+            background: rgba(0, 212, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
         .logout-btn {
             background: rgba(255, 68, 68, 0.15);
             padding: 6px 16px;
@@ -74,10 +85,6 @@
             cursor: pointer;
             color: #ff4444;
             font-size: 0.85rem;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 68, 68, 0.3);
         }
 
         .main-content {
@@ -106,7 +113,6 @@
             color: white;
         }
 
-        /* Address Sections */
         .address-section {
             padding: 20px;
             border-bottom: 1px solid #2a2e39;
@@ -127,7 +133,6 @@
             word-break: break-all;
             font-family: monospace;
             font-size: 0.8rem;
-            color: #d1d4dc;
             border: 1px solid #3a3e49;
         }
 
@@ -139,14 +144,8 @@
             cursor: pointer;
             color: white;
             font-size: 0.8rem;
-            transition: 0.3s;
         }
 
-        .copy-btn:hover {
-            transform: translateY(-1px);
-        }
-
-        /* Form Section */
         .form-section {
             padding: 20px;
         }
@@ -169,31 +168,15 @@
             border: 1px solid #3a3e49;
             border-radius: 8px;
             color: white;
-            font-size: 0.9rem;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #00d4ff;
         }
 
         .file-input {
+            width: 100%;
             padding: 10px;
             background: #2a2e39;
             border: 1px solid #3a3e49;
             border-radius: 8px;
             color: white;
-            width: 100%;
-        }
-
-        .file-input::-webkit-file-upload-button {
-            background: linear-gradient(135deg, #00d4ff, #7c3aed);
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-            margin-right: 10px;
         }
 
         .submit-btn {
@@ -205,13 +188,7 @@
             font-weight: bold;
             cursor: pointer;
             color: white;
-            font-size: 0.9rem;
             margin-top: 10px;
-            transition: 0.3s;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
         }
 
         .info-text {
@@ -240,20 +217,9 @@
             border-radius: 12px;
             width: 360px;
             text-align: center;
-            border: 1px solid #2a2e39;
         }
 
-        .modal-content h3 {
-            color: #00ff88;
-            margin-bottom: 12px;
-        }
-
-        .modal-content p {
-            margin-bottom: 15px;
-            line-height: 1.5;
-            font-size: 0.9rem;
-        }
-
+        .modal-content h3 { color: #00ff88; margin-bottom: 12px; }
         .modal-btn {
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             border: none;
@@ -261,22 +227,12 @@
             border-radius: 8px;
             color: white;
             cursor: pointer;
+            margin-top: 15px;
         }
 
         @media (max-width: 768px) {
-            .navbar {
-                padding: 12px 20px;
-                flex-direction: column;
-                gap: 12px;
-            }
-            .nav-links {
-                gap: 20px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .main-content {
-                padding: 15px;
-            }
+            .navbar { padding: 12px 20px; flex-direction: column; gap: 12px; }
+            .nav-links { gap: 20px; flex-wrap: wrap; justify-content: center; }
         }
     </style>
 </head>
@@ -292,6 +248,7 @@
     </div>
     <div class="user-info">
         <span class="username" id="displayUsername">Trader</span>
+        <div class="theme-toggle" onclick="toggleTheme()">🌓 Theme</div>
         <a href="#" class="logout-btn" onclick="logout()">Logout</a>
     </div>
 </nav>
@@ -302,28 +259,24 @@
             <h1>💰 Deposit Funds</h1>
         </div>
 
-        <!-- ETH Address -->
         <div class="address-section">
             <div class="address-title">🔷 ETH</div>
             <div class="address-box" id="ethAddress">Loading...</div>
             <button class="copy-btn" onclick="copyAddress('eth')">📋 Copy Address</button>
         </div>
 
-        <!-- BTC Address -->
         <div class="address-section">
             <div class="address-title">₿ BTC</div>
             <div class="address-box" id="btcAddress">Loading...</div>
             <button class="copy-btn" onclick="copyAddress('btc')">📋 Copy Address</button>
         </div>
 
-        <!-- USDT Address -->
         <div class="address-section">
             <div class="address-title">💎 USDT (ERC-20)</div>
             <div class="address-box" id="usdtAddress">Loading...</div>
             <button class="copy-btn" onclick="copyAddress('usdt')">📋 Copy Address</button>
         </div>
 
-        <!-- Deposit Form -->
         <div class="form-section">
             <div class="form-group">
                 <label>Amount (USDT)</label>
@@ -345,7 +298,6 @@
             </div>
 
             <button class="submit-btn" onclick="submitDeposit()">📤 Submit Deposit Request</button>
-            
             <div class="info-text">⚠️ Your deposit will be approved after reviewing. Please upload valid proof of payment.</div>
         </div>
     </div>
@@ -360,13 +312,17 @@
 </div>
 
 <script>
-    // Load deposit addresses from localStorage (set by admin)
-    function loadDepositAddresses() {
-        const addresses = JSON.parse(localStorage.getItem('depositAddresses') || '{}');
+    let userId = null;
+
+    async function loadDepositAddresses() {
+        const addresses = await supabaseClient.getDepositAddresses();
+        const ethAddr = addresses.find(a => a.currency === 'ETH');
+        const btcAddr = addresses.find(a => a.currency === 'BTC');
+        const usdtAddr = addresses.find(a => a.currency === 'USDT');
         
-        document.getElementById('ethAddress').innerHTML = addresses.eth || '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
-        document.getElementById('btcAddress').innerHTML = addresses.btc || 'bc1q7nzqm4jxkhit6jwy4de2g50';
-        document.getElementById('usdtAddress').innerHTML = addresses.usdt || '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
+        document.getElementById('ethAddress').innerHTML = ethAddr?.address || '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
+        document.getElementById('btcAddress').innerHTML = btcAddr?.address || 'bc1q7nzqm4jxkhit6jwy4de2g50';
+        document.getElementById('usdtAddress').innerHTML = usdtAddr?.address || '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
     }
 
     function copyAddress(type) {
@@ -374,61 +330,31 @@
         if (type === 'eth') address = document.getElementById('ethAddress').innerText;
         if (type === 'btc') address = document.getElementById('btcAddress').innerText;
         if (type === 'usdt') address = document.getElementById('usdtAddress').innerText;
-        
-        navigator.clipboard.writeText(address).then(() => {
-            alert(`✅ ${type.toUpperCase()} address copied to clipboard!`);
-        });
+        navigator.clipboard.writeText(address).then(() => alert(`✅ ${type.toUpperCase()} address copied!`));
     }
 
-    function submitDeposit() {
+    async function submitDeposit() {
         const amount = parseFloat(document.getElementById('depositAmount').value);
         const currency = document.getElementById('depositCurrency').value;
         const fileInput = document.getElementById('paymentProof');
         
-        if (isNaN(amount) || amount <= 0) {
-            alert('Please enter a valid amount');
-            return;
-        }
+        if (isNaN(amount) || amount <= 0) { alert('Please enter a valid amount'); return; }
+        if (fileInput.files.length === 0) { alert('Please upload proof of payment'); return; }
         
-        if (fileInput.files.length === 0) {
-            alert('Please upload proof of payment');
-            return;
-        }
+        const user = await supabaseClient.getCurrentUser();
+        if (!user) { alert('Please login'); return; }
         
-        // Get user info
-        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-        let userEmail = 'User';
-        let userName = 'User';
-        if (savedUser) {
-            try {
-                const user = JSON.parse(savedUser);
-                userEmail = user.email || userEmail;
-                userName = user.fullName || userName;
-            } catch(e) {}
-        }
-        
-        // Create deposit request
-        const depositRequest = {
-            id: Date.now(),
-            userEmail: userEmail,
-            userName: userName,
+        await supabaseClient.createDeposit({
+            user_id: user.id,
             amount: amount,
             currency: currency,
-            status: 'pending',
-            date: new Date().toLocaleString(),
-            proofFileName: fileInput.files[0].name
-        };
+            proof_url: fileInput.files[0].name,
+            status: 'pending'
+        });
         
-        // Save to localStorage
-        const depositRequests = JSON.parse(localStorage.getItem('depositRequests') || '[]');
-        depositRequests.push(depositRequest);
-        localStorage.setItem('depositRequests', JSON.stringify(depositRequests));
-        
-        // Show success modal
         document.getElementById('modalMessage').innerHTML = `Deposit request of $${amount.toFixed(2)} ${currency} submitted!<br><br>Your deposit is under review, please wait a moment.`;
         document.getElementById('successModal').style.display = 'flex';
         
-        // Reset form
         document.getElementById('depositAmount').value = '';
         document.getElementById('paymentProof').value = '';
     }
@@ -438,31 +364,40 @@
         window.location.href = 'profile.html';
     }
 
-    function checkAuth() {
-        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-        if (!savedUser) {
-            window.location.href = 'index.html';
-        }
-        return savedUser ? JSON.parse(savedUser) : null;
-    }
-
-    function displayUsername() {
-        const user = checkAuth();
-        if (user && user.fullName) {
-            document.getElementById('displayUsername').innerText = user.fullName.split(' ')[0];
-        } else if (user && user.email) {
-            document.getElementById('displayUsername').innerText = user.email.split('@')[0];
-        }
-    }
-
-    function logout() {
+    async function logout() {
+        await supabaseClient.signOut();
         localStorage.removeItem('lunoUser');
         sessionStorage.removeItem('lunoUser');
         window.location.href = 'index.html';
     }
 
+    async function displayUsername() {
+        const user = await supabaseClient.getCurrentUser();
+        if (user) {
+            const profile = await supabaseClient.getUserProfile();
+            document.getElementById('displayUsername').innerText = profile?.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'Trader';
+        }
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('light-mode');
+        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    }
+
+    function checkTheme() {
+        if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+    }
+
+    async function checkAuth() {
+        const user = await supabaseClient.getCurrentUser();
+        if (!user) window.location.href = 'index.html';
+        userId = user.id;
+    }
+
+    checkAuth();
     displayUsername();
     loadDepositAddresses();
+    checkTheme();
 </script>
 
 </body>
