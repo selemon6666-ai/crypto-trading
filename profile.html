@@ -85,6 +85,11 @@
             cursor: pointer;
             color: #ff4444;
             font-size: 0.85rem;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 68, 68, 0.3);
         }
 
         .main-container {
@@ -384,79 +389,60 @@
     let userId = null;
     let userProfile = null;
 
-    // Helper function to safely get value
-    function getValue(obj, path, defaultValue = '-') {
-        return obj?.[path] || defaultValue;
+    // LOGOUT FUNCTION - FIXED
+    async function logout() {
+        console.log('Logging out...');
+        try {
+            // Sign out from Supabase
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error('Supabase sign out error:', error);
+            }
+        } catch (e) {
+            console.error('Logout error:', e);
+        }
+        
+        // Clear local storage
+        localStorage.removeItem('lunoUser');
+        sessionStorage.removeItem('lunoUser');
+        
+        // Redirect to login page
+        window.location.href = 'index.html';
     }
 
     async function loadUserData() {
         try {
             console.log('Loading user data...');
             
-            // Get current authenticated user
             const { data: { user }, error: userError } = await supabase.auth.getUser();
             
-            if (userError) {
-                console.error('Auth error:', userError);
-                window.location.href = 'index.html';
-                return;
-            }
-            
-            if (!user) {
+            if (userError || !user) {
                 console.log('No user found, redirecting to login');
                 window.location.href = 'index.html';
                 return;
             }
             
             userId = user.id;
-            console.log('User ID:', userId);
             
-            // Fetch user profile from users table
             const { data: profile, error: profileError } = await supabase
                 .from('users')
                 .select('*')
                 .eq('id', userId)
                 .single();
             
-            if (profileError) {
+            if (profileError && profileError.code !== 'PGRST116') {
                 console.error('Profile fetch error:', profileError);
-                // Try to create profile if not exists
-                const { error: insertError } = await supabase
-                    .from('users')
-                    .insert([{
-                        id: userId,
-                        email: user.email,
-                        full_name: user.user_metadata?.full_name || user.email.split('@')[0],
-                        balance: 0,
-                        kyc_status: 'pending'
-                    }]);
-                
-                if (insertError) {
-                    console.error('Profile creation error:', insertError);
-                } else {
-                    // Reload profile
-                    const { data: newProfile } = await supabase
-                        .from('users')
-                        .select('*')
-                        .eq('id', userId)
-                        .single();
-                    userProfile = newProfile;
-                }
-            } else {
-                userProfile = profile;
             }
             
-            console.log('User profile:', userProfile);
-            
-            // Update UI with data
-            if (userProfile) {
-                document.getElementById('fullName').innerText = userProfile.full_name || user.email.split('@')[0];
+            if (profile) {
+                userProfile = profile;
+                document.getElementById('fullName').innerText = profile.full_name || user.email.split('@')[0];
                 document.getElementById('email').innerText = user.email;
-                document.getElementById('memberSince').innerText = userProfile.created_at ? new Date(userProfile.created_at).toLocaleDateString() : new Date().toLocaleDateString();
-                document.getElementById('balance').innerText = `$${(userProfile.balance || 0).toLocaleString()}`;
-                document.getElementById('kycStatus').innerText = userProfile.kyc_status || 'pending';
-                document.getElementById('displayUsername').innerText = (userProfile.full_name || user.email).split(' ')[0];
-                document.getElementById('updateFullName').value = userProfile.full_name || '';
+                document.getElementById('memberSince').innerText = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : new Date().toLocaleDateString();
+                document.getElementById('balance').innerText = `$${(profile.balance || 0).toLocaleString()}`;
+                document.getElementById('kycStatus').innerText = profile.kyc_status || 'pending';
+                document.getElementById('displayUsername').innerText = (profile.full_name || user.email).split(' ')[0];
+                document.getElementById('updateFullName').value = profile.full_name || '';
             } else {
                 document.getElementById('fullName').innerText = user.email.split('@')[0];
                 document.getElementById('email').innerText = user.email;
@@ -466,18 +452,11 @@
                 document.getElementById('displayUsername').innerText = user.email.split('@')[0];
             }
             
-            // Load trade history and stats
             await loadTradeHistory();
             await updateTradeStats();
             
         } catch (error) {
             console.error('Error loading user data:', error);
-            // Show fallback data
-            document.getElementById('fullName').innerText = 'User';
-            document.getElementById('email').innerText = 'user@example.com';
-            document.getElementById('memberSince').innerText = new Date().toLocaleDateString();
-            document.getElementById('balance').innerText = '$0';
-            document.getElementById('kycStatus').innerText = 'pending';
         }
     }
 
@@ -489,10 +468,7 @@
                 .eq('user_id', userId)
                 .order('created_at', { ascending: false });
             
-            if (error) {
-                console.error('Trade history error:', error);
-                return;
-            }
+            if (error) throw error;
             
             const container = document.getElementById('historyTable');
             
@@ -501,19 +477,19 @@
                 return;
             }
             
-            let html = '</table><thead><tr><th>Date</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Profit</th><th>Status</th></tr></thead><tbody>';
+            let html = '<table><thead><tr><th>Date</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Profit</th><th>Status</th></tr></thead><tbody>';
             trades.forEach(trade => {
                 const profitClass = (trade.profit || 0) >= 0 ? 'status-won' : 'status-lost';
                 html += `<tr>
                     <td>${new Date(trade.created_at).toLocaleString()}</td>
-                    <td>${trade.coin_name} (${trade.coin})</td>
+                    <td>${trade.coin_name} (${trade.coin})<td>
                     <td>$${trade.amount}</td>
                     <td>${trade.duration}s</td>
                     <td class="${profitClass}">${(trade.profit || 0) >= 0 ? '+' : ''}$${trade.profit || 0}</td>
                     <td class="${trade.status === 'won' ? 'status-won' : 'status-lost'}">${trade.status || 'pending'}</td>
                 </tr>`;
             });
-            html += '</tbody></table>';
+            html += '</tbody></td>';
             container.innerHTML = html;
             
         } catch (error) {
@@ -528,10 +504,7 @@
                 .select('*')
                 .eq('user_id', userId);
             
-            if (error) {
-                console.error('Trade stats error:', error);
-                return;
-            }
+            if (error) throw error;
             
             if (!trades) return;
             
@@ -603,7 +576,7 @@
             alert('Error updating profile');
         } else {
             alert('✅ Profile updated successfully!');
-            loadUserData(); // Reload data
+            loadUserData();
         }
     }
 
@@ -652,13 +625,6 @@
         document.getElementById('withdrawAddress').value = '';
     }
 
-    async function logout() {
-        await supabase.auth.signOut();
-        localStorage.removeItem('lunoUser');
-        sessionStorage.removeItem('lunoUser');
-        window.location.href = 'index.html';
-    }
-
     function toggleTheme() {
         document.body.classList.toggle('light-mode');
         localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
@@ -670,7 +636,6 @@
         }
     }
 
-    // Navigation
     document.querySelectorAll('.sidebar-item').forEach(item => {
         item.addEventListener('click', () => {
             const page = item.getAttribute('data-page');
@@ -697,7 +662,6 @@
         });
     });
 
-    // Initialize
     loadUserData();
     checkTheme();
 </script>
