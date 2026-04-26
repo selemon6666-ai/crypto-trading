@@ -313,12 +313,12 @@
         </div>
 
         <div class="trade-type">
-            <div class="trade-type-btn buy active" onclick="setTradeType('buy')">BUY</div>
-            <div class="trade-type-btn sell" onclick="setTradeType('sell')">SELL</div>
+            <div class="trade-type-btn buy active" id="buyBtn">BUY</div>
+            <div class="trade-type-btn sell" id="sellBtn">SELL</div>
         </div>
 
         <div class="crypto-selector">
-            <select id="cryptoSelect" onchange="changeCrypto()">
+            <select id="cryptoSelect">
                 <optgroup label="💰 Large Cap">
                     <option value="BTC">Bitcoin (BTC)</option>
                     <option value="ETH">Ethereum (ETH)</option>
@@ -354,7 +354,7 @@
         <div class="form-section">
             <div class="form-group">
                 <label>Amount (USDT)</label>
-                <input type="number" id="amount" placeholder="Enter amount to trade" oninput="calculateReturn()">
+                <input type="number" id="amount" placeholder="Enter amount to trade">
             </div>
 
             <label style="display: block; margin-bottom: 8px; color: #787b86;">Select Duration</label>
@@ -385,8 +385,8 @@
         </div>
 
         <div class="action-buttons">
-            <button class="btn-cancel" onclick="cancelTrade()">Cancel</button>
-            <button class="btn-confirm" onclick="confirmTrade()">Confirm Trade</button>
+            <button class="btn-cancel" id="cancelBtn">Cancel</button>
+            <button class="btn-confirm" id="confirmBtn">Confirm Trade</button>
         </div>
     </div>
 </div>
@@ -395,15 +395,15 @@
     <div class="modal-content">
         <h3 id="modalTitle">Trade Result</h3>
         <p id="modalMessage">Processing your trade...</p>
-        <button class="modal-btn" onclick="closeModal()">OK</button>
+        <button class="modal-btn" id="closeModalBtn">OK</button>
     </div>
 </div>
 
 <script>
-    // Supabase configuration
-    const supabaseUrl = 'https://zvfnqldeazdjokuqfegg.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Zm5xbGRlYXpkam9rdXFmZWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDI0OTMsImV4cCI6MjA5MjcxODQ5M30.MyYRk6SPO9PfFkWlNUYdZMVbcEqUOizNMiriMuZGJ8o';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    // Supabase configuration (using different variable name to avoid conflict)
+    const SUPABASE_URL = 'https://zvfnqldeazdjokuqfegg.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Zm5xbGRlYXpkam9rdXFmZWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDI0OTMsImV4cCI6MjA5MjcxODQ5M30.MyYRk6SPO9PfFkWlNUYdZMVbcEqUOizNMiriMuZGJ8o';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let userBalance = 0;
     let userId = null;
@@ -425,17 +425,17 @@
         LINK: 'Chainlink', MATIC: 'Polygon', UNI: 'Uniswap', AAVE: 'Aave', SHIB: 'Shiba Inu'
     };
 
-    // Load user balance from Supabase
+    // Load user balance
     async function loadUserBalance() {
         try {
-            const { data: { user }, error } = await supabase.auth.getUser();
+            const { data: { user }, error } = await supabaseClient.auth.getUser();
             if (error || !user) {
                 window.location.href = 'index.html';
                 return;
             }
             userId = user.id;
             
-            const { data: profile } = await supabase
+            const { data: profile } = await supabaseClient
                 .from('users')
                 .select('balance, full_name')
                 .eq('id', userId)
@@ -450,28 +450,8 @@
                 document.getElementById('displayUsername').innerText = user.email.split('@')[0];
             }
         } catch (error) {
-            console.error('Error loading user:', error);
+            console.error('Error:', error);
         }
-    }
-
-    // Set up duration click handlers
-    function setupDurationHandlers() {
-        const durationOptions = document.querySelectorAll('.return-option');
-        durationOptions.forEach(option => {
-            option.addEventListener('click', function(e) {
-                e.stopPropagation();
-                // Remove selected class from all
-                durationOptions.forEach(opt => opt.classList.remove('selected'));
-                // Add selected class to clicked
-                this.classList.add('selected');
-                // Store values
-                selectedDuration = parseInt(this.getAttribute('data-time'));
-                selectedRate = parseInt(this.getAttribute('data-rate'));
-                selectedMinAmount = parseInt(this.getAttribute('data-min'));
-                // Recalculate
-                calculateReturn();
-            });
-        });
     }
 
     function changeCrypto() {
@@ -492,8 +472,8 @@
 
     function setTradeType(type) {
         tradeType = type;
-        const buyBtn = document.querySelector('.trade-type-btn.buy');
-        const sellBtn = document.querySelector('.trade-type-btn.sell');
+        const buyBtn = document.getElementById('buyBtn');
+        const sellBtn = document.getElementById('sellBtn');
         if (type === 'buy') {
             buyBtn.classList.add('active');
             sellBtn.classList.remove('active');
@@ -578,12 +558,12 @@
             
             // Update balance
             const newBalance = userBalance - totalPay;
-            await supabase.from('users').update({ balance: newBalance }).eq('id', userId);
+            await supabaseClient.from('users').update({ balance: newBalance }).eq('id', userId);
             userBalance = newBalance;
             
             // Create trade record
             const tradeId = Date.now();
-            await supabase.from('trades').insert({
+            await supabaseClient.from('trades').insert({
                 id: tradeId,
                 user_id: userId,
                 coin: currentCoin,
@@ -613,19 +593,53 @@
     }
 
     async function logout() {
-        await supabase.auth.signOut();
+        await supabaseClient.auth.signOut();
         localStorage.removeItem('lunoUser');
         sessionStorage.removeItem('lunoUser');
         window.location.href = 'index.html';
     }
 
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Trade page loaded');
-        loadUserBalance();
+    // Set up event listeners
+    function setupEventListeners() {
+        // Buy/Sell buttons
+        document.getElementById('buyBtn').addEventListener('click', () => setTradeType('buy'));
+        document.getElementById('sellBtn').addEventListener('click', () => setTradeType('sell'));
+        
+        // Cancel and Confirm buttons
+        document.getElementById('cancelBtn').addEventListener('click', cancelTrade);
+        document.getElementById('confirmBtn').addEventListener('click', confirmTrade);
+        
+        // Close modal button
+        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+        
+        // Crypto select
+        document.getElementById('cryptoSelect').addEventListener('change', changeCrypto);
+        
+        // Amount input
+        document.getElementById('amount').addEventListener('input', calculateReturn);
+        
+        // Duration options
+        const durationOptions = document.querySelectorAll('.return-option');
+        durationOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                durationOptions.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedDuration = parseInt(this.getAttribute('data-time'));
+                selectedRate = parseInt(this.getAttribute('data-rate'));
+                selectedMinAmount = parseInt(this.getAttribute('data-min'));
+                calculateReturn();
+            });
+        });
+    }
+
+    // Initialize
+    async function init() {
+        await loadUserBalance();
         changeCrypto();
-        setupDurationHandlers();
-    });
+        setupEventListeners();
+    }
+    
+    init();
 </script>
 
 </body>
