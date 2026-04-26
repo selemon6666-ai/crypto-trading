@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - My Profile</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
     <style>
         * {
             margin: 0;
@@ -66,6 +68,15 @@
             color: #00d4ff;
         }
 
+        .theme-toggle {
+            background: rgba(0, 212, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
         .logout-btn {
             background: rgba(255, 68, 68, 0.15);
             padding: 6px 16px;
@@ -76,14 +87,10 @@
             font-size: 0.85rem;
         }
 
-        .logout-btn:hover {
-            background: rgba(255, 68, 68, 0.3);
-        }
-
         .main-container {
             display: flex;
-            margin-top: 60px;
-            min-height: calc(100vh - 60px);
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
         }
 
         .sidebar {
@@ -92,7 +99,7 @@
             border-right: 1px solid #2a2e39;
             padding: 20px 0;
             position: fixed;
-            height: calc(100vh - 60px);
+            height: calc(100vh - 70px);
             overflow-y: auto;
         }
 
@@ -164,7 +171,6 @@
         }
 
         .info-label { color: #787b86; }
-        .info-value { font-weight: 500; color: #d1d4dc; }
         .balance-amount { font-size: 2rem; font-weight: bold; color: #00ff88; margin: 15px 0; }
 
         .action-buttons {
@@ -186,50 +192,23 @@
         .btn-save { background: linear-gradient(135deg, #00d4ff, #7c3aed); color: white; }
 
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 6px; color: #787b86; font-size: 0.8rem; }
+        .form-group label { display: block; margin-bottom: 6px; color: #787b86; }
         .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px 12px;
-            background: #2a2e39;
-            border: 1px solid #3a3e49;
-            border-radius: 8px;
-            color: white;
-        }
-
-        /* File input styling */
-        .file-input {
             width: 100%;
             padding: 10px;
             background: #2a2e39;
             border: 1px solid #3a3e49;
             border-radius: 8px;
             color: white;
-            cursor: pointer;
         }
 
-        .file-input::-webkit-file-upload-button {
-            background: linear-gradient(135deg, #00d4ff, #7c3aed);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-
-        .image-preview {
-            max-width: 100%;
-            max-height: 150px;
-            margin-top: 10px;
+        .file-input {
+            padding: 10px;
+            background: #2a2e39;
+            border: 1px solid #3a3e49;
             border-radius: 8px;
-            display: none;
-        }
-
-        .info-text {
-            font-size: 0.7rem;
-            color: #787b86;
-            margin-top: 10px;
-            text-align: center;
+            color: white;
+            width: 100%;
         }
 
         .modal {
@@ -251,7 +230,6 @@
             border-radius: 12px;
             width: 380px;
             text-align: center;
-            border: 1px solid #2a2e39;
         }
 
         .modal-content input {
@@ -270,20 +248,12 @@
             margin-top: 15px;
         }
 
-        .modal-buttons button {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
         .btn-confirm { background: linear-gradient(135deg, #00d4ff, #7c3aed); border: none; color: white; }
         .btn-cancel { background: #2a2e39; border: 1px solid #3a3e49; color: white; }
 
         .history-table { overflow-x: auto; }
         .history-table table { width: 100%; border-collapse: collapse; }
-        .history-table th, .history-table td { padding: 12px; text-align: left; border-bottom: 1px solid #2a2e39; }
-        .history-table th { color: #787b86; font-weight: 500; }
+        .history-table th, .history-table td { padding: 10px; text-align: left; border-bottom: 1px solid #2a2e39; }
 
         .status-won { color: #00ff88; }
         .status-lost { color: #ff4444; }
@@ -294,7 +264,6 @@
             .content-area { margin-left: 80px; padding: 20px; }
             .profile-grid { grid-template-columns: 1fr; }
             .profile-card.full-width { grid-column: span 1; }
-            .action-buttons { flex-direction: column; }
         }
     </style>
 </head>
@@ -310,6 +279,7 @@
     </div>
     <div class="user-info">
         <span class="username" id="displayUsername">Trader</span>
+        <div class="theme-toggle" onclick="toggleTheme()">🌓 Theme</div>
         <a href="#" class="logout-btn" onclick="logout()">Logout</a>
     </div>
 </nav>
@@ -325,18 +295,18 @@
 
     <div class="content-area">
         <div id="profilePage" class="page-content">
-            <div class="page-header"><h1>Profile</h1><p>View your personal information and account status</p></div>
+            <div class="page-header"><h1>Profile</h1><p>View your personal information</p></div>
             <div class="profile-grid">
                 <div class="profile-card">
                     <div class="card-title">👤 Personal Information</div>
-                    <div class="info-row"><span class="info-label">Full Name:</span><span class="info-value" id="fullName">Loading...</span></div>
-                    <div class="info-row"><span class="info-label">Email:</span><span class="info-value" id="email">Loading...</span></div>
-                    <div class="info-row"><span class="info-label">Member Since:</span><span class="info-value" id="memberSince">Loading...</span></div>
+                    <div class="info-row"><span class="info-label">Full Name:</span><span id="fullName">Loading...</span></div>
+                    <div class="info-row"><span class="info-label">Email:</span><span id="email">Loading...</span></div>
+                    <div class="info-row"><span class="info-label">Member Since:</span><span id="memberSince">Loading...</span></div>
                 </div>
                 <div class="profile-card">
                     <div class="card-title">💰 Account Balance</div>
                     <div class="balance-amount" id="balance">$0</div>
-                    <div class="info-row"><span class="info-label">KYC Status:</span><span class="info-value" id="kycStatus">pending</span></div>
+                    <div class="info-row"><span class="info-label">KYC Status:</span><span id="kycStatus">pending</span></div>
                     <div class="action-buttons">
                         <button class="btn-deposit" onclick="window.location.href='deposit.html'">💰 Deposit</button>
                         <button class="btn-withdraw" onclick="openWithdrawModal()">💸 Withdraw Funds</button>
@@ -344,75 +314,38 @@
                 </div>
                 <div class="profile-card full-width">
                     <div class="card-title">📊 Trading Statistics</div>
-                    <div class="info-row"><span class="info-label">Total Trades:</span><span class="info-value" id="totalTrades">0</span></div>
-                    <div class="info-row"><span class="info-label">Win Rate:</span><span class="info-value" id="winRate">0%</span></div>
-                    <div class="info-row"><span class="info-label">Total Volume:</span><span class="info-value" id="totalVolume">$0</span></div>
-                    <div class="info-row"><span class="info-label">Total Profit:</span><span class="info-value" id="totalProfit">$0</span></div>
+                    <div class="info-row"><span class="info-label">Total Trades:</span><span id="totalTrades">0</span></div>
+                    <div class="info-row"><span class="info-label">Win Rate:</span><span id="winRate">0%</span></div>
+                    <div class="info-row"><span class="info-label">Total Volume:</span><span id="totalVolume">$0</span></div>
+                    <div class="info-row"><span class="info-label">Total Profit:</span><span id="totalProfit">$0</span></div>
                 </div>
             </div>
         </div>
 
         <div id="historyPage" class="page-content" style="display: none;">
-            <div class="page-header"><h1>Trade History</h1><p>View all your past trades</p></div>
+            <div class="page-header"><h1>Trade History</h1></div>
             <div class="profile-card full-width">
                 <div class="card-title">📜 All Trades</div>
                 <div class="history-table" id="historyTable"></div>
             </div>
         </div>
 
-        <!-- KYC Page with File Upload -->
         <div id="kycPage" class="page-content" style="display: none;">
-            <div class="page-header"><h1>KYC Verification</h1><p>Verify your identity to unlock full trading features</p></div>
+            <div class="page-header"><h1>KYC Verification</h1></div>
             <div class="profile-card">
                 <div class="card-title">✅ Identity Verification</div>
-                
-                <div class="form-group">
-                    <label>Full Name (as on ID)</label>
-                    <input type="text" id="kycFullName" placeholder="Enter your full name as on ID">
-                </div>
-                
-                <div class="form-group">
-                    <label>ID Type</label>
-                    <select id="idType">
-                        <option value="passport">Passport</option>
-                        <option value="drivers">Driver's License</option>
-                        <option value="national">National ID Card</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>ID Number</label>
-                    <input type="text" id="idNumber" placeholder="Enter your ID number">
-                </div>
-                
-                <div class="form-group">
-                    <label>📎 Upload ID Document (Front Side)</label>
-                    <input type="file" id="kycFileFront" accept="image/*" class="file-input" onchange="previewImage(this, 'frontPreview')">
-                    <img id="frontPreview" class="image-preview" alt="Front ID Preview">
-                </div>
-                
-                <div class="form-group">
-                    <label>📎 Upload ID Document (Back Side)</label>
-                    <input type="file" id="kycFileBack" accept="image/*" class="file-input" onchange="previewImage(this, 'backPreview')">
-                    <img id="backPreview" class="image-preview" alt="Back ID Preview">
-                </div>
-                
-                <div class="form-group">
-                    <label>📎 Upload Selfie with ID</label>
-                    <input type="file" id="kycSelfie" accept="image/*" class="file-input" onchange="previewImage(this, 'selfiePreview')">
-                    <img id="selfiePreview" class="image-preview" alt="Selfie Preview">
-                </div>
-                
+                <div class="form-group"><label>Full Name (as on ID)</label><input type="text" id="kycFullName"></div>
+                <div class="form-group"><label>ID Type</label><select id="idType"><option>Passport</option><option>Driver's License</option><option>National ID</option></select></div>
+                <div class="form-group"><label>ID Number</label><input type="text" id="idNumber"></div>
+                <div class="form-group"><label>Upload ID (Front)</label><input type="file" id="kycFront" class="file-input"></div>
+                <div class="form-group"><label>Upload ID (Back)</label><input type="file" id="kycBack" class="file-input"></div>
+                <div class="form-group"><label>Upload Selfie with ID</label><input type="file" id="kycSelfie" class="file-input"></div>
                 <button class="btn-save" onclick="submitKYC()">Submit Verification</button>
-                
-                <div class="info-text">
-                    ⚠️ Your documents are securely encrypted. KYC verification may take 24-48 hours.
-                </div>
             </div>
         </div>
 
         <div id="updatePage" class="page-content" style="display: none;">
-            <div class="page-header"><h1>Update Profile</h1><p>Update your personal information</p></div>
+            <div class="page-header"><h1>Update Profile</h1></div>
             <div class="profile-card">
                 <div class="card-title">✏️ Edit Information</div>
                 <div class="form-group"><label>Full Name</label><input type="text" id="updateFullName"></div>
@@ -424,7 +357,7 @@
         </div>
 
         <div id="supportPage" class="page-content" style="display: none;">
-            <div class="page-header"><h1>Customer Support</h1><p>Get help with your account</p></div>
+            <div class="page-header"><h1>Customer Support</h1></div>
             <div class="profile-card">
                 <div class="card-title">💬 Contact Support</div>
                 <div class="info-row"><span>📧</span><span>support@lunotrading.com</span></div>
@@ -447,262 +380,159 @@
 </div>
 
 <script>
-    // Preview image before upload
-    function previewImage(input, previewId) {
-        const preview = document.getElementById(previewId);
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-            };
-            reader.readAsDataURL(input.files[0]);
+    let userId = null;
+    let userData = {};
+
+    async function loadUserData() {
+        const user = await supabaseClient.getCurrentUser();
+        if (user) {
+            userId = user.id;
+            const profile = await supabaseClient.getUserProfile();
+            userData = profile;
+            
+            document.getElementById('fullName').innerText = profile?.full_name || 'N/A';
+            document.getElementById('email').innerText = user.email;
+            document.getElementById('memberSince').innerText = new Date(profile?.created_at).toLocaleDateString() || new Date().toLocaleDateString();
+            document.getElementById('balance').innerText = `$${profile?.balance?.toLocaleString() || 0}`;
+            document.getElementById('kycStatus').innerText = profile?.kyc_status || 'pending';
+            document.getElementById('displayUsername').innerText = profile?.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'Trader';
+            document.getElementById('updateFullName').value = profile?.full_name || '';
+            
+            await loadTradeHistory();
+            await updateTradeStats();
         }
     }
 
-    let userData = { 
-        fullName: '', 
-        email: '', 
-        balance: 0, 
-        kycStatus: 'pending', 
-        tradeHistory: [],
-        totalTrades: 0,
-        winRate: 0,
-        totalVolume: 0,
-        totalProfit: 0
-    };
-    
-    function checkAuth() {
-        const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-        if (!savedUser) window.location.href = 'index.html';
-        return savedUser ? JSON.parse(savedUser) : null;
-    }
-    
-    function loadUserData() {
-        const user = checkAuth();
-        if (user) {
-            userData.email = user.email;
-            userData.fullName = user.fullName || user.email.split('@')[0];
-        }
-        const profile = JSON.parse(localStorage.getItem('lunoProfile') || '{"balance": 0}');
-        userData.balance = profile.balance;
-        userData.kycStatus = profile.kycStatus || 'pending';
-        
-        loadTradeHistoryAndStats();
-        updateUI();
-    }
-    
-    function loadTradeHistoryAndStats() {
-        const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
-        userData.tradeHistory = history;
-        
-        userData.totalTrades = history.length;
-        const wonTrades = history.filter(t => t.status === 'won').length;
-        
-        userData.winRate = userData.totalTrades > 0 ? (wonTrades / userData.totalTrades * 100).toFixed(1) : 0;
-        userData.totalVolume = history.reduce((sum, t) => sum + t.amount, 0);
-        userData.totalProfit = history.reduce((sum, t) => sum + (t.profit || 0), 0);
-        
-        const totalTradesElem = document.getElementById('totalTrades');
-        const winRateElem = document.getElementById('winRate');
-        const totalVolumeElem = document.getElementById('totalVolume');
-        const totalProfitElem = document.getElementById('totalProfit');
-        
-        if (totalTradesElem) totalTradesElem.innerText = userData.totalTrades;
-        if (winRateElem) winRateElem.innerText = userData.winRate + '%';
-        if (totalVolumeElem) totalVolumeElem.innerText = `$${userData.totalVolume.toFixed(2)}`;
-        if (totalProfitElem) {
-            totalProfitElem.innerText = `${userData.totalProfit >= 0 ? '+' : ''}$${userData.totalProfit.toFixed(2)}`;
-            totalProfitElem.style.color = userData.totalProfit >= 0 ? '#00ff88' : '#ff4444';
-        }
-        
-        return history;
-    }
-    
-    function updateUI() {
-        document.getElementById('fullName').innerText = userData.fullName;
-        document.getElementById('email').innerText = userData.email;
-        document.getElementById('memberSince').innerText = new Date().toLocaleDateString();
-        document.getElementById('balance').innerText = `$${userData.balance.toFixed(2)}`;
-        document.getElementById('kycStatus').innerText = userData.kycStatus;
-        document.getElementById('displayUsername').innerText = userData.fullName.split(' ')[0];
-    }
-    
-    function loadTradeHistory() {
-        const history = JSON.parse(localStorage.getItem('lunoTradeHistory') || '[]');
+    async function loadTradeHistory() {
+        const trades = await supabaseClient.getUserTrades();
         const container = document.getElementById('historyTable');
         
-        if (history.length === 0) {
-            container.innerHTML = '<div style="text-align:center;padding:40px;">📭 No trades yet. Start trading to see your history!</div>';
+        if (trades.length === 0) {
+            container.innerHTML = '<div style="text-align:center;padding:40px;">No trades yet.</div>';
             return;
         }
         
-        let html = '<table><thead><tr><th>Date</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Return</th><th>Profit/Loss</th><th>Status</th></tr></thead><tbody>';
-        
-        history.forEach(trade => {
+        let html = '<table><thead><td><th>Date</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Profit</th><th>Status</th></tr></thead><tbody>';
+        trades.forEach(trade => {
             const profitClass = trade.profit >= 0 ? 'status-won' : 'status-lost';
-            const statusClass = trade.status === 'won' ? 'status-won' : 'status-lost';
-            const statusText = trade.status === 'won' ? '✅ WON' : '❌ LOST';
-            const profitSymbol = trade.profit >= 0 ? '+' : '';
-            
             html += `<tr>
-                <td>${trade.date || new Date().toLocaleString()}</td>
-                <td>${trade.coinName} (${trade.coin})</td>
-                <td>$${trade.amount.toFixed(2)}</td>
-                <td>${trade.duration || '-'}s</td>
-                <td>${trade.rate ? `+${trade.rate}%` : '-'}</td>
-                <td class="${profitClass}">${profitSymbol}$${(trade.profit || 0).toFixed(2)}</td>
-                <td class="${statusClass}">${statusText}</td>
+                <td>${new Date(trade.created_at).toLocaleString()}</td>
+                <td>${trade.coin_name} (${trade.coin})</td>
+                <td>$${trade.amount}</td>
+                <td>${trade.duration}s</td>
+                <td class="${profitClass}">${trade.profit >= 0 ? '+' : ''}$${trade.profit || 0}</td>
+                <td class="${trade.status === 'won' ? 'status-won' : 'status-lost'}">${trade.status}</td>
             </tr>`;
         });
-        
         html += '</tbody></table>';
         container.innerHTML = html;
     }
-    
-    function submitKYC() {
+
+    async function updateTradeStats() {
+        const trades = await supabaseClient.getUserTrades();
+        const totalTrades = trades.length;
+        const wonTrades = trades.filter(t => t.status === 'won').length;
+        const winRate = totalTrades > 0 ? (wonTrades / totalTrades * 100).toFixed(1) : 0;
+        const totalVolume = trades.reduce((sum, t) => sum + t.amount, 0);
+        const totalProfit = trades.reduce((sum, t) => sum + (t.profit || 0), 0);
+        
+        document.getElementById('totalTrades').innerText = totalTrades;
+        document.getElementById('winRate').innerText = winRate + '%';
+        document.getElementById('totalVolume').innerText = `$${totalVolume.toFixed(2)}`;
+        document.getElementById('totalProfit').innerText = `${totalProfit >= 0 ? '+' : ''}$${totalProfit.toFixed(2)}`;
+        document.getElementById('totalProfit').style.color = totalProfit >= 0 ? '#00ff88' : '#ff4444';
+    }
+
+    async function submitKYC() {
         const fullName = document.getElementById('kycFullName').value;
         const idType = document.getElementById('idType').value;
         const idNumber = document.getElementById('idNumber').value;
-        const frontFile = document.getElementById('kycFileFront').files[0];
-        const backFile = document.getElementById('kycFileBack').files[0];
-        const selfieFile = document.getElementById('kycSelfie').files[0];
         
         if (!fullName || !idNumber) {
-            alert('Please fill in all required fields');
+            alert('Please fill in all fields');
             return;
         }
         
-        if (!frontFile) {
-            alert('Please upload the front side of your ID');
-            return;
-        }
-        
-        let message = `KYC verification submitted!\n\nName: ${fullName}\nID Type: ${idType}\nID Number: ${idNumber}\n`;
-        message += `\nDocuments uploaded:\n- Front ID: ${frontFile.name}\n`;
-        if (backFile) message += `- Back ID: ${backFile.name}\n`;
-        if (selfieFile) message += `- Selfie: ${selfieFile.name}\n`;
-        message += `\nYour verification is under review, please wait a moment.`;
-        
-        alert(message);
-        
-        // Save KYC request to admin
-        const kycRequests = JSON.parse(localStorage.getItem('kycRequests') || '[]');
-        kycRequests.push({
-            email: userData.email,
-            fullName: fullName,
-            idType: idType,
-            idNumber: idNumber,
-            frontFileName: frontFile.name,
-            backFileName: backFile ? backFile.name : null,
-            selfieFileName: selfieFile ? selfieFile.name : null,
-            date: new Date().toLocaleString(),
+        await supabaseClient.createKYCRequest({
+            user_id: userId,
+            full_name: fullName,
+            id_type: idType,
+            id_number: idNumber,
             status: 'pending'
         });
-        localStorage.setItem('kycRequests', JSON.stringify(kycRequests));
         
-        // Reset form
+        alert('✅ KYC verification submitted! Your verification is under review, please wait a moment.');
         document.getElementById('kycFullName').value = '';
         document.getElementById('idNumber').value = '';
-        document.getElementById('kycFileFront').value = '';
-        document.getElementById('kycFileBack').value = '';
-        document.getElementById('kycSelfie').value = '';
-        document.getElementById('frontPreview').style.display = 'none';
-        document.getElementById('backPreview').style.display = 'none';
-        document.getElementById('selfiePreview').style.display = 'none';
     }
-    
-    function updateProfile() {
+
+    async function updateProfile() {
         const newName = document.getElementById('updateFullName').value;
         if (newName) {
-            userData.fullName = newName;
-            const savedUser = localStorage.getItem('lunoUser') || sessionStorage.getItem('lunoUser');
-            if (savedUser) {
-                const user = JSON.parse(savedUser);
-                user.fullName = newName;
-                if (localStorage.getItem('lunoUser')) {
-                    localStorage.setItem('lunoUser', JSON.stringify(user));
-                } else {
-                    sessionStorage.setItem('lunoUser', JSON.stringify(user));
-                }
-            }
+            await supabase.from('users').update({ full_name: newName }).eq('id', userId);
+            alert('✅ Profile updated successfully!');
+            loadUserData();
         }
-        
-        alert('✅ Profile updated successfully!');
-        updateUI();
-        document.getElementById('newPassword').value = '';
-        document.getElementById('confirmPassword').value = '';
     }
-    
-    function openWithdrawModal() { document.getElementById('transactionModal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('transactionModal').style.display = 'none'; }
-    
-    function processWithdrawal() {
+
+    async function processWithdrawal() {
         const amount = parseFloat(document.getElementById('transactionAmount').value);
         const address = document.getElementById('withdrawAddress').value;
         
-        if (isNaN(amount) || amount <= 0) {
-            alert('Please enter a valid amount');
-            return;
-        }
-        if (!address) {
-            alert('Please enter a wallet address');
-            return;
-        }
-        if (amount > userData.balance) {
-            alert(`Insufficient balance! You have $${userData.balance.toFixed(2)}`);
-            return;
-        }
+        if (isNaN(amount) || amount <= 0) { alert('Enter valid amount'); return; }
+        if (!address) { alert('Enter wallet address'); return; }
+        if (amount > userData.balance) { alert('Insufficient balance!'); return; }
         
-        const withdrawalRequests = JSON.parse(localStorage.getItem('withdrawalRequests') || '[]');
-        withdrawalRequests.push({
-            userEmail: userData.email,
+        await supabaseClient.createWithdrawal({
+            user_id: userId,
             amount: amount,
             address: address,
-            date: new Date().toLocaleString(),
             status: 'pending'
         });
-        localStorage.setItem('withdrawalRequests', JSON.stringify(withdrawalRequests));
         
-        alert(`✅ Withdrawal request of $${amount.toFixed(2)} submitted!\n\nYour withdrawal request is under review, please wait a moment.`);
+        alert(`✅ Withdrawal request of $${amount.toFixed(2)} submitted! Your withdrawal request is under review, please wait a moment.`);
         closeModal();
-        document.getElementById('transactionAmount').value = '';
-        document.getElementById('withdrawAddress').value = '';
     }
-    
-    function logout() {
+
+    function openWithdrawModal() { document.getElementById('transactionModal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('transactionModal').style.display = 'none'; }
+
+    async function logout() {
+        await supabaseClient.signOut();
         localStorage.removeItem('lunoUser');
         sessionStorage.removeItem('lunoUser');
         window.location.href = 'index.html';
     }
-    
+
+    function toggleTheme() {
+        document.body.classList.toggle('light-mode');
+        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    }
+
+    function checkTheme() {
+        if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+    }
+
     document.querySelectorAll('.sidebar-item').forEach(item => {
         item.addEventListener('click', () => {
             const page = item.getAttribute('data-page');
             document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
-            
             document.getElementById('profilePage').style.display = 'none';
             document.getElementById('historyPage').style.display = 'none';
             document.getElementById('kycPage').style.display = 'none';
             document.getElementById('updatePage').style.display = 'none';
             document.getElementById('supportPage').style.display = 'none';
-            
-            if (page === 'profile') {
-                document.getElementById('profilePage').style.display = 'block';
-                loadTradeHistoryAndStats();
-            }
-            if (page === 'history') { 
-                document.getElementById('historyPage').style.display = 'block'; 
-                loadTradeHistory(); 
-            }
+            if (page === 'profile') document.getElementById('profilePage').style.display = 'block';
+            if (page === 'history') { document.getElementById('historyPage').style.display = 'block'; loadTradeHistory(); }
             if (page === 'kyc') document.getElementById('kycPage').style.display = 'block';
             if (page === 'update') document.getElementById('updatePage').style.display = 'block';
             if (page === 'support') document.getElementById('supportPage').style.display = 'block';
         });
     });
-    
+
     loadUserData();
+    checkTheme();
 </script>
 
 </body>
