@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - Markets</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
     <style>
         * {
             margin: 0;
@@ -66,6 +68,15 @@
             color: #00d4ff;
         }
 
+        .theme-toggle {
+            background: rgba(0, 212, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
         .logout-btn {
             background: rgba(255, 68, 68, 0.15);
             padding: 6px 16px;
@@ -74,10 +85,6 @@
             cursor: pointer;
             color: #ff4444;
             font-size: 0.85rem;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 68, 68, 0.3);
         }
 
         .main-content {
@@ -121,11 +128,6 @@
             border-radius: 8px;
             color: white;
             font-size: 0.9rem;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #00d4ff;
         }
 
         .category-filters {
@@ -244,10 +246,6 @@
             width: fit-content;
         }
 
-        .details-btn:hover {
-            background: rgba(0, 212, 255, 0.3);
-        }
-
         .stats-cards {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -279,18 +277,6 @@
             text-align: center;
             padding: 40px;
             color: #00d4ff;
-        }
-
-        .error {
-            text-align: center;
-            padding: 40px;
-            color: #ff4444;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 40px;
-            color: #787b86;
         }
 
         @media (max-width: 768px) {
@@ -333,6 +319,7 @@
     </div>
     <div class="user-info">
         <span class="username" id="displayUsername">Trader</span>
+        <div class="theme-toggle" onclick="toggleTheme()">🌓 Theme</div>
         <a href="#" class="logout-btn" onclick="logout()">Logout</a>
     </div>
 </nav>
@@ -391,105 +378,25 @@
 </div>
 
 <script>
-    // Fallback cryptocurrency data (used if API fails)
-    const fallbackData = [
-        { symbol: 'BTC', name: 'Bitcoin', price: 65234.50, change24h: 2.34, marketCap: 1280000000000, volume24h: 25000000000, high24h: 66000, low24h: 64000, category: 'large' },
-        { symbol: 'ETH', name: 'Ethereum', price: 3420.75, change24h: 1.56, marketCap: 410000000000, volume24h: 18000000000, high24h: 3500, low24h: 3350, category: 'large' },
-        { symbol: 'BNB', name: 'Binance Coin', price: 580.20, change24h: 0.89, marketCap: 89000000000, volume24h: 1200000000, high24h: 590, low24h: 570, category: 'large' },
-        { symbol: 'SOL', name: 'Solana', price: 145.30, change24h: 3.21, marketCap: 64000000000, volume24h: 2100000000, high24h: 150, low24h: 140, category: 'large' },
-        { symbol: 'XRP', name: 'XRP', price: 0.62, change24h: -0.45, marketCap: 34000000000, volume24h: 1100000000, high24h: 0.64, low24h: 0.61, category: 'large' },
-        { symbol: 'ADA', name: 'Cardano', price: 0.48, change24h: 1.23, marketCap: 17000000000, volume24h: 380000000, high24h: 0.49, low24h: 0.47, category: 'large' },
-        { symbol: 'AVAX', name: 'Avalanche', price: 38.75, change24h: 2.10, marketCap: 14000000000, volume24h: 320000000, high24h: 40, low24h: 37, category: 'large' },
-        { symbol: 'DOGE', name: 'Dogecoin', price: 0.124, change24h: 5.67, marketCap: 18000000000, volume24h: 890000000, high24h: 0.13, low24h: 0.12, category: 'meme' },
-        { symbol: 'DOT', name: 'Polkadot', price: 7.25, change24h: -1.23, marketCap: 9500000000, volume24h: 190000000, high24h: 7.45, low24h: 7.10, category: 'mid' },
-        { symbol: 'LINK', name: 'Chainlink', price: 15.40, change24h: 2.80, marketCap: 9000000000, volume24h: 250000000, high24h: 15.80, low24h: 15.00, category: 'mid' },
-        { symbol: 'MATIC', name: 'Polygon', price: 0.72, change24h: 0.45, marketCap: 6800000000, volume24h: 160000000, high24h: 0.74, low24h: 0.70, category: 'mid' },
-        { symbol: 'SHIB', name: 'Shiba Inu', price: 0.000018, change24h: 4.20, marketCap: 10600000000, volume24h: 420000000, high24h: 0.000019, low24h: 0.000017, category: 'meme' },
-        { symbol: 'UNI', name: 'Uniswap', price: 8.15, change24h: -0.80, marketCap: 6200000000, volume24h: 130000000, high24h: 8.35, low24h: 8.00, category: 'defi' },
-        { symbol: 'AAVE', name: 'Aave', price: 98.50, change24h: 1.95, marketCap: 1450000000, volume24h: 72000000, high24h: 101, low24h: 96, category: 'defi' }
+    // Cryptocurrency data with fallback
+    const cryptoData = [
+        { symbol: 'BTC', name: 'Bitcoin', price: 65234.50, change24h: 2.34, marketCap: 1280000000000, category: 'large' },
+        { symbol: 'ETH', name: 'Ethereum', price: 3420.75, change24h: 1.56, marketCap: 410000000000, category: 'large' },
+        { symbol: 'BNB', name: 'Binance Coin', price: 580.20, change24h: 0.89, marketCap: 89000000000, category: 'large' },
+        { symbol: 'SOL', name: 'Solana', price: 145.30, change24h: 3.21, marketCap: 64000000000, category: 'large' },
+        { symbol: 'XRP', name: 'XRP', price: 0.62, change24h: -0.45, marketCap: 34000000000, category: 'large' },
+        { symbol: 'ADA', name: 'Cardano', price: 0.48, change24h: 1.23, marketCap: 17000000000, category: 'large' },
+        { symbol: 'DOGE', name: 'Dogecoin', price: 0.124, change24h: 5.67, marketCap: 18000000000, category: 'meme' },
+        { symbol: 'DOT', name: 'Polkadot', price: 7.25, change24h: -1.23, marketCap: 9500000000, category: 'mid' },
+        { symbol: 'LINK', name: 'Chainlink', price: 15.40, change24h: 2.80, marketCap: 9000000000, category: 'mid' },
+        { symbol: 'MATIC', name: 'Polygon', price: 0.72, change24h: 0.45, marketCap: 6800000000, category: 'mid' },
+        { symbol: 'SHIB', name: 'Shiba Inu', price: 0.000018, change24h: 4.20, marketCap: 10600000000, category: 'meme' },
+        { symbol: 'UNI', name: 'Uniswap', price: 8.15, change24h: -0.80, marketCap: 6200000000, category: 'defi' }
     ];
 
-    let cryptocurrencies = [];
+    let cryptocurrencies = [...cryptoData];
     let currentCategory = 'all';
     let currentSearch = '';
-
-    async function loadRealMarketData() {
-        try {
-            const marketList = document.getElementById('marketList');
-            marketList.innerHTML = '<div class="loading">Loading live market data from CoinGecko...</div>';
-            
-            // Fetch crypto data from CoinGecko
-            const coinIds = ['bitcoin', 'ethereum', 'binancecoin', 'solana', 'ripple', 'cardano', 'avalanche-2', 'dogecoin', 'polkadot', 'chainlink', 'polygon', 'shiba-inu', 'uniswap', 'aave'];
-            const url = `https://api.coingecko.com/api/v3/simple/price?ids=${coinIds.join(',')}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true`;
-            
-            const response = await fetch(url);
-            
-            if (!response.ok) {
-                throw new Error('API request failed');
-            }
-            
-            const prices = await response.json();
-            
-            // Map the response to our cryptocurrency array
-            cryptocurrencies = [];
-            
-            const coinMapping = {
-                'bitcoin': { symbol: 'BTC', name: 'Bitcoin', category: 'large' },
-                'ethereum': { symbol: 'ETH', name: 'Ethereum', category: 'large' },
-                'binancecoin': { symbol: 'BNB', name: 'Binance Coin', category: 'large' },
-                'solana': { symbol: 'SOL', name: 'Solana', category: 'large' },
-                'ripple': { symbol: 'XRP', name: 'XRP', category: 'large' },
-                'cardano': { symbol: 'ADA', name: 'Cardano', category: 'large' },
-                'avalanche-2': { symbol: 'AVAX', name: 'Avalanche', category: 'large' },
-                'dogecoin': { symbol: 'DOGE', name: 'Dogecoin', category: 'meme' },
-                'polkadot': { symbol: 'DOT', name: 'Polkadot', category: 'mid' },
-                'chainlink': { symbol: 'LINK', name: 'Chainlink', category: 'mid' },
-                'polygon': { symbol: 'MATIC', name: 'Polygon', category: 'mid' },
-                'shiba-inu': { symbol: 'SHIB', name: 'Shiba Inu', category: 'meme' },
-                'uniswap': { symbol: 'UNI', name: 'Uniswap', category: 'defi' },
-                'aave': { symbol: 'AAVE', name: 'Aave', category: 'defi' }
-            };
-            
-            for (const [coinId, data] of Object.entries(prices)) {
-                const coin = coinMapping[coinId];
-                if (coin && data.usd) {
-                    cryptocurrencies.push({
-                        symbol: coin.symbol,
-                        name: coin.name,
-                        price: data.usd,
-                        change24h: data.usd_24h_change?.toFixed(2) || 0,
-                        marketCap: data.usd_market_cap || 0,
-                        volume24h: data.usd_24h_vol || 0,
-                        high24h: data.usd_24h_high || data.usd,
-                        low24h: data.usd_24h_low || data.usd,
-                        category: coin.category
-                    });
-                }
-            }
-            
-            if (cryptocurrencies.length === 0) {
-                throw new Error('No data received');
-            }
-            
-            cryptocurrencies.sort((a, b) => b.marketCap - a.marketCap);
-            document.getElementById('activeCoins').innerText = cryptocurrencies.length;
-            renderMarketList();
-            updateStats();
-            
-        } catch (error) {
-            console.error('Error loading market data:', error);
-            // Use fallback data if API fails
-            useFallbackData();
-        }
-    }
-
-    function useFallbackData() {
-        console.log('Using fallback market data');
-        cryptocurrencies = [...fallbackData];
-        document.getElementById('activeCoins').innerText = cryptocurrencies.length;
-        renderMarketList();
-        updateStatsWithFallback();
-    }
 
     function formatMarketCap(cap) {
         if (cap >= 1e12) return `$${(cap / 1e12).toFixed(2)}T`;
@@ -525,7 +432,7 @@
         }
 
         if (filteredCoins.length === 0) {
-            marketList.innerHTML = '<div class="no-results">No cryptocurrencies found. Try a different search.</div>';
+            marketList.innerHTML = '<div class="no-results" style="text-align:center;padding:40px;">No cryptocurrencies found.</div>';
             return;
         }
 
@@ -552,43 +459,12 @@
     }
 
     function goToTradingView(symbol) {
-        const selectedCoin = cryptocurrencies.find(c => c.symbol === symbol);
-        if (selectedCoin) {
-            localStorage.setItem('selectedCrypto', JSON.stringify({
-                symbol: selectedCoin.symbol,
-                name: selectedCoin.name,
-                price: selectedCoin.price
-            }));
-        }
+        localStorage.setItem('selectedCrypto', JSON.stringify({ symbol: symbol }));
         window.location.href = `trading-view.html?symbol=${symbol}`;
     }
 
     async function updateStats() {
-        try {
-            const response = await fetch('https://api.coingecko.com/api/v3/global');
-            if (response.ok) {
-                const data = await response.json();
-                const globalData = data.data;
-                document.getElementById('totalMarketCap').innerText = formatMarketCap(globalData.total_market_cap?.usd || 0);
-                document.getElementById('totalVolume').innerText = formatMarketCap(globalData.total_volume?.usd || 0);
-                document.getElementById('btcDominance').innerText = globalData.market_cap_percentage?.btc?.toFixed(1) + '%' || '48.5%';
-            } else {
-                updateStatsWithFallback();
-            }
-        } catch (error) {
-            updateStatsWithFallback();
-        }
-    }
-
-    function updateStatsWithFallback() {
-        const totalMarketCap = cryptocurrencies.reduce((sum, c) => sum + c.marketCap, 0);
-        const totalVolume = cryptocurrencies.reduce((sum, c) => sum + c.volume24h, 0);
-        const btcMarketCap = cryptocurrencies.find(c => c.symbol === 'BTC')?.marketCap || 0;
-        const btcDominance = (btcMarketCap / totalMarketCap * 100).toFixed(1);
-        
-        document.getElementById('totalMarketCap').innerText = formatMarketCap(totalMarketCap);
-        document.getElementById('totalVolume').innerText = formatMarketCap(totalVolume);
-        document.getElementById('btcDominance').innerText = btcDominance + '%';
+        document.getElementById('activeCoins').innerText = cryptocurrencies.length;
     }
 
     function checkAuth() {
@@ -606,10 +482,23 @@
         }
     }
 
-    function logout() {
+    async function logout() {
+        await supabaseClient.signOut();
         localStorage.removeItem('lunoUser');
         sessionStorage.removeItem('lunoUser');
         window.location.href = 'index.html';
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('light-mode');
+        const isLight = document.body.classList.contains('light-mode');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    }
+
+    function checkTheme() {
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+        }
     }
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -627,10 +516,9 @@
     });
 
     displayUsername();
-    loadRealMarketData();
-    
-    // Refresh every 60 seconds
-    setInterval(loadRealMarketData, 60000);
+    renderMarketList();
+    updateStats();
+    checkTheme();
 </script>
 
 </body>
