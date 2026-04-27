@@ -3,96 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luno Admin - Supabase</title>
+    <title>Luno Admin - Pre-Trade WIN/LOSE Control</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #131722;
-            color: #d1d4dc;
+            background: #0a0e17;
+            color: #e0e0e0;
             padding: 20px;
             transition: background 0.3s;
         }
+        
         body.light-mode {
             background: #f0f2f5;
             color: #1e222d;
         }
-        body.light-mode .stat-card,
+        
+        body.light-mode .card,
         body.light-mode .section,
         body.light-mode .login-box {
             background: #ffffff;
             border-color: #e0e0e0;
         }
-        body.light-mode h1 { color: #1e222d; }
         
         .container { max-width: 1400px; margin: 0 auto; }
-        .admin-header {
+        
+        /* Header */
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
             gap: 15px;
         }
-        h1 { color: white; margin: 0; }
-        .theme-toggle, .logout-admin {
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-left: 10px;
+        
+        h1 { 
+            font-size: 1.8rem; 
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
-        .theme-toggle {
-            background: rgba(0, 212, 255, 0.15);
-            border: 1px solid rgba(0, 212, 255, 0.3);
+        
+        /* Cards */
+        .card {
+            background: #151e2a;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #1f2a3a;
         }
-        .logout-admin {
-            background: rgba(255, 68, 68, 0.15);
-            border: 1px solid rgba(255, 68, 68, 0.3);
-            color: #ff4444;
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #00d4ff;
         }
-        .stats {
+        
+        /* Stats Grid */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
+        
         .stat-card {
-            background: #1e222d;
+            background: #151e2a;
             border-radius: 12px;
             padding: 20px;
             text-align: center;
-            border: 1px solid #2a2e39;
+            border: 1px solid #1f2a3a;
         }
-        .stat-number { font-size: 2rem; font-weight: bold; color: #00d4ff; }
-        .stat-label { font-size: 0.8rem; color: #787b86; margin-top: 5px; }
-        .section {
-            background: #1e222d;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid #2a2e39;
-            overflow-x: auto;
-        }
-        .section-title { font-size: 1.2rem; margin-bottom: 15px; color: white; font-weight: 600; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #2a2e39; }
-        th { color: #787b86; font-weight: 600; }
         
-        /* Toggle Switch Styles */
+        .stat-number { 
+            font-size: 2.5rem; 
+            font-weight: bold; 
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .stat-label { font-size: 0.8rem; color: #787b86; margin-top: 5px; }
+        
+        /* Toggle Switches */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+        }
+        
         .toggle-switch {
             position: relative;
             display: inline-block;
-            width: 60px;
-            height: 28px;
-            margin: 0 5px;
+            width: 100px;
+            height: 44px;
         }
+        
         .toggle-switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
+        
         .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ff4444;
+            transition: 0.3s;
+            border-radius: 44px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 36px;
+            width: 36px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #00ff88;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(56px);
+        }
+        
+        .toggle-label {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .toggle-label.lose { color: #ff4444; }
+        .toggle-label.win { color: #00ff88; }
+        
+        /* Coin Grid */
+        .coin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+        }
+        
+        .coin-item {
+            background: #1a2535;
+            border-radius: 10px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+        }
+        
+        body.light-mode .coin-item {
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .coin-name {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        
+        .coin-symbol {
+            font-size: 0.7rem;
+            color: #787b86;
+            margin-left: 5px;
+        }
+        
+        .coin-toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 28px;
+        }
+        
+        .coin-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .coin-toggle-slider {
             position: absolute;
             cursor: pointer;
             top: 0;
@@ -103,7 +211,8 @@
             transition: 0.3s;
             border-radius: 28px;
         }
-        .toggle-slider:before {
+        
+        .coin-toggle-slider:before {
             position: absolute;
             content: "";
             height: 22px;
@@ -114,67 +223,15 @@
             transition: 0.3s;
             border-radius: 50%;
         }
-        input:checked + .toggle-slider {
+        
+        input:checked + .coin-toggle-slider {
             background-color: #00ff88;
         }
-        input:checked + .toggle-slider:before {
+        
+        input:checked + .coin-toggle-slider:before {
             transform: translateX(32px);
         }
-        .toggle-label {
-            font-size: 0.7rem;
-            margin-left: 5px;
-            font-weight: bold;
-        }
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
         
-        .btn-win { background: rgba(0, 255, 136, 0.2); color: #00ff88; border-color: rgba(0, 255, 136, 0.3); }
-        .btn-lose { background: rgba(255, 68, 68, 0.2); color: #ff4444; border-color: rgba(255, 68, 68, 0.3); }
-        .login-box {
-            max-width: 400px;
-            margin: 100px auto;
-            background: #1e222d;
-            padding: 35px;
-            border-radius: 16px;
-            text-align: center;
-            border: 1px solid #2a2e39;
-        }
-        .login-box h2 { margin-bottom: 20px; color: white; }
-        .login-box input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            background: #2a2e39;
-            border: 1px solid #3a3e49;
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-        }
-        .login-box button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #00d4ff, #7c3aed);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .admin-content { display: none; }
-        .refresh-btn {
-            background: rgba(0, 212, 255, 0.15);
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            margin-left: 10px;
-        }
         .status-badge {
             display: inline-block;
             padding: 4px 12px;
@@ -182,18 +239,88 @@
             font-size: 0.7rem;
             font-weight: bold;
         }
+        
         .status-won { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
         .status-lost { background: rgba(255, 68, 68, 0.2); color: #ff4444; }
         .status-pending { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
         
+        .global-status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        
+        .global-win { background: rgba(0, 255, 136, 0.15); color: #00ff88; }
+        .global-lose { background: rgba(255, 68, 68, 0.15); color: #ff4444; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #1f2a3a;
+        }
+        
+        th { color: #787b86; font-weight: 600; }
+        
+        button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            border: none;
+        }
+        
+        .btn-approve { background: #00ff88; color: #1e222d; }
+        .btn-refresh { background: rgba(0, 212, 255, 0.15); color: #00d4ff; }
+        .btn-logout { background: rgba(255, 68, 68, 0.15); color: #ff4444; }
+        .btn-theme { background: rgba(0, 212, 255, 0.15); color: #00d4ff; }
+        
+        .login-box {
+            max-width: 400px;
+            margin: 100px auto;
+            background: #151e2a;
+            padding: 35px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid #1f2a3a;
+        }
+        
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #1a2535;
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            color: white;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .admin-content { display: none; }
+        
         @media (max-width: 768px) {
-            .stats { grid-template-columns: repeat(2, 1fr); }
-            .admin-header { flex-direction: column; align-items: flex-start; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .coin-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 <div class="container">
+    <!-- Login Section -->
     <div id="loginSection" class="login-box">
         <h2>🔐 Admin Login</h2>
         <input type="email" id="adminEmail" placeholder="Admin Email" value="selemonagent33333@gmail.com">
@@ -201,94 +328,113 @@
         <button onclick="adminLogin()">Login</button>
     </div>
 
+    <!-- Admin Panel -->
     <div id="adminSection" class="admin-content">
-        <div class="admin-header">
+        <div class="header">
             <h1>👑 Luno Admin Panel</h1>
             <div>
-                <span style="color: #787b86; font-size: 0.8rem;">🌐 Cross-device admin control</span>
-                <button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
-                <button class="logout-admin" onclick="adminLogout()">🚪 Logout</button>
+                <span style="color: #787b86;">⚡ Pre-Trade WIN/LOSE Control</span>
+                <button class="btn-theme" onclick="toggleTheme()" style="margin-left: 10px;">🌓 Theme</button>
+                <button class="btn-logout" onclick="adminLogout()" style="margin-left: 10px;">🚪 Logout</button>
             </div>
         </div>
         
-        <div class="stats">
+        <!-- Stats -->
+        <div class="stats-grid">
             <div class="stat-card"><div class="stat-number" id="totalUsers">0</div><div class="stat-label">Total Users</div></div>
-            <div class="stat-card"><div class="stat-number" id="pendingTrades">0</div><div class="stat-label">Pending Trades</div></div>
+            <div class="stat-card"><div class="stat-number" id="totalTrades">0</div><div class="stat-label">Total Trades</div></div>
             <div class="stat-card"><div class="stat-number" id="pendingKYC">0</div><div class="stat-label">Pending KYC</div></div>
             <div class="stat-card"><div class="stat-number" id="pendingDeposits">0</div><div class="stat-label">Pending Deposits</div></div>
         </div>
         
-        <div class="section">
-            <div class="section-title">
-                👥 All Users (Across ALL Devices)
-                <button class="refresh-btn" onclick="loadAllUsers()">🔄 Refresh</button>
+        <!-- Global Control -->
+        <div class="card">
+            <div class="card-title">🎮 GLOBAL TRADE OUTCOME CONTROL</div>
+            <p style="color: #787b86; margin-bottom: 15px;">⚡ This setting affects ALL new trades across all coins</p>
+            <div class="toggle-container">
+                <span class="toggle-label lose">LOSE</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="globalToggle" onchange="updateGlobalSetting(this.checked)">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label win">WIN</span>
             </div>
+            <div id="globalStatus" class="global-status global-win">🟢 GLOBAL MODE: WIN</div>
+        </div>
+        
+        <!-- Per-Coin Control -->
+        <div class="card">
+            <div class="card-title">📊 PER-COIN TRADE CONTROL</div>
+            <p style="color: #787b86; margin-bottom: 15px;">Override global setting for specific cryptocurrencies</p>
+            <div class="coin-grid" id="coinSettingsList">Loading...</div>
+        </div>
+        
+        <!-- Users List -->
+        <div class="card">
+            <div class="card-title">👥 All Users <button class="btn-refresh" onclick="loadAllUsers()" style="margin-left: 10px;">🔄 Refresh</button></div>
             <div style="overflow-x: auto;">
-                <table id="usersTable">
-                    <thead>
-                        <tr><th>Email</th><th>Full Name</th><th>Balance</th><th>KYC Status</th><th>Joined</th>
-                    </thead>
-                    <tbody id="usersList">
-                        <tr><td colspan="5" style="text-align:center;">Loading users from database...</td</tr>
-                    </tbody>
+                <table>
+                    <thead><tr><th>Email</th><th>Full Name</th><th>Balance</th><th>KYC Status</th><th>Joined</th></tr></thead>
+                    <tbody id="usersList"><tr><td colspan="5" style="text-align:center;">Loading...</td></tr></tbody>
                 </table>
             </div>
         </div>
         
-        <div class="section">
-            <div class="section-title">💰 Pending Trades (Use Toggle Switches to Set WIN/LOSE)</div>
-            <div id="pendingTradesList">Loading...</div>
+        <!-- Recent Trades -->
+        <div class="card">
+            <div class="card-title">📈 Recent Trades (Auto-Settled)</div>
+            <div id="recentTradesList">Loading...</div>
         </div>
         
-        <div class="section">
-            <div class="section-title">✅ Pending KYC Requests</div>
+        <!-- KYC Requests -->
+        <div class="card">
+            <div class="card-title">✅ KYC Verification Requests</div>
             <div id="kycList">Loading...</div>
         </div>
         
-        <div class="section">
-            <div class="section-title">💰 Pending Deposits</div>
+        <!-- Deposits -->
+        <div class="card">
+            <div class="card-title">💰 Deposit Requests</div>
             <div id="depositsList">Loading...</div>
-        </div>
-        
-        <div class="section">
-            <div class="section-title">💸 Pending Withdrawals</div>
-            <div id="withdrawalsList">Loading...</div>
         </div>
     </div>
 </div>
 
 <script>
-    // Supabase configuration
     const SUPABASE_URL = 'https://zvfnqldeazdjokuqfegg.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Zm5xbGRlYXpkam9rdXFmZWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDI0OTMsImV4cCI6MjA5MjcxODQ5M30.MyYRk6SPO9PfFkWlNUYdZMVbcEqUOizNMiriMuZGJ8o';
-    let supabaseClient = null;
+    let supabase = null;
     let refreshInterval = null;
-
-    // Initialize Supabase
-    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+    
+    supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
     async function adminLogin() {
         const email = document.getElementById('adminEmail').value;
         const password = document.getElementById('adminPassword').value;
         
         try {
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
-            
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
             
-            if (data && data.user) {
-                console.log('Admin logged in:', data.user.email);
-                document.getElementById('loginSection').style.display = 'none';
-                document.getElementById('adminSection').style.display = 'block';
-                
-                await loadAllData();
-                
-                if (refreshInterval) clearInterval(refreshInterval);
-                refreshInterval = setInterval(loadAllData, 5000);
-            }
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('adminSection').style.display = 'block';
+            
+            await Promise.all([
+                loadGlobalSetting(),
+                loadCoinSettings(),
+                loadAllUsers(),
+                loadRecentTrades(),
+                loadPendingKYC(),
+                loadPendingDeposits(),
+                loadStats()
+            ]);
+            
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = setInterval(() => {
+                loadAllUsers();
+                loadRecentTrades();
+                loadStats();
+            }, 10000);
         } catch (error) {
             alert('Login failed: ' + error.message);
         }
@@ -296,109 +442,244 @@
     
     async function adminLogout() {
         if (refreshInterval) clearInterval(refreshInterval);
-        await supabaseClient.auth.signOut();
+        await supabase.auth.signOut();
         location.reload();
     }
     
-    async function loadAllData() {
-        await loadAllUsers();
-        await loadPendingTrades();
-        await loadPendingKYC();
-        await loadPendingDeposits();
-        await loadPendingWithdrawals();
-        await loadStats();
+    async function loadGlobalSetting() {
+        const { data, error } = await supabase
+            .from('admin_settings')
+            .select('setting_value')
+            .eq('setting_key', 'default_trade_outcome')
+            .single();
+        
+        if (!error && data) {
+            const isWin = data.setting_value === 'win';
+            document.getElementById('globalToggle').checked = isWin;
+            updateGlobalDisplay(isWin);
+        }
+    }
+    
+    async function updateGlobalSetting(isWin) {
+        const outcome = isWin ? 'win' : 'lose';
+        
+        const { error } = await supabase
+            .from('admin_settings')
+            .upsert({ setting_key: 'default_trade_outcome', setting_value: outcome, updated_at: new Date() });
+        
+        if (!error) {
+            updateGlobalDisplay(isWin);
+            showToast('Global Mode Updated', `All new trades will be ${outcome.toUpperCase()}!`, 'success');
+        } else {
+            showToast('Error', 'Failed to update setting', 'error');
+            document.getElementById('globalToggle').checked = !isWin;
+        }
+    }
+    
+    function updateGlobalDisplay(isWin) {
+        const statusDiv = document.getElementById('globalStatus');
+        if (isWin) {
+            statusDiv.innerHTML = '🟢 GLOBAL MODE: WIN (Users will profit on all trades)';
+            statusDiv.className = 'global-status global-win';
+        } else {
+            statusDiv.innerHTML = '🔴 GLOBAL MODE: LOSE (Users will lose on all trades)';
+            statusDiv.className = 'global-status global-lose';
+        }
+    }
+    
+    async function loadCoinSettings() {
+        const { data, error } = await supabase
+            .from('coin_trade_settings')
+            .select('*')
+            .order('coin_symbol');
+        
+        const container = document.getElementById('coinSettingsList');
+        if (error || !data || data.length === 0) {
+            container.innerHTML = '<div style="text-align:center;">Error loading coin settings</div>';
+            return;
+        }
+        
+        let html = '';
+        data.forEach(coin => {
+            const isWin = coin.trade_outcome === 'win';
+            html += `
+                <div class="coin-item">
+                    <div>
+                        <span class="coin-name">${coin.coin_name}</span>
+                        <span class="coin-symbol">${coin.coin_symbol}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size:0.65rem; color:#ff4444;">LOSE</span>
+                        <label class="coin-toggle">
+                            <input type="checkbox" id="coin_${coin.coin_symbol}" 
+                                onchange="updateCoinSetting('${coin.coin_symbol}', this.checked)"
+                                ${isWin ? 'checked' : ''}>
+                            <span class="coin-toggle-slider"></span>
+                        </label>
+                        <span style="font-size:0.65rem; color:#00ff88;">WIN</span>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+    
+    async function updateCoinSetting(coinSymbol, isWin) {
+        const outcome = isWin ? 'win' : 'lose';
+        
+        const { error } = await supabase
+            .from('coin_trade_settings')
+            .update({ trade_outcome: outcome, updated_at: new Date() })
+            .eq('coin_symbol', coinSymbol);
+        
+        if (!error) {
+            showToast(`${coinSymbol} Updated`, `Trades will be ${outcome.toUpperCase()}`, 'success');
+        } else {
+            showToast('Error', 'Failed to update', 'error');
+            document.getElementById(`coin_${coinSymbol}`).checked = !isWin;
+        }
     }
     
     async function loadAllUsers() {
-        try {
-            const { data: users, error } = await supabaseClient
-                .from('users')
-                .select('*')
-                .order('created_at', { ascending: false });
-            
-            if (error) throw error;
-            
-            const container = document.getElementById('usersList');
-            const totalUsersElem = document.getElementById('totalUsers');
-            
-            if (!users || users.length === 0) {
-                container.innerHTML = '<tr><td colspan="5" style="text-align:center;">No users found.</td></tr>';
-                if (totalUsersElem) totalUsersElem.innerText = '0';
-                return;
-            }
-            
-            totalUsersElem.innerText = users.length;
-            
-            let html = '';
-            users.forEach(user => {
-                const kycStatusClass = user.kyc_status === 'verified' ? 'status-won' : 'status-pending';
-                const kycStatusText = user.kyc_status === 'verified' ? '✅ Verified' : '⏳ Pending';
-                const joinedDate = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A';
-                html += `<tr>
-                    <td>${user.email}</td>
-                    <td>${user.full_name || 'N/A'}</td>
-                    <td>$${(user.balance || 0).toLocaleString()}</td>
-                    <td><span class="status-badge ${kycStatusClass}">${kycStatusText}</span></td>
-                    <td>${joinedDate}</td>
-                </tr>`;
-            });
-            container.innerHTML = html;
-        } catch(e) {
-            console.error('Error loading users:', e);
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        const container = document.getElementById('usersList');
+        if (error || !data || data.length === 0) {
+            container.innerHTML = '<tr><td colspan="5" style="text-align:center;">No users found</td></tr>';
+            return;
         }
+        
+        let html = '';
+        data.forEach(user => {
+            const kycClass = user.kyc_status === 'verified' ? 'status-won' : 'status-pending';
+            const kycText = user.kyc_status === 'verified' ? '✅ Verified' : '⏳ Pending';
+            html += `<tr>
+                <td>${user.email}</td>
+                <td>${user.full_name || 'N/A'}</td>
+                <td>$${(user.balance || 0).toLocaleString()}</td>
+                <td><span class="status-badge ${kycClass}">${kycText}</span></td>
+                <td>${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</td>
+            </tr>`;
+        });
+        container.innerHTML = html;
     }
     
-    // UPDATED: Toggle Switch for WIN/LOSE
-    async function setTradeOutcome(tradeId, outcome) {
-        try {
-            const { data: trade, error: tradeError } = await supabaseClient
-                .from('trades')
-                .select('*')
-                .eq('id', tradeId)
-                .single();
-            
-            if (tradeError) throw tradeError;
-            
-            if (outcome === 'win') {
-                const profit = trade.expected_profit;
-                const totalReturn = trade.amount + profit;
-                
-                await supabaseClient
-                    .from('trades')
-                    .update({ status: 'won', profit: profit, completed_at: new Date() })
-                    .eq('id', tradeId);
-                
-                const { data: user } = await supabaseClient
-                    .from('users')
-                    .select('balance')
-                    .eq('id', trade.user_id)
-                    .single();
-                
-                await supabaseClient
-                    .from('users')
-                    .update({ balance: (user.balance || 0) + totalReturn })
-                    .eq('id', trade.user_id);
-                    
-                showToast('✅ Trade WON!', `User earned $${profit.toFixed(2)} profit.`, 'success');
-            } else {
-                await supabaseClient
-                    .from('trades')
-                    .update({ status: 'lost', profit: -trade.amount, completed_at: new Date() })
-                    .eq('id', tradeId);
-                    
-                showToast('❌ Trade LOST!', `User lost $${trade.amount.toFixed(2)}.`, 'error');
-            }
-            
-            await loadPendingTrades();
-            await loadStats();
-            await loadAllUsers();
-        } catch(e) { 
-            console.error(e); 
-            showToast('Error', e.message, 'error');
+    async function loadRecentTrades() {
+        const { data, error } = await supabase
+            .from('trades')
+            .select('*, users(email)')
+            .order('created_at', { ascending: false })
+            .limit(20);
+        
+        const container = document.getElementById('recentTradesList');
+        if (error || !data || data.length === 0) {
+            container.innerHTML = '<div style="text-align:center;padding:20px;">No trades yet</div>';
+            return;
         }
+        
+        let html = '<table><thead><tr><th>User</th><th>Coin</th><th>Amount</th><th>Outcome</th><th>Profit</th><th>Settled</th></tr></thead><tbody>';
+        data.forEach(trade => {
+            const outcomeClass = trade.status === 'won' ? 'status-won' : (trade.status === 'lost' ? 'status-lost' : 'status-pending');
+            const outcomeText = trade.status === 'won' ? '✅ WON' : (trade.status === 'lost' ? '❌ LOST' : '⏳ PENDING');
+            html += `<tr>
+                <td>${trade.users?.email || 'N/A'}</td>
+                <td>${trade.coin_name}</td>
+                <td>$${trade.amount}</td>
+                <td><span class="status-badge ${outcomeClass}">${outcomeText}</span></td>
+                <td>${trade.profit >= 0 ? '+' : ''}$${(trade.profit || 0).toFixed(2)}</td>
+                <td>${trade.auto_settled ? '⚡ Auto' : 'Manual'}</td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
     }
     
-    // Toast notification function
+    async function loadPendingKYC() {
+        const { data, error } = await supabase
+            .from('kyc_requests')
+            .select('*, users(email)')
+            .eq('status', 'pending');
+        
+        const container = document.getElementById('kycList');
+        if (error || !data || data.length === 0) {
+            container.innerHTML = '<div style="text-align:center;padding:20px;">No pending KYC requests</div>';
+            return;
+        }
+        
+        let html = '<table><thead><tr><th>User</th><th>Full Name</th><th>ID Type</th><th>ID Number</th><th>Action</th></tr></thead><tbody>';
+        data.forEach(req => {
+            html += `<tr>
+                <td>${req.users?.email || 'N/A'}</td>
+                <td>${req.full_name}</td>
+                <td>${req.id_type}</td>
+                <td>${req.id_number}</td>
+                <td><button class="btn-approve" onclick="approveKYC('${req.id}', '${req.user_id}')">✅ Approve</button></td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+    
+    async function approveKYC(requestId, userId) {
+        await supabase.from('kyc_requests').update({ status: 'approved', reviewed_at: new Date() }).eq('id', requestId);
+        await supabase.from('users').update({ kyc_status: 'verified' }).eq('id', userId);
+        showToast('✅ KYC Approved!', 'User can now trade.', 'success');
+        loadPendingKYC();
+        loadAllUsers();
+        loadStats();
+    }
+    
+    async function loadPendingDeposits() {
+        const { data, error } = await supabase
+            .from('deposits')
+            .select('*, users(email)')
+            .eq('status', 'pending');
+        
+        const container = document.getElementById('depositsList');
+        if (error || !data || data.length === 0) {
+            container.innerHTML = '<div style="text-align:center;padding:20px;">No pending deposits</div>';
+            return;
+        }
+        
+        let html = '<table><thead><tr><th>User</th><th>Amount</th><th>Currency</th><th>Date</th><th>Action</th></tr></thead><tbody>';
+        data.forEach(dep => {
+            html += `<tr>
+                <td>${dep.users?.email || 'N/A'}</td>
+                <td>$${dep.amount}</td>
+                <td>${dep.currency}</td>
+                <td>${new Date(dep.created_at).toLocaleString()}</td>
+                <td><button class="btn-approve" onclick="approveDeposit('${dep.id}', '${dep.user_id}', ${dep.amount})">💰 Approve</button></td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+    
+    async function approveDeposit(depositId, userId, amount) {
+        await supabase.from('deposits').update({ status: 'approved', approved_at: new Date() }).eq('id', depositId);
+        const { data: user } = await supabase.from('users').select('balance').eq('id', userId).single();
+        await supabase.from('users').update({ balance: (user.balance || 0) + amount }).eq('id', userId);
+        showToast('✅ Deposit Approved!', `$${amount} added to user balance.`, 'success');
+        loadPendingDeposits();
+        loadAllUsers();
+        loadStats();
+    }
+    
+    async function loadStats() {
+        const { data: users } = await supabase.from('users').select('*');
+        const { data: trades } = await supabase.from('trades').select('*');
+        const { data: kyc } = await supabase.from('kyc_requests').select('*').eq('status', 'pending');
+        const { data: deposits } = await supabase.from('deposits').select('*').eq('status', 'pending');
+        
+        document.getElementById('totalUsers').innerText = users?.length || 0;
+        document.getElementById('totalTrades').innerText = trades?.length || 0;
+        document.getElementById('pendingKYC').innerText = kyc?.length || 0;
+        document.getElementById('pendingDeposits').innerText = deposits?.length || 0;
+    }
+    
     function showToast(title, message, type) {
         const toast = document.createElement('div');
         toast.style.position = 'fixed';
@@ -410,245 +691,14 @@
         toast.style.borderRadius = '8px';
         toast.style.fontWeight = 'bold';
         toast.style.zIndex = '9999';
-        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
         toast.innerHTML = `<strong>${title}</strong><br>${message}`;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
     
-    async function loadPendingTrades() {
-        try {
-            const { data: trades, error } = await supabaseClient
-                .from('trades')
-                .select('*, users(email, full_name)')
-                .order('created_at', { ascending: false });
-            
-            if (error) throw error;
-            
-            const pending = trades?.filter(t => t.status === 'pending') || [];
-            const container = document.getElementById('pendingTradesList');
-            
-            if (pending.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:20px;">No pending trades</div>';
-                return;
-            }
-            
-            let html = '<table><thead><tr><th>User</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Expected Return</th><th>WIN / LOSE</th><th>Status</th></tr></thead><tbody>';
-            pending.forEach(trade => {
-                html += `<tr>
-                    <td>${trade.users?.email || 'N/A'}</td>
-                    <td>${trade.coin_name} (${trade.coin})</td>
-                    <td>$${trade.amount}</td>
-                    <td>${trade.duration}s</td>
-                    <td>+${trade.rate}% ($${trade.expected_profit})</td>
-                    <td>
-                        <div class="toggle-container">
-                            <span style="font-size:0.7rem;">LOSE</span>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="toggle_${trade.id}" onchange="handleToggleChange('${trade.id}', this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <span style="font-size:0.7rem;">WIN</span>
-                        </div>
-                    </td>
-                    <td><span class="status-badge status-pending">⏳ PENDING</span></td>
-                </tr>`;
-            });
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        } catch(e) { console.error(e); }
-    }
-    
-    // Handle toggle switch change
-    async function handleToggleChange(tradeId, isWin) {
-        const result = await setTradeOutcome(tradeId, isWin ? 'win' : 'lose');
-    }
-    
-    async function loadPendingKYC() {
-        try {
-            const { data: kycRequests, error } = await supabaseClient
-                .from('kyc_requests')
-                .select('*, users(email, full_name)')
-                .eq('status', 'pending');
-            
-            if (error) throw error;
-            
-            const container = document.getElementById('kycList');
-            
-            if (!kycRequests || kycRequests.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:20px;">No pending KYC requests</div>';
-                return;
-            }
-            
-            let html = '<table><thead><tr><th>User</th><th>Full Name</th><th>ID Type</th><th>ID Number</th><th>Action</th></tr></thead><tbody>';
-            kycRequests.forEach(req => {
-                html += `<tr>
-                    <td>${req.users?.email || 'N/A'}</td>
-                    <td>${req.full_name}</td>
-                    <td>${req.id_type}</td>
-                    <td>${req.id_number}</td>
-                    <td><button onclick="approveKYC('${req.id}', '${req.user_id}')" style="background:#00ff88; color:#1e222d;">✅ Approve KYC</button></td>
-                </tr>`;
-            });
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        } catch(e) { console.error(e); }
-    }
-    
-    async function approveKYC(requestId, userId) {
-        try {
-            await supabaseClient
-                .from('kyc_requests')
-                .update({ status: 'approved', reviewed_at: new Date() })
-                .eq('id', requestId);
-            
-            await supabaseClient
-                .from('users')
-                .update({ kyc_status: 'verified' })
-                .eq('id', userId);
-            
-            showToast('✅ KYC Approved!', 'User can now trade.', 'success');
-            await loadPendingKYC();
-            await loadAllUsers();
-            await loadStats();
-        } catch(e) { console.error(e); }
-    }
-    
-    async function loadPendingDeposits() {
-        try {
-            const { data: deposits, error } = await supabaseClient
-                .from('deposits')
-                .select('*, users(email, full_name)')
-                .eq('status', 'pending');
-            
-            if (error) throw error;
-            
-            const container = document.getElementById('depositsList');
-            
-            if (!deposits || deposits.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:20px;">No pending deposits</div>';
-                return;
-            }
-            
-            let html = '<table><thead><tr><th>User</th><th>Amount</th><th>Currency</th><th>Date</th><th>Action</th></tr></thead><tbody>';
-            deposits.forEach(dep => {
-                html += `<tr>
-                    <td>${dep.users?.email || 'N/A'}</td>
-                    <td>$${dep.amount}</td>
-                    <td>${dep.currency}</td>
-                    <td>${new Date(dep.created_at).toLocaleString()}</td>
-                    <td><button onclick="approveDeposit('${dep.id}', '${dep.user_id}', ${dep.amount})" style="background:#00d4ff; color:#1e222d;">💰 Approve Deposit</button></td>
-                </tr>`;
-            });
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        } catch(e) { console.error(e); }
-    }
-    
-    async function approveDeposit(depositId, userId, amount) {
-        try {
-            await supabaseClient
-                .from('deposits')
-                .update({ status: 'approved', approved_at: new Date() })
-                .eq('id', depositId);
-            
-            const { data: user } = await supabaseClient
-                .from('users')
-                .select('balance')
-                .eq('id', userId)
-                .single();
-            
-            await supabaseClient
-                .from('users')
-                .update({ balance: (user.balance || 0) + amount })
-                .eq('id', userId);
-            
-            showToast('✅ Deposit Approved!', `$${amount} added to user balance.`, 'success');
-            await loadPendingDeposits();
-            await loadAllUsers();
-            await loadStats();
-        } catch(e) { console.error(e); }
-    }
-    
-    async function loadPendingWithdrawals() {
-        try {
-            const { data: withdrawals, error } = await supabaseClient
-                .from('withdrawals')
-                .select('*, users(email, full_name, balance)')
-                .eq('status', 'pending');
-            
-            if (error) throw error;
-            
-            const container = document.getElementById('withdrawalsList');
-            
-            if (!withdrawals || withdrawals.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:20px;">No pending withdrawals</div>';
-                return;
-            }
-            
-            let html = '<table><thead><tr><th>User</th><th>Amount</th><th>Address</th><th>Date</th><th>Action</th></tr></thead><tbody>';
-            withdrawals.forEach(wd => {
-                html += `<tr>
-                    <td>${wd.users?.email || 'N/A'}</td>
-                    <td>$${wd.amount}</td>
-                    <td>${wd.address.substring(0, 20)}...</td>
-                    <td>${new Date(wd.created_at).toLocaleString()}</td>
-                    <td><button onclick="approveWithdrawal('${wd.id}', '${wd.user_id}', ${wd.amount})" style="background:#ffaa00; color:#1e222d;">💸 Approve Withdrawal</button></td>
-                </tr>`;
-            });
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        } catch(e) { console.error(e); }
-    }
-    
-    async function approveWithdrawal(withdrawalId, userId, amount) {
-        try {
-            const { data: user } = await supabaseClient
-                .from('users')
-                .select('balance')
-                .eq('id', userId)
-                .single();
-            
-            if ((user.balance || 0) < amount) {
-                showToast('❌ Insufficient Balance!', `User only has $${user.balance}`, 'error');
-                return;
-            }
-            
-            await supabaseClient
-                .from('withdrawals')
-                .update({ status: 'approved', approved_at: new Date() })
-                .eq('id', withdrawalId);
-            
-            await supabaseClient
-                .from('users')
-                .update({ balance: (user.balance || 0) - amount })
-                .eq('id', userId);
-            
-            showToast('✅ Withdrawal Approved!', `$${amount} deducted from user balance.`, 'success');
-            await loadPendingWithdrawals();
-            await loadAllUsers();
-            await loadStats();
-        } catch(e) { console.error(e); }
-    }
-    
-    async function loadStats() {
-        try {
-            const { data: users } = await supabaseClient.from('users').select('*');
-            const { data: trades } = await supabaseClient.from('trades').select('*');
-            const { data: kyc } = await supabaseClient.from('kyc_requests').select('*').eq('status', 'pending');
-            const { data: deposits } = await supabaseClient.from('deposits').select('*').eq('status', 'pending');
-            
-            document.getElementById('totalUsers').innerText = users?.length || 0;
-            document.getElementById('pendingTrades').innerText = trades?.filter(t => t.status === 'pending').length || 0;
-            document.getElementById('pendingKYC').innerText = kyc?.length || 0;
-            document.getElementById('pendingDeposits').innerText = deposits?.length || 0;
-        } catch(e) { console.error(e); }
-    }
-    
     function toggleTheme() {
         document.body.classList.toggle('light-mode');
-        const isLight = document.body.classList.contains('light-mode');
-        localStorage.setItem('adminTheme', isLight ? 'light' : 'dark');
+        localStorage.setItem('adminTheme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
     }
     
     function checkTheme() {
@@ -657,15 +707,14 @@
         }
     }
     
-    // Make functions global for onclick handlers
-    window.setTradeOutcome = setTradeOutcome;
-    window.handleToggleChange = handleToggleChange;
-    window.approveKYC = approveKYC;
-    window.approveDeposit = approveDeposit;
-    window.approveWithdrawal = approveWithdrawal;
+    // Make functions global
     window.adminLogin = adminLogin;
     window.adminLogout = adminLogout;
     window.toggleTheme = toggleTheme;
+    window.updateGlobalSetting = updateGlobalSetting;
+    window.updateCoinSetting = updateCoinSetting;
+    window.approveKYC = approveKYC;
+    window.approveDeposit = approveDeposit;
     window.loadAllUsers = loadAllUsers;
     
     checkTheme();
