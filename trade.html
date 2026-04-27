@@ -103,6 +103,7 @@
             color: white;
         }
 
+        /* Active Trade Banner */
         .active-trade-banner {
             background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2));
             border: 2px solid #00d4ff;
@@ -114,10 +115,11 @@
         }
 
         .active-trade-banner .timer {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: bold;
             color: #00d4ff;
             margin: 10px 0;
+            font-family: monospace;
         }
 
         .trade-locked {
@@ -395,7 +397,6 @@
             .navbar { padding: 12px 20px; flex-direction: column; }
             .nav-links { flex-wrap: wrap; justify-content: center; }
             .modal-content { width: 90%; margin: 20px; }
-            .toast { min-width: 250px; }
         }
     </style>
 </head>
@@ -426,7 +427,7 @@
         <div id="activeTradeBanner" class="active-trade-banner">
             <div>⏳ Active Trade in Progress</div>
             <div class="timer" id="timerDisplay">0s</div>
-            <div class="trade-locked">🔒 New trades are locked until current trade completes</div>
+            <div class="trade-locked">🔒 Countdown in progress...</div>
         </div>
 
         <div class="trade-type">
@@ -476,20 +477,20 @@
 
             <label style="display: block; margin-bottom: 8px; color: #787b86;">⏱️ Select Duration</label>
             <div class="return-options" id="durationOptions">
-                <div class="return-option" data-time="30" data-rate="12" data-min="100">
-                    <div class="return-time">30s</div><div class="return-rate">+12%</div><div class="return-min">Min $100</div>
+                <div class="return-option" data-time="10" data-rate="12" data-min="100">
+                    <div class="return-time">10s</div><div class="return-rate">+12%</div><div class="return-min">Min $100</div>
                 </div>
-                <div class="return-option" data-time="60" data-rate="18" data-min="15000">
-                    <div class="return-time">60s</div><div class="return-rate">+18%</div><div class="return-min">Min $15K</div>
+                <div class="return-option" data-time="30" data-rate="18" data-min="15000">
+                    <div class="return-time">30s</div><div class="return-rate">+18%</div><div class="return-min">Min $15K</div>
                 </div>
-                <div class="return-option" data-time="90" data-rate="25" data-min="60000">
-                    <div class="return-time">90s</div><div class="return-rate">+25%</div><div class="return-min">Min $60K</div>
+                <div class="return-option" data-time="60" data-rate="25" data-min="60000">
+                    <div class="return-time">60s</div><div class="return-rate">+25%</div><div class="return-min">Min $60K</div>
                 </div>
-                <div class="return-option" data-time="180" data-rate="32" data-min="200000">
-                    <div class="return-time">180s</div><div class="return-rate">+32%</div><div class="return-min">Min $200K</div>
+                <div class="return-option" data-time="120" data-rate="32" data-min="200000">
+                    <div class="return-time">120s</div><div class="return-rate">+32%</div><div class="return-min">Min $200K</div>
                 </div>
-                <div class="return-option" data-time="300" data-rate="45" data-min="900000">
-                    <div class="return-time">300s</div><div class="return-rate">+45%</div><div class="return-min">Min $900K</div>
+                <div class="return-option" data-time="180" data-rate="45" data-min="900000">
+                    <div class="return-time">180s</div><div class="return-rate">+45%</div><div class="return-min">Min $900K</div>
                 </div>
             </div>
 
@@ -536,6 +537,14 @@
     let currentCoinPrice = 65234;
     let activeTrade = false;
     let countdownInterval = null;
+    
+    // Store pending trade data for after countdown
+    let pendingTrade = {
+        id: null,
+        amount: null,
+        expectedProfit: null,
+        isWin: null
+    };
 
     const coinPrices = {
         BTC: 65234, ETH: 3420, BNB: 580, SOL: 145, XRP: 0.62, ADA: 0.48,
@@ -570,6 +579,8 @@
     function closeModal() {
         const modal = document.getElementById('resultModal');
         modal.style.display = 'none';
+        // After closing modal, redirect or refresh
+        loadUserBalance();
     }
 
     function showToast(title, message, type = 'info') {
@@ -626,6 +637,181 @@
         }
     }
 
+    // ========== SETTLE TRADE AFTER COUNTDOWN ==========
+    
+    async function settleTrade() {
+        if (!pendingTrade.id) return;
+        
+        const isWin = pendingTrade.isWin;
+        const amount = pendingTrade.amount;
+        const expectedProfit = pendingTrade.expectedProfit;
+        const coin = currentCoin;
+        const coinName = coinNames[currentCoin];
+        const rate = selectedRate;
+        const duration = selectedDuration;
+        
+        if (isWin) {
+            // Update trade as WON
+            const { error: updateError } = await supabaseClient
+                .from('trades')
+                .update({ 
+                    status: 'won', 
+                    profit: expectedProfit, 
+                    completed_at: new Date(),
+                    auto_settled: true,
+                    settled_by: 'system'
+                })
+                .eq('id', pendingTrade.id);
+            
+            if (updateError) {
+                console.error('Error updating trade:', updateError);
+                return;
+            }
+            
+            // Add profit to user balance
+            const { data: user } = await supabaseClient
+                .from('users')
+                .select('balance')
+                .eq('id', userId)
+                .single();
+            
+            await supabaseClient
+                .from('users')
+                .update({ balance: (user.balance || 0) + expectedProfit })
+                .eq('id', userId);
+            
+            userBalance = (user.balance || 0) + expectedProfit;
+            
+            showModal(
+                '🎉 TRADE WON! 🎉',
+                `Your trade for ${coinName} (${coin}) of $${amount.toFixed(2)} was a WIN!\n\n` +
+                `📈 Rate: +${rate}%\n` +
+                `💰 Profit: +$${expectedProfit.toFixed(2)}\n` +
+                `⏱️ Duration: ${duration}s`,
+                true
+            );
+            showToast('Trade Won!', `You earned $${expectedProfit.toFixed(2)}!`, 'success');
+        } else {
+            // Update trade as LOST
+            const { error: updateError } = await supabaseClient
+                .from('trades')
+                .update({ 
+                    status: 'lost', 
+                    profit: -amount, 
+                    completed_at: new Date(),
+                    auto_settled: true,
+                    settled_by: 'system'
+                })
+                .eq('id', pendingTrade.id);
+            
+            if (updateError) {
+                console.error('Error updating trade:', updateError);
+                return;
+            }
+            
+            showModal(
+                '💀 TRADE LOST 💀',
+                `Your trade for ${coinName} (${coin}) of $${amount.toFixed(2)} was a LOSS.\n\n` +
+                `📉 Rate: ${rate}%\n` +
+                `💸 Loss: -$${amount.toFixed(2)}\n` +
+                `⏱️ Duration: ${duration}s\n\n` +
+                `Better luck next time!`,
+                false
+            );
+            showToast('Trade Lost', `You lost $${amount.toFixed(2)}`, 'error');
+        }
+        
+        // Reset pending trade
+        pendingTrade = { id: null, amount: null, expectedProfit: null, isWin: null };
+        
+        // Clear localStorage
+        localStorage.removeItem('tradeEndTime');
+        localStorage.removeItem('pendingTradeData');
+    }
+
+    // ========== COUNTDOWN TIMER ==========
+    
+    function startCountdown(seconds, tradeId, amount, expectedProfit, isWin) {
+        const timerDisplay = document.getElementById('timerDisplay');
+        let remaining = seconds;
+        timerDisplay.innerText = `${remaining}s`;
+        
+        // Store end time in localStorage for page refresh persistence
+        const endTime = Date.now() + (seconds * 1000);
+        localStorage.setItem('tradeEndTime', endTime.toString());
+        localStorage.setItem('pendingTradeData', JSON.stringify({
+            tradeId: tradeId,
+            amount: amount,
+            expectedProfit: expectedProfit,
+            isWin: isWin,
+            duration: seconds
+        }));
+        
+        if (countdownInterval) clearInterval(countdownInterval);
+        
+        countdownInterval = setInterval(async () => {
+            remaining--;
+            timerDisplay.innerText = `${remaining}s`;
+            
+            if (remaining <= 0) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+                
+                // Countdown finished - settle the trade
+                await settleTrade();
+                
+                // Unlock interface
+                activeTrade = false;
+                lockTradeInterface(false);
+            }
+        }, 1000);
+    }
+
+    // Check for active trade on page load (for refresh recovery)
+    function checkActiveTrade() {
+        const savedEndTime = localStorage.getItem('tradeEndTime');
+        const savedTradeData = localStorage.getItem('pendingTradeData');
+        
+        if (savedEndTime && savedTradeData) {
+            const endTime = parseInt(savedEndTime);
+            const now = Date.now();
+            
+            if (endTime > now) {
+                const remaining = Math.ceil((endTime - now) / 1000);
+                const tradeData = JSON.parse(savedTradeData);
+                
+                activeTrade = true;
+                lockTradeInterface(true);
+                
+                pendingTrade = {
+                    id: tradeData.tradeId,
+                    amount: tradeData.amount,
+                    expectedProfit: tradeData.expectedProfit,
+                    isWin: tradeData.isWin
+                };
+                selectedDuration = tradeData.duration;
+                
+                startCountdown(remaining, tradeData.tradeId, tradeData.amount, tradeData.expectedProfit, tradeData.isWin);
+            } else {
+                // Trade should have completed, clean up
+                localStorage.removeItem('tradeEndTime');
+                localStorage.removeItem('pendingTradeData');
+                
+                // Try to settle if needed
+                if (savedTradeData) {
+                    const tradeData = JSON.parse(savedTradeData);
+                    pendingTrade = {
+                        id: tradeData.tradeId,
+                        amount: tradeData.amount,
+                        expectedProfit: tradeData.expectedProfit,
+                        isWin: tradeData.isWin
+                    };
+                    settleTrade();
+                }
+            }
+        }
+    }
+
     // ========== USER DATA FUNCTIONS ==========
     
     async function loadUserBalance() {
@@ -678,46 +864,6 @@
             buyBtn.style.pointerEvents = 'auto';
             sellBtn.style.pointerEvents = 'auto';
             activeBanner.style.display = 'none';
-        }
-    }
-
-    function startCountdown(seconds) {
-        const timerDisplay = document.getElementById('timerDisplay');
-        let remaining = seconds;
-        timerDisplay.innerText = `${remaining}s`;
-        
-        if (countdownInterval) clearInterval(countdownInterval);
-        
-        countdownInterval = setInterval(() => {
-            remaining--;
-            timerDisplay.innerText = `${remaining}s`;
-            
-            if (remaining <= 0) {
-                clearInterval(countdownInterval);
-                countdownInterval = null;
-                activeTrade = false;
-                lockTradeInterface(false);
-                loadUserBalance();
-                showToast('Trade Complete', 'Your trade has finished!', 'info');
-            }
-        }, 1000);
-    }
-
-    function checkActiveTrade() {
-        const savedEndTime = localStorage.getItem('tradeEndTime');
-        if (savedEndTime) {
-            const endTime = parseInt(savedEndTime);
-            const now = Date.now();
-            
-            if (endTime > now) {
-                const remaining = Math.ceil((endTime - now) / 1000);
-                activeTrade = true;
-                lockTradeInterface(true);
-                startCountdown(remaining);
-            } else {
-                localStorage.removeItem('tradeEndTime');
-                localStorage.removeItem('activeTradeData');
-            }
         }
     }
 
@@ -797,7 +943,7 @@
         calculateReturn();
     }
 
-    // ========== CONFIRM TRADE FUNCTION WITH NOTIFICATIONS ==========
+    // ========== CONFIRM TRADE - STARTS COUNTDOWN ==========
     
     async function confirmTrade() {
         if (activeTrade) {
@@ -829,12 +975,14 @@
                 return;
             }
             
-            showToast('Processing Trade', 'Please wait...', 'info');
+            showToast('Trade Placed', `Your trade will complete in ${selectedDuration} seconds...`, 'info');
             
+            // Get admin outcome BEFORE placing trade
             const adminOutcome = await getTradeOutcome(currentCoin);
             const isWin = adminOutcome === 'win';
             const expectedReturnAmount = amount * (selectedRate / 100);
             
+            // Deduct amount from balance (user pays now)
             const newBalance = userBalance - totalPay;
             const { error: updateError } = await supabaseClient
                 .from('users')
@@ -847,7 +995,9 @@
             }
             
             userBalance = newBalance;
+            document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
             
+            // Create trade record with PENDING status
             const tradeId = Date.now();
             const { error: tradeError } = await supabaseClient.from('trades').insert({
                 id: tradeId,
@@ -858,7 +1008,8 @@
                 duration: selectedDuration,
                 rate: selectedRate,
                 expected_profit: expectedReturnAmount,
-                trade_type: 'buy'
+                trade_type: 'buy',
+                status: 'pending'
             });
             
             if (tradeError) {
@@ -866,35 +1017,18 @@
                 return;
             }
             
-            document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
+            // Store pending trade for after countdown
+            pendingTrade = {
+                id: tradeId,
+                amount: amount,
+                expectedProfit: expectedReturnAmount,
+                isWin: isWin
+            };
             
-            if (isWin) {
-                setTimeout(async () => {
-                    const { data: updatedUser } = await supabaseClient
-                        .from('users')
-                        .select('balance')
-                        .eq('id', userId)
-                        .single();
-                    if (updatedUser) {
-                        userBalance = updatedUser.balance;
-                        document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
-                    }
-                }, 500);
-                
-                showModal(
-                    '🎉 TRADE WON! 🎉',
-                    `Your trade for ${coinNames[currentCoin]} (${currentCoin}) of $${amount.toFixed(2)} was a WIN!\n\n💵 Amount: $${amount.toFixed(2)}\n📈 Rate: +${selectedRate}%\n💰 Profit: +$${expectedReturnAmount.toFixed(2)}\n⏱️ Duration: ${selectedDuration}s`,
-                    true
-                );
-                showToast('Trade Won!', `You earned $${expectedReturnAmount.toFixed(2)}!`, 'success');
-            } else {
-                showModal(
-                    '💀 TRADE LOST 💀',
-                    `Your trade for ${coinNames[currentCoin]} (${currentCoin}) of $${amount.toFixed(2)} was a LOSS.\n\n💵 Amount: $${amount.toFixed(2)}\n📉 Rate: ${selectedRate}%\n💸 Loss: -$${amount.toFixed(2)}\n⏱️ Duration: ${selectedDuration}s\n\nBetter luck next time!`,
-                    false
-                );
-                showToast('Trade Lost', `You lost $${amount.toFixed(2)}`, 'error');
-            }
+            // Lock interface and start countdown
+            activeTrade = true;
+            lockTradeInterface(true);
+            startCountdown(selectedDuration, tradeId, amount, expectedReturnAmount, isWin);
             
             cancelTrade();
         } else {
@@ -906,6 +1040,8 @@
         await supabaseClient.auth.signOut();
         localStorage.removeItem('lunoUser');
         sessionStorage.removeItem('lunoUser');
+        localStorage.removeItem('tradeEndTime');
+        localStorage.removeItem('pendingTradeData');
         window.location.href = 'index.html';
     }
 
@@ -947,7 +1083,7 @@
         await loadUserBalance();
         changeCrypto();
         setupEventListeners();
-        checkActiveTrade();
+        checkActiveTrade(); // Check for any active trade on page load
     }
     
     init();
