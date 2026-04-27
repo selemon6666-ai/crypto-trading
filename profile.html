@@ -374,24 +374,24 @@
 </div>
 
 <script>
-    // Supabase configuration
-    const SUPABASE_URL = 'https://zvfnqldeazdjokuqfegg.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Zm5xbGRlYXpkam9rdXFmZWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDI0OTMsImV4cCI6MjA5MjcxODQ5M30.MyYRk6SPO9PfFkWlNUYdZMVbcEqUOizNMiriMuZGJ8o';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Supabase configuration - using different variable name to avoid conflict
+    const SB_URL = 'https://zvfnqldeazdjokuqfegg.supabase.co';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Zm5xbGRlYXpkam9rdXFmZWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDI0OTMsImV4cCI6MjA5MjcxODQ5M30.MyYRk6SPO9PfFkWlNUYdZMVbcEqUOizNMiriMuZGJ8o';
+    const sbClient = supabase.createClient(SB_URL, SB_KEY);
 
     let userId = null;
     let userProfile = null;
 
     async function loadUserData() {
         try {
-            const { data: { user }, error } = await supabase.auth.getUser();
+            const { data: { user }, error } = await sbClient.auth.getUser();
             if (error || !user) {
                 window.location.href = 'index.html';
                 return;
             }
             userId = user.id;
             
-            const { data: profile } = await supabase
+            const { data: profile } = await sbClient
                 .from('users')
                 .select('*')
                 .eq('id', userId)
@@ -417,7 +417,7 @@
 
     async function loadTradeHistory() {
         try {
-            const { data: trades, error } = await supabase
+            const { data: trades, error } = await sbClient
                 .from('trades')
                 .select('*')
                 .eq('user_id', userId)
@@ -452,7 +452,7 @@
                     statusClass = 'status-pending';
                 }
                 
-                html += `<tr>
+                html += `<td>
                     <td>${new Date(trade.created_at).toLocaleString()}</td>
                     <td>${trade.coin_name} (${trade.coin})</td>
                     <td>$${trade.amount.toFixed(2)}</td>
@@ -474,7 +474,7 @@
 
     async function updateTradeStats() {
         try {
-            const { data: trades, error } = await supabase
+            const { data: trades, error } = await sbClient
                 .from('trades')
                 .select('*')
                 .eq('user_id', userId);
@@ -516,7 +516,7 @@
             return;
         }
         
-        await supabase.from('kyc_requests').insert({
+        await sbClient.from('kyc_requests').insert({
             user_id: userId,
             full_name: fullName,
             id_type: idType,
@@ -540,7 +540,7 @@
             return;
         }
         
-        await supabase.from('users').update({ full_name: newName }).eq('id', userId);
+        await sbClient.from('users').update({ full_name: newName }).eq('id', userId);
         alert('✅ Profile updated successfully!');
         loadUserData();
     }
@@ -562,7 +562,7 @@
             return;
         }
         
-        await supabase.from('withdrawals').insert({
+        await sbClient.from('withdrawals').insert({
             user_id: userId,
             amount: amount,
             address: address,
@@ -577,7 +577,7 @@
     function closeModal() { document.getElementById('transactionModal').style.display = 'none'; }
 
     async function logout() {
-        await supabase.auth.signOut();
+        await sbClient.auth.signOut();
         localStorage.removeItem('lunoUser');
         sessionStorage.removeItem('lunoUser');
         window.location.href = 'index.html';
