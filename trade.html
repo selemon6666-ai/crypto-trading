@@ -103,7 +103,6 @@
             color: white;
         }
 
-        /* Active Trade Banner */
         .active-trade-banner {
             background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2));
             border: 2px solid #00d4ff;
@@ -284,6 +283,7 @@
             cursor: not-allowed;
         }
 
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -291,34 +291,111 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 10000;
+            backdrop-filter: blur(5px);
         }
 
         .modal-content {
             background: #1e222d;
-            padding: 25px;
-            border-radius: 12px;
-            width: 350px;
+            padding: 30px;
+            border-radius: 20px;
+            width: 400px;
             text-align: center;
+            border: 1px solid #2a2e39;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content h3 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            white-space: pre-line;
         }
 
         .modal-btn {
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             border: none;
-            padding: 10px 25px;
-            border-radius: 8px;
+            padding: 12px 30px;
+            border-radius: 10px;
             color: white;
             cursor: pointer;
-            margin-top: 15px;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: transform 0.2s;
         }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Toast Container */
+        #toastContainer {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10001;
+        }
+
+        .toast {
+            background: #1e222d;
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-top: 10px;
+            min-width: 280px;
+            border-left: 4px solid;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            animation: toastSlideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success { border-left-color: #00ff88; }
+        .toast.error { border-left-color: #ff4444; }
+        .toast.info { border-left-color: #00d4ff; }
+
+        .toast-icon { font-size: 1.5rem; }
+        .toast-content { flex: 1; }
+        .toast-title { font-weight: bold; margin-bottom: 4px; }
+        .toast-message { font-size: 0.8rem; color: #787b86; }
+        .toast-close { cursor: pointer; font-size: 1.2rem; opacity: 0.7; }
+        .toast-close:hover { opacity: 1; }
 
         @media (max-width: 550px) {
             .return-options { grid-template-columns: repeat(2, 1fr); }
             .navbar { padding: 12px 20px; flex-direction: column; }
             .nav-links { flex-wrap: wrap; justify-content: center; }
+            .modal-content { width: 90%; margin: 20px; }
+            .toast { min-width: 250px; }
         }
     </style>
 </head>
@@ -341,8 +418,8 @@
 <div class="main-content">
     <div class="trade-card">
         <div class="card-header">
-            <h1>Confirm Your Trade</h1>
-            <p>Review your trade details before confirming</p>
+            <h1>💰 Place Your Trade</h1>
+            <p>Select coin, amount, and duration</p>
         </div>
 
         <!-- Active Trade Banner -->
@@ -393,11 +470,11 @@
 
         <div class="form-section">
             <div class="form-group">
-                <label>Amount (USDT)</label>
+                <label>💰 Amount (USDT)</label>
                 <input type="number" id="amount" placeholder="Enter amount to trade">
             </div>
 
-            <label style="display: block; margin-bottom: 8px; color: #787b86;">Select Duration</label>
+            <label style="display: block; margin-bottom: 8px; color: #787b86;">⏱️ Select Duration</label>
             <div class="return-options" id="durationOptions">
                 <div class="return-option" data-time="30" data-rate="12" data-min="100">
                     <div class="return-time">30s</div><div class="return-rate">+12%</div><div class="return-min">Min $100</div>
@@ -418,19 +495,20 @@
 
             <div id="warningMsg" class="warning-message"></div>
 
-            <div class="info-row"><span>Available Amount:</span><span id="availableAmount">0 USDT</span></div>
-            <div class="info-row"><span>Expected Return:</span><span class="info-value highlight" id="expectedReturn">0.00 USDT</span></div>
-            <div class="info-row"><span>Transaction Fee (2%):</span><span id="transactionFee">0.00 USDT</span></div>
-            <div class="info-row"><span>Total to Pay:</span><span class="info-value highlight" id="totalPay">0.00 USDT</span></div>
+            <div class="info-row"><span>💵 Available Amount:</span><span id="availableAmount">0 USDT</span></div>
+            <div class="info-row"><span>📈 Expected Return:</span><span class="info-value highlight" id="expectedReturn">0.00 USDT</span></div>
+            <div class="info-row"><span>💸 Transaction Fee (2%):</span><span id="transactionFee">0.00 USDT</span></div>
+            <div class="info-row"><span>💳 Total to Pay:</span><span class="info-value highlight" id="totalPay">0.00 USDT</span></div>
         </div>
 
         <div class="action-buttons">
-            <button class="btn-cancel" id="cancelBtn">Cancel</button>
-            <button class="btn-confirm" id="confirmBtn">Confirm Trade</button>
+            <button class="btn-cancel" id="cancelBtn">❌ Cancel</button>
+            <button class="btn-confirm" id="confirmBtn">✅ Confirm Trade</button>
         </div>
     </div>
 </div>
 
+<!-- Result Modal -->
 <div id="resultModal" class="modal">
     <div class="modal-content">
         <h3 id="modalTitle">Trade Result</h3>
@@ -438,6 +516,9 @@
         <button class="modal-btn" id="closeModalBtn">OK</button>
     </div>
 </div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
 
 <script>
     // Supabase configuration
@@ -467,7 +548,86 @@
         LINK: 'Chainlink', MATIC: 'Polygon', UNI: 'Uniswap', AAVE: 'Aave', SHIB: 'Shiba Inu'
     };
 
-    // Load user balance
+    // ========== NOTIFICATION FUNCTIONS ==========
+    
+    function showModal(title, message, isWin = true) {
+        const modal = document.getElementById('resultModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        
+        modalTitle.innerHTML = title;
+        modalMessage.innerHTML = message;
+        
+        if (isWin) {
+            modalTitle.style.color = '#00ff88';
+        } else {
+            modalTitle.style.color = '#ff4444';
+        }
+        
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('resultModal');
+        modal.style.display = 'none';
+    }
+
+    function showToast(title, message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        let icon = 'ℹ️';
+        if (type === 'success') icon = '✅';
+        if (type === 'error') icon = '❌';
+        
+        toast.innerHTML = `
+            <div class="toast-icon">${icon}</div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <div class="toast-close" onclick="this.parentElement.remove()">✕</div>
+        `;
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            if (toast && toast.parentElement) {
+                toast.remove();
+            }
+        }, 4000);
+    }
+
+    // ========== TRADE OUTCOME FUNCTION ==========
+    
+    async function getTradeOutcome(coinSymbol) {
+        try {
+            const { data: coinSetting } = await supabaseClient
+                .from('coin_trade_settings')
+                .select('trade_outcome')
+                .eq('coin_symbol', coinSymbol)
+                .maybeSingle();
+            
+            if (coinSetting) {
+                return coinSetting.trade_outcome;
+            }
+            
+            const { data: globalSetting } = await supabaseClient
+                .from('admin_settings')
+                .select('setting_value')
+                .eq('setting_key', 'default_trade_outcome')
+                .maybeSingle();
+            
+            return globalSetting?.setting_value || 'win';
+        } catch(e) {
+            console.error('Error getting trade outcome:', e);
+            return 'win';
+        }
+    }
+
+    // ========== USER DATA FUNCTIONS ==========
+    
     async function loadUserBalance() {
         try {
             const { data: { user }, error } = await supabaseClient.auth.getUser();
@@ -485,18 +645,14 @@
             
             userBalance = profile?.balance || 0;
             document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
-            
-            if (profile?.full_name) {
-                document.getElementById('displayUsername').innerText = profile.full_name.split(' ')[0];
-            } else {
-                document.getElementById('displayUsername').innerText = user.email.split('@')[0];
-            }
+            document.getElementById('displayUsername').innerText = profile?.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'Trader';
         } catch (error) {
             console.error('Error:', error);
         }
     }
 
-    // Lock/Unlock trade interface
+    // ========== TRADE INTERFACE FUNCTIONS ==========
+    
     function lockTradeInterface(lock) {
         const amountInput = document.getElementById('amount');
         const cryptoSelect = document.getElementById('cryptoSelect');
@@ -525,7 +681,6 @@
         }
     }
 
-    // Start countdown timer
     function startCountdown(seconds) {
         const timerDisplay = document.getElementById('timerDisplay');
         let remaining = seconds;
@@ -542,13 +697,12 @@
                 countdownInterval = null;
                 activeTrade = false;
                 lockTradeInterface(false);
-                // Auto refresh balance after trade completes
                 loadUserBalance();
+                showToast('Trade Complete', 'Your trade has finished!', 'info');
             }
         }, 1000);
     }
 
-    // Check for active trades on page load
     function checkActiveTrade() {
         const savedEndTime = localStorage.getItem('tradeEndTime');
         if (savedEndTime) {
@@ -562,10 +716,7 @@
                 startCountdown(remaining);
             } else {
                 localStorage.removeItem('tradeEndTime');
-                const savedTradeData = localStorage.getItem('activeTradeData');
-                if (savedTradeData) {
-                    localStorage.removeItem('activeTradeData');
-                }
+                localStorage.removeItem('activeTradeData');
             }
         }
     }
@@ -646,47 +797,59 @@
         calculateReturn();
     }
 
+    // ========== CONFIRM TRADE FUNCTION WITH NOTIFICATIONS ==========
+    
     async function confirmTrade() {
         if (activeTrade) {
-            alert('⚠️ You have an active trade! Please wait for it to complete.');
+            showToast('Trade Locked', 'You have an active trade! Please wait for it to complete.', 'error');
             return;
         }
         
         const amount = parseFloat(document.getElementById('amount').value);
         
         if (isNaN(amount) || amount <= 0) {
-            alert('Please enter a valid amount');
+            showToast('Invalid Amount', 'Please enter a valid amount', 'error');
             return;
         }
         if (!selectedDuration) {
-            alert('Please select a duration');
+            showToast('No Duration', 'Please select a duration', 'error');
             return;
         }
         if (amount < selectedMinAmount) {
-            alert(`Minimum amount for ${selectedDuration}s is $${selectedMinAmount.toLocaleString()} USDT`);
+            showToast('Minimum Amount', `Minimum amount for ${selectedDuration}s is $${selectedMinAmount.toLocaleString()} USDT`, 'error');
             return;
         }
         
         if (tradeType === 'buy') {
             const transactionFee = amount * 0.02;
             const totalPay = amount + transactionFee;
-            const expectedReturnAmount = amount * (selectedRate / 100);
             
             if (totalPay > userBalance) {
-                alert(`Insufficient balance! You need $${totalPay.toFixed(2)} USDT but only have $${userBalance.toFixed(2)} USDT`);
+                showToast('Insufficient Balance', `You need $${totalPay.toFixed(2)} USDT but have $${userBalance.toFixed(2)} USDT`, 'error');
                 return;
             }
             
-            // Update balance
+            showToast('Processing Trade', 'Please wait...', 'info');
+            
+            const adminOutcome = await getTradeOutcome(currentCoin);
+            const isWin = adminOutcome === 'win';
+            const expectedReturnAmount = amount * (selectedRate / 100);
+            
             const newBalance = userBalance - totalPay;
-            await supabaseClient.from('users').update({ balance: newBalance }).eq('id', userId);
+            const { error: updateError } = await supabaseClient
+                .from('users')
+                .update({ balance: newBalance })
+                .eq('id', userId);
+            
+            if (updateError) {
+                showToast('Error', 'Failed to update balance', 'error');
+                return;
+            }
+            
             userBalance = newBalance;
             
-            // Create trade record
             const tradeId = Date.now();
-            const endTime = Date.now() + (selectedDuration * 1000);
-            
-            await supabaseClient.from('trades').insert({
+            const { error: tradeError } = await supabaseClient.from('trades').insert({
                 id: tradeId,
                 user_id: userId,
                 coin: currentCoin,
@@ -695,37 +858,47 @@
                 duration: selectedDuration,
                 rate: selectedRate,
                 expected_profit: expectedReturnAmount,
-                status: 'pending',
                 trade_type: 'buy'
             });
             
-            // Save to localStorage for persistence
-            localStorage.setItem('tradeEndTime', endTime.toString());
-            localStorage.setItem('activeTradeData', JSON.stringify({
-                id: tradeId,
-                duration: selectedDuration
-            }));
+            if (tradeError) {
+                showToast('Error', 'Failed to place trade. Please try again.', 'error');
+                return;
+            }
             
-            // Start countdown
-            activeTrade = true;
-            lockTradeInterface(true);
-            startCountdown(selectedDuration);
+            document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
             
-            document.getElementById('modalTitle').innerHTML = '✅ TRADE PLACED!';
-            document.getElementById('modalMessage').innerHTML = `Your trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s has been placed!\n\nTrade will complete in ${selectedDuration} seconds.`;
-            document.getElementById('resultModal').style.display = 'flex';
+            if (isWin) {
+                setTimeout(async () => {
+                    const { data: updatedUser } = await supabaseClient
+                        .from('users')
+                        .select('balance')
+                        .eq('id', userId)
+                        .single();
+                    if (updatedUser) {
+                        userBalance = updatedUser.balance;
+                        document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
+                    }
+                }, 500);
+                
+                showModal(
+                    '🎉 TRADE WON! 🎉',
+                    `Your trade for ${coinNames[currentCoin]} (${currentCoin}) of $${amount.toFixed(2)} was a WIN!\n\n💵 Amount: $${amount.toFixed(2)}\n📈 Rate: +${selectedRate}%\n💰 Profit: +$${expectedReturnAmount.toFixed(2)}\n⏱️ Duration: ${selectedDuration}s`,
+                    true
+                );
+                showToast('Trade Won!', `You earned $${expectedReturnAmount.toFixed(2)}!`, 'success');
+            } else {
+                showModal(
+                    '💀 TRADE LOST 💀',
+                    `Your trade for ${coinNames[currentCoin]} (${currentCoin}) of $${amount.toFixed(2)} was a LOSS.\n\n💵 Amount: $${amount.toFixed(2)}\n📉 Rate: ${selectedRate}%\n💸 Loss: -$${amount.toFixed(2)}\n⏱️ Duration: ${selectedDuration}s\n\nBetter luck next time!`,
+                    false
+                );
+                showToast('Trade Lost', `You lost $${amount.toFixed(2)}`, 'error');
+            }
             
             cancelTrade();
-            document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
         } else {
-            alert('Sell feature coming soon!');
-        }
-    }
-
-    function closeModal() {
-        document.getElementById('resultModal').style.display = 'none';
-        if (!activeTrade) {
-            window.location.href = 'profile.html';
+            showToast('Coming Soon', 'Sell feature coming soon!', 'info');
         }
     }
 
@@ -736,7 +909,8 @@
         window.location.href = 'index.html';
     }
 
-    // Set up event listeners
+    // ========== EVENT LISTENERS ==========
+    
     function setupEventListeners() {
         document.getElementById('buyBtn').addEventListener('click', () => setTradeType('buy'));
         document.getElementById('sellBtn').addEventListener('click', () => setTradeType('sell'));
@@ -745,6 +919,13 @@
         document.getElementById('closeModalBtn').addEventListener('click', closeModal);
         document.getElementById('cryptoSelect').addEventListener('change', changeCrypto);
         document.getElementById('amount').addEventListener('input', calculateReturn);
+        
+        const modal = document.getElementById('resultModal');
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
         
         const durationOptions = document.querySelectorAll('.return-option');
         durationOptions.forEach(option => {
@@ -760,7 +941,8 @@
         });
     }
 
-    // Initialize
+    // ========== INITIALIZE ==========
+    
     async function init() {
         await loadUserBalance();
         changeCrypto();
