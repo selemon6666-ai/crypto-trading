@@ -103,6 +103,29 @@
             color: white;
         }
 
+        /* Active Trade Banner */
+        .active-trade-banner {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2));
+            border: 2px solid #00d4ff;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .active-trade-banner .timer {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+            margin: 10px 0;
+        }
+
+        .trade-locked {
+            color: #ffaa00;
+            font-size: 0.85rem;
+        }
+
         .trade-type {
             display: flex;
             margin: 15px 20px;
@@ -193,6 +216,11 @@
             transition: 0.3s;
         }
 
+        .return-option.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
         .return-option:hover {
             background: rgba(0, 212, 255, 0.2);
         }
@@ -249,6 +277,11 @@
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
             border: none;
             color: white;
+        }
+
+        .btn-confirm:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .modal {
@@ -310,6 +343,13 @@
         <div class="card-header">
             <h1>Confirm Your Trade</h1>
             <p>Review your trade details before confirming</p>
+        </div>
+
+        <!-- Active Trade Banner -->
+        <div id="activeTradeBanner" class="active-trade-banner">
+            <div>⏳ Active Trade in Progress</div>
+            <div class="timer" id="timerDisplay">0s</div>
+            <div class="trade-locked">🔒 New trades are locked until current trade completes</div>
         </div>
 
         <div class="trade-type">
@@ -400,7 +440,7 @@
 </div>
 
 <script>
-    // Supabase configuration (using different variable name to avoid conflict)
+    // Supabase configuration
     const SUPABASE_URL = 'https://zvfnqldeazdjokuqfegg.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Zm5xbGRlYXpkam9rdXFmZWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDI0OTMsImV4cCI6MjA5MjcxODQ5M30.MyYRk6SPO9PfFkWlNUYdZMVbcEqUOizNMiriMuZGJ8o';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -413,6 +453,8 @@
     let selectedMinAmount = 0;
     let currentCoin = 'BTC';
     let currentCoinPrice = 65234;
+    let activeTrade = false;
+    let countdownInterval = null;
 
     const coinPrices = {
         BTC: 65234, ETH: 3420, BNB: 580, SOL: 145, XRP: 0.62, ADA: 0.48,
@@ -451,6 +493,80 @@
             }
         } catch (error) {
             console.error('Error:', error);
+        }
+    }
+
+    // Lock/Unlock trade interface
+    function lockTradeInterface(lock) {
+        const amountInput = document.getElementById('amount');
+        const cryptoSelect = document.getElementById('cryptoSelect');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const durationOptions = document.querySelectorAll('.return-option');
+        const buyBtn = document.getElementById('buyBtn');
+        const sellBtn = document.getElementById('sellBtn');
+        const activeBanner = document.getElementById('activeTradeBanner');
+        
+        if (lock) {
+            amountInput.disabled = true;
+            cryptoSelect.disabled = true;
+            confirmBtn.disabled = true;
+            durationOptions.forEach(opt => opt.classList.add('disabled'));
+            buyBtn.style.pointerEvents = 'none';
+            sellBtn.style.pointerEvents = 'none';
+            activeBanner.style.display = 'block';
+        } else {
+            amountInput.disabled = false;
+            cryptoSelect.disabled = false;
+            confirmBtn.disabled = false;
+            durationOptions.forEach(opt => opt.classList.remove('disabled'));
+            buyBtn.style.pointerEvents = 'auto';
+            sellBtn.style.pointerEvents = 'auto';
+            activeBanner.style.display = 'none';
+        }
+    }
+
+    // Start countdown timer
+    function startCountdown(seconds) {
+        const timerDisplay = document.getElementById('timerDisplay');
+        let remaining = seconds;
+        timerDisplay.innerText = `${remaining}s`;
+        
+        if (countdownInterval) clearInterval(countdownInterval);
+        
+        countdownInterval = setInterval(() => {
+            remaining--;
+            timerDisplay.innerText = `${remaining}s`;
+            
+            if (remaining <= 0) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+                activeTrade = false;
+                lockTradeInterface(false);
+                // Auto refresh balance after trade completes
+                loadUserBalance();
+            }
+        }, 1000);
+    }
+
+    // Check for active trades on page load
+    function checkActiveTrade() {
+        const savedEndTime = localStorage.getItem('tradeEndTime');
+        if (savedEndTime) {
+            const endTime = parseInt(savedEndTime);
+            const now = Date.now();
+            
+            if (endTime > now) {
+                const remaining = Math.ceil((endTime - now) / 1000);
+                activeTrade = true;
+                lockTradeInterface(true);
+                startCountdown(remaining);
+            } else {
+                localStorage.removeItem('tradeEndTime');
+                const savedTradeData = localStorage.getItem('activeTradeData');
+                if (savedTradeData) {
+                    localStorage.removeItem('activeTradeData');
+                }
+            }
         }
     }
 
@@ -531,6 +647,11 @@
     }
 
     async function confirmTrade() {
+        if (activeTrade) {
+            alert('⚠️ You have an active trade! Please wait for it to complete.');
+            return;
+        }
+        
         const amount = parseFloat(document.getElementById('amount').value);
         
         if (isNaN(amount) || amount <= 0) {
@@ -563,6 +684,8 @@
             
             // Create trade record
             const tradeId = Date.now();
+            const endTime = Date.now() + (selectedDuration * 1000);
+            
             await supabaseClient.from('trades').insert({
                 id: tradeId,
                 user_id: userId,
@@ -576,8 +699,20 @@
                 trade_type: 'buy'
             });
             
+            // Save to localStorage for persistence
+            localStorage.setItem('tradeEndTime', endTime.toString());
+            localStorage.setItem('activeTradeData', JSON.stringify({
+                id: tradeId,
+                duration: selectedDuration
+            }));
+            
+            // Start countdown
+            activeTrade = true;
+            lockTradeInterface(true);
+            startCountdown(selectedDuration);
+            
             document.getElementById('modalTitle').innerHTML = '✅ TRADE PLACED!';
-            document.getElementById('modalMessage').innerHTML = `Your trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s has been placed! Waiting for admin.`;
+            document.getElementById('modalMessage').innerHTML = `Your trade for ${coinNames[currentCoin]} (${currentCoin}) with ${selectedDuration}s has been placed!\n\nTrade will complete in ${selectedDuration} seconds.`;
             document.getElementById('resultModal').style.display = 'flex';
             
             cancelTrade();
@@ -589,7 +724,9 @@
 
     function closeModal() {
         document.getElementById('resultModal').style.display = 'none';
-        window.location.href = 'profile.html';
+        if (!activeTrade) {
+            window.location.href = 'profile.html';
+        }
     }
 
     async function logout() {
@@ -601,27 +738,18 @@
 
     // Set up event listeners
     function setupEventListeners() {
-        // Buy/Sell buttons
         document.getElementById('buyBtn').addEventListener('click', () => setTradeType('buy'));
         document.getElementById('sellBtn').addEventListener('click', () => setTradeType('sell'));
-        
-        // Cancel and Confirm buttons
         document.getElementById('cancelBtn').addEventListener('click', cancelTrade);
         document.getElementById('confirmBtn').addEventListener('click', confirmTrade);
-        
-        // Close modal button
         document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-        
-        // Crypto select
         document.getElementById('cryptoSelect').addEventListener('change', changeCrypto);
-        
-        // Amount input
         document.getElementById('amount').addEventListener('input', calculateReturn);
         
-        // Duration options
         const durationOptions = document.querySelectorAll('.return-option');
         durationOptions.forEach(option => {
             option.addEventListener('click', function() {
+                if (activeTrade) return;
                 durationOptions.forEach(opt => opt.classList.remove('selected'));
                 this.classList.add('selected');
                 selectedDuration = parseInt(this.getAttribute('data-time'));
@@ -637,6 +765,7 @@
         await loadUserBalance();
         changeCrypto();
         setupEventListeners();
+        checkActiveTrade();
     }
     
     init();
