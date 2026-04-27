@@ -103,7 +103,6 @@
             color: white;
         }
 
-        /* Active Trade Banner */
         .active-trade-banner {
             background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2));
             border: 2px solid #00d4ff;
@@ -285,7 +284,6 @@
             cursor: not-allowed;
         }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -348,7 +346,6 @@
             transform: translateY(-2px);
         }
 
-        /* Toast Container */
         #toastContainer {
             position: fixed;
             bottom: 20px;
@@ -423,7 +420,6 @@
             <p>Select coin, amount, and duration</p>
         </div>
 
-        <!-- Active Trade Banner -->
         <div id="activeTradeBanner" class="active-trade-banner">
             <div>⏳ Active Trade in Progress</div>
             <div class="timer" id="timerDisplay">0s</div>
@@ -519,7 +515,6 @@
     </div>
 </div>
 
-<!-- Result Modal -->
 <div id="resultModal" class="modal">
     <div class="modal-content">
         <h3 id="modalTitle">Trade Result</h3>
@@ -528,11 +523,9 @@
     </div>
 </div>
 
-<!-- Toast Container -->
 <div id="toastContainer"></div>
 
 <script>
-    // Supabase configuration
     const SUPABASE_URL = 'https://zvfnqldeazdjokuqfegg.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Zm5xbGRlYXpkam9rdXFmZWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDI0OTMsImV4cCI6MjA5MjcxODQ5M30.MyYRk6SPO9PfFkWlNUYdZMVbcEqUOizNMiriMuZGJ8o';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -548,11 +541,14 @@
     let activeTrade = false;
     let countdownInterval = null;
     
-    // Store pending trade data for after countdown
     let pendingTrade = {
         id: null,
         amount: null,
         expectedProfit: null,
+        rate: null,
+        duration: null,
+        coinName: null,
+        coinSymbol: null,
         isWin: null
     };
 
@@ -567,8 +563,6 @@
         LINK: 'Chainlink', MATIC: 'Polygon', UNI: 'Uniswap', AAVE: 'Aave', SHIB: 'Shiba Inu'
     };
 
-    // ========== NOTIFICATION FUNCTIONS ==========
-    
     function showModal(title, message, isWin = true) {
         const modal = document.getElementById('resultModal');
         const modalTitle = document.getElementById('modalTitle');
@@ -611,16 +605,9 @@
         `;
         
         container.appendChild(toast);
-        
-        setTimeout(() => {
-            if (toast && toast.parentElement) {
-                toast.remove();
-            }
-        }, 4000);
+        setTimeout(() => toast.remove(), 4000);
     }
 
-    // ========== TRADE OUTCOME FUNCTION ==========
-    
     async function getTradeOutcome(coinSymbol) {
         try {
             const { data: coinSetting } = await supabaseClient
@@ -629,9 +616,7 @@
                 .eq('coin_symbol', coinSymbol)
                 .maybeSingle();
             
-            if (coinSetting) {
-                return coinSetting.trade_outcome;
-            }
+            if (coinSetting) return coinSetting.trade_outcome;
             
             const { data: globalSetting } = await supabaseClient
                 .from('admin_settings')
@@ -641,40 +626,31 @@
             
             return globalSetting?.setting_value || 'win';
         } catch(e) {
-            console.error('Error getting trade outcome:', e);
             return 'win';
         }
     }
 
-    // ========== SETTLE TRADE AFTER COUNTDOWN ==========
-    
     async function settleTrade() {
         if (!pendingTrade.id) return;
         
         const isWin = pendingTrade.isWin;
         const amount = pendingTrade.amount;
         const expectedProfit = pendingTrade.expectedProfit;
-        const coin = currentCoin;
-        const coinName = coinNames[currentCoin];
-        const rate = selectedRate;
-        const duration = selectedDuration;
+        const rate = pendingTrade.rate;
+        const duration = pendingTrade.duration;
+        const coinName = pendingTrade.coinName;
+        const coinSymbol = pendingTrade.coinSymbol;
         
         if (isWin) {
-            const { error: updateError } = await supabaseClient
+            await supabaseClient
                 .from('trades')
                 .update({ 
                     status: 'won', 
                     profit: expectedProfit, 
                     completed_at: new Date(),
-                    auto_settled: true,
-                    settled_by: 'system'
+                    auto_settled: true
                 })
                 .eq('id', pendingTrade.id);
-            
-            if (updateError) {
-                console.error('Error updating trade:', updateError);
-                return;
-            }
             
             const { data: user } = await supabaseClient
                 .from('users')
@@ -691,7 +667,7 @@
             
             showModal(
                 '🎉 TRADE WON! 🎉',
-                `Your trade for ${coinName} (${coin}) of $${amount.toFixed(2)} was a WIN!\n\n` +
+                `Your trade for ${coinName} (${coinSymbol}) of $${amount.toFixed(2)} was a WIN!\n\n` +
                 `📈 Rate: +${rate}%\n` +
                 `💰 Profit: +$${expectedProfit.toFixed(2)}\n` +
                 `⏱️ Duration: ${duration}s`,
@@ -699,25 +675,19 @@
             );
             showToast('Trade Won!', `You earned $${expectedProfit.toFixed(2)}!`, 'success');
         } else {
-            const { error: updateError } = await supabaseClient
+            await supabaseClient
                 .from('trades')
                 .update({ 
                     status: 'lost', 
                     profit: -amount, 
                     completed_at: new Date(),
-                    auto_settled: true,
-                    settled_by: 'system'
+                    auto_settled: true
                 })
                 .eq('id', pendingTrade.id);
             
-            if (updateError) {
-                console.error('Error updating trade:', updateError);
-                return;
-            }
-            
             showModal(
                 '💀 TRADE LOST 💀',
-                `Your trade for ${coinName} (${coin}) of $${amount.toFixed(2)} was a LOSS.\n\n` +
+                `Your trade for ${coinName} (${coinSymbol}) of $${amount.toFixed(2)} was a LOSS.\n\n` +
                 `📉 Rate: ${rate}%\n` +
                 `💸 Loss: -$${amount.toFixed(2)}\n` +
                 `⏱️ Duration: ${duration}s\n\n` +
@@ -727,28 +697,19 @@
             showToast('Trade Lost', `You lost $${amount.toFixed(2)}`, 'error');
         }
         
-        pendingTrade = { id: null, amount: null, expectedProfit: null, isWin: null };
-        
+        pendingTrade = { id: null, amount: null, expectedProfit: null, rate: null, duration: null, coinName: null, coinSymbol: null, isWin: null };
         localStorage.removeItem('tradeEndTime');
         localStorage.removeItem('pendingTradeData');
     }
 
-    // ========== COUNTDOWN TIMER ==========
-    
-    function startCountdown(seconds, tradeId, amount, expectedProfit, isWin) {
+    function startCountdown(seconds, tradeData) {
         const timerDisplay = document.getElementById('timerDisplay');
         let remaining = seconds;
         timerDisplay.innerText = `${remaining}s`;
         
         const endTime = Date.now() + (seconds * 1000);
         localStorage.setItem('tradeEndTime', endTime.toString());
-        localStorage.setItem('pendingTradeData', JSON.stringify({
-            tradeId: tradeId,
-            amount: amount,
-            expectedProfit: expectedProfit,
-            isWin: isWin,
-            duration: seconds
-        }));
+        localStorage.setItem('pendingTradeData', JSON.stringify(tradeData));
         
         if (countdownInterval) clearInterval(countdownInterval);
         
@@ -781,35 +742,19 @@
                 activeTrade = true;
                 lockTradeInterface(true);
                 
-                pendingTrade = {
-                    id: tradeData.tradeId,
-                    amount: tradeData.amount,
-                    expectedProfit: tradeData.expectedProfit,
-                    isWin: tradeData.isWin
-                };
-                selectedDuration = tradeData.duration;
-                
-                startCountdown(remaining, tradeData.tradeId, tradeData.amount, tradeData.expectedProfit, tradeData.isWin);
+                pendingTrade = tradeData;
+                startCountdown(remaining, tradeData);
             } else {
                 localStorage.removeItem('tradeEndTime');
                 localStorage.removeItem('pendingTradeData');
-                
                 if (savedTradeData) {
-                    const tradeData = JSON.parse(savedTradeData);
-                    pendingTrade = {
-                        id: tradeData.tradeId,
-                        amount: tradeData.amount,
-                        expectedProfit: tradeData.expectedProfit,
-                        isWin: tradeData.isWin
-                    };
+                    pendingTrade = JSON.parse(savedTradeData);
                     settleTrade();
                 }
             }
         }
     }
 
-    // ========== USER DATA FUNCTIONS ==========
-    
     async function loadUserBalance() {
         try {
             const { data: { user }, error } = await supabaseClient.auth.getUser();
@@ -939,7 +884,7 @@
 
     async function confirmTrade() {
         if (activeTrade) {
-            showToast('Trade Locked', 'You have an active trade! Please wait for it to complete.', 'error');
+            showToast('Trade Locked', 'You have an active trade! Please wait.', 'error');
             return;
         }
         
@@ -954,7 +899,7 @@
             return;
         }
         if (amount < selectedMinAmount) {
-            showToast('Minimum Amount', `Minimum amount for ${selectedDuration}s is $${selectedMinAmount.toLocaleString()} USDT`, 'error');
+            showToast('Minimum Amount', `Minimum amount is $${selectedMinAmount.toLocaleString()} USDT`, 'error');
             return;
         }
         
@@ -963,32 +908,23 @@
             const totalPay = amount + transactionFee;
             
             if (totalPay > userBalance) {
-                showToast('Insufficient Balance', `You need $${totalPay.toFixed(2)} USDT but have $${userBalance.toFixed(2)} USDT`, 'error');
+                showToast('Insufficient Balance', `You need $${totalPay.toFixed(2)} USDT`, 'error');
                 return;
             }
             
-            showToast('Trade Placed', `Your trade will complete in ${selectedDuration} seconds...`, 'info');
+            showToast('Trade Placed', `Trade will complete in ${selectedDuration} seconds...`, 'info');
             
             const adminOutcome = await getTradeOutcome(currentCoin);
             const isWin = adminOutcome === 'win';
             const expectedReturnAmount = amount * (selectedRate / 100);
             
             const newBalance = userBalance - totalPay;
-            const { error: updateError } = await supabaseClient
-                .from('users')
-                .update({ balance: newBalance })
-                .eq('id', userId);
-            
-            if (updateError) {
-                showToast('Error', 'Failed to update balance', 'error');
-                return;
-            }
-            
+            await supabaseClient.from('users').update({ balance: newBalance }).eq('id', userId);
             userBalance = newBalance;
             document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
             
             const tradeId = Date.now();
-            const { error: tradeError } = await supabaseClient.from('trades').insert({
+            await supabaseClient.from('trades').insert({
                 id: tradeId,
                 user_id: userId,
                 coin: currentCoin,
@@ -1001,22 +937,21 @@
                 status: 'pending'
             });
             
-            if (tradeError) {
-                showToast('Error', 'Failed to place trade. Please try again.', 'error');
-                return;
-            }
-            
-            pendingTrade = {
+            const tradeData = {
                 id: tradeId,
                 amount: amount,
                 expectedProfit: expectedReturnAmount,
+                rate: selectedRate,
+                duration: selectedDuration,
+                coinName: coinNames[currentCoin],
+                coinSymbol: currentCoin,
                 isWin: isWin
             };
             
+            pendingTrade = tradeData;
             activeTrade = true;
             lockTradeInterface(true);
-            startCountdown(selectedDuration, tradeId, amount, expectedReturnAmount, isWin);
-            
+            startCountdown(selectedDuration, tradeData);
             cancelTrade();
         } else {
             showToast('Coming Soon', 'Sell feature coming soon!', 'info');
@@ -1025,10 +960,7 @@
 
     async function logout() {
         await supabaseClient.auth.signOut();
-        localStorage.removeItem('lunoUser');
-        sessionStorage.removeItem('lunoUser');
-        localStorage.removeItem('tradeEndTime');
-        localStorage.removeItem('pendingTradeData');
+        localStorage.clear();
         window.location.href = 'index.html';
     }
 
@@ -1042,21 +974,16 @@
         document.getElementById('amount').addEventListener('input', calculateReturn);
         
         const modal = document.getElementById('resultModal');
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
         
-        const durationOptions = document.querySelectorAll('.return-option');
-        durationOptions.forEach(option => {
+        document.querySelectorAll('.return-option').forEach(option => {
             option.addEventListener('click', function() {
                 if (activeTrade) return;
-                durationOptions.forEach(opt => opt.classList.remove('selected'));
+                document.querySelectorAll('.return-option').forEach(opt => opt.classList.remove('selected'));
                 this.classList.add('selected');
-                selectedDuration = parseInt(this.getAttribute('data-time'));
-                selectedRate = parseInt(this.getAttribute('data-rate'));
-                selectedMinAmount = parseInt(this.getAttribute('data-min'));
+                selectedDuration = parseInt(this.dataset.time);
+                selectedRate = parseInt(this.dataset.rate);
+                selectedMinAmount = parseInt(this.dataset.min);
                 calculateReturn();
             });
         });
