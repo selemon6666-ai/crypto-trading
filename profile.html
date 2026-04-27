@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luno Trading - My Profile</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase.js"></script>
     <style>
         * {
             margin: 0;
@@ -68,15 +67,6 @@
             color: #00d4ff;
         }
 
-        .theme-toggle {
-            background: rgba(0, 212, 255, 0.15);
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            border: 1px solid rgba(0, 212, 255, 0.3);
-        }
-
         .logout-btn {
             background: rgba(255, 68, 68, 0.15);
             padding: 6px 16px;
@@ -85,11 +75,6 @@
             cursor: pointer;
             color: #ff4444;
             font-size: 0.85rem;
-            transition: 0.3s;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 68, 68, 0.3);
         }
 
         .main-container {
@@ -209,12 +194,12 @@
         }
 
         .file-input {
+            width: 100%;
             padding: 10px;
             background: #2a2e39;
             border: 1px solid #3a3e49;
             border-radius: 8px;
             color: white;
-            width: 100%;
         }
 
         .modal {
@@ -236,6 +221,7 @@
             border-radius: 12px;
             width: 380px;
             text-align: center;
+            border: 1px solid #2a2e39;
         }
 
         .modal-content input {
@@ -260,9 +246,11 @@
         .history-table { overflow-x: auto; }
         .history-table table { width: 100%; border-collapse: collapse; }
         .history-table th, .history-table td { padding: 10px; text-align: left; border-bottom: 1px solid #2a2e39; }
+        .history-table th { color: #787b86; font-weight: 500; }
 
         .status-won { color: #00ff88; }
         .status-lost { color: #ff4444; }
+        .status-pending { color: #ffaa00; }
 
         @media (max-width: 768px) {
             .sidebar { width: 80px; }
@@ -270,6 +258,7 @@
             .content-area { margin-left: 80px; padding: 20px; }
             .profile-grid { grid-template-columns: 1fr; }
             .profile-card.full-width { grid-column: span 1; }
+            .action-buttons { flex-direction: column; }
         }
     </style>
 </head>
@@ -285,7 +274,6 @@
     </div>
     <div class="user-info">
         <span class="username" id="displayUsername">Trader</span>
-        <div class="theme-toggle" onclick="toggleTheme()">🌓 Theme</div>
         <a href="#" class="logout-btn" onclick="logout()">Logout</a>
     </div>
 </nav>
@@ -301,7 +289,7 @@
 
     <div class="content-area">
         <div id="profilePage" class="page-content">
-            <div class="page-header"><h1>Profile</h1><p>View your personal information</p></div>
+            <div class="page-header"><h1>Profile</h1><p>View your personal information and account status</p></div>
             <div class="profile-grid">
                 <div class="profile-card">
                     <div class="card-title">👤 Personal Information</div>
@@ -329,7 +317,7 @@
         </div>
 
         <div id="historyPage" class="page-content" style="display: none;">
-            <div class="page-header"><h1>Trade History</h1></div>
+            <div class="page-header"><h1>Trade History</h1><p>View all your past trades</p></div>
             <div class="profile-card full-width">
                 <div class="card-title">📜 All Trades</div>
                 <div class="history-table" id="historyTable"></div>
@@ -337,7 +325,7 @@
         </div>
 
         <div id="kycPage" class="page-content" style="display: none;">
-            <div class="page-header"><h1>KYC Verification</h1></div>
+            <div class="page-header"><h1>KYC Verification</h1><p>Verify your identity to unlock full trading features</p></div>
             <div class="profile-card">
                 <div class="card-title">✅ Identity Verification</div>
                 <div class="form-group"><label>Full Name (as on ID)</label><input type="text" id="kycFullName"></div>
@@ -351,7 +339,7 @@
         </div>
 
         <div id="updatePage" class="page-content" style="display: none;">
-            <div class="page-header"><h1>Update Profile</h1></div>
+            <div class="page-header"><h1>Update Profile</h1><p>Update your personal information</p></div>
             <div class="profile-card">
                 <div class="card-title">✏️ Edit Information</div>
                 <div class="form-group"><label>Full Name</label><input type="text" id="updateFullName"></div>
@@ -363,7 +351,7 @@
         </div>
 
         <div id="supportPage" class="page-content" style="display: none;">
-            <div class="page-header"><h1>Customer Support</h1></div>
+            <div class="page-header"><h1>Customer Support</h1><p>Get help with your account</p></div>
             <div class="profile-card">
                 <div class="card-title">💬 Contact Support</div>
                 <div class="info-row"><span>📧</span><span>support@lunotrading.com</span></div>
@@ -386,77 +374,44 @@
 </div>
 
 <script>
+    // Supabase configuration
+    const SUPABASE_URL = 'https://zvfnqldeazdjokuqfegg.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Zm5xbGRlYXpkam9rdXFmZWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDI0OTMsImV4cCI6MjA5MjcxODQ5M30.MyYRk6SPO9PfFkWlNUYdZMVbcEqUOizNMiriMuZGJ8o';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
     let userId = null;
     let userProfile = null;
 
-    // LOGOUT FUNCTION - FIXED
-    async function logout() {
-        console.log('Logging out...');
-        try {
-            // Sign out from Supabase
-            const { error } = await supabase.auth.signOut();
-            if (error) {
-                console.error('Supabase sign out error:', error);
-            }
-        } catch (e) {
-            console.error('Logout error:', e);
-        }
-        
-        // Clear local storage
-        localStorage.removeItem('lunoUser');
-        sessionStorage.removeItem('lunoUser');
-        
-        // Redirect to login page
-        window.location.href = 'index.html';
-    }
-
     async function loadUserData() {
         try {
-            console.log('Loading user data...');
-            
-            const { data: { user }, error: userError } = await supabase.auth.getUser();
-            
-            if (userError || !user) {
-                console.log('No user found, redirecting to login');
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (error || !user) {
                 window.location.href = 'index.html';
                 return;
             }
-            
             userId = user.id;
             
-            const { data: profile, error: profileError } = await supabase
+            const { data: profile } = await supabase
                 .from('users')
                 .select('*')
                 .eq('id', userId)
                 .single();
             
-            if (profileError && profileError.code !== 'PGRST116') {
-                console.error('Profile fetch error:', profileError);
-            }
+            userProfile = profile;
             
-            if (profile) {
-                userProfile = profile;
-                document.getElementById('fullName').innerText = profile.full_name || user.email.split('@')[0];
-                document.getElementById('email').innerText = user.email;
-                document.getElementById('memberSince').innerText = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : new Date().toLocaleDateString();
-                document.getElementById('balance').innerText = `$${(profile.balance || 0).toLocaleString()}`;
-                document.getElementById('kycStatus').innerText = profile.kyc_status || 'pending';
-                document.getElementById('displayUsername').innerText = (profile.full_name || user.email).split(' ')[0];
-                document.getElementById('updateFullName').value = profile.full_name || '';
-            } else {
-                document.getElementById('fullName').innerText = user.email.split('@')[0];
-                document.getElementById('email').innerText = user.email;
-                document.getElementById('memberSince').innerText = new Date().toLocaleDateString();
-                document.getElementById('balance').innerText = '$0';
-                document.getElementById('kycStatus').innerText = 'pending';
-                document.getElementById('displayUsername').innerText = user.email.split('@')[0];
-            }
+            document.getElementById('fullName').innerText = profile?.full_name || user.email.split('@')[0];
+            document.getElementById('email').innerText = user.email;
+            document.getElementById('memberSince').innerText = profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : new Date().toLocaleDateString();
+            document.getElementById('balance').innerText = `$${(profile?.balance || 0).toLocaleString()}`;
+            document.getElementById('kycStatus').innerText = profile?.kyc_status || 'pending';
+            document.getElementById('displayUsername').innerText = (profile?.full_name || user.email).split(' ')[0];
+            document.getElementById('updateFullName').value = profile?.full_name || '';
             
             await loadTradeHistory();
             await updateTradeStats();
             
         } catch (error) {
-            console.error('Error loading user data:', error);
+            console.error('Error loading user:', error);
         }
     }
 
@@ -473,27 +428,47 @@
             const container = document.getElementById('historyTable');
             
             if (!trades || trades.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:40px;">No trades yet.</div>';
+                container.innerHTML = '<div style="text-align:center;padding:40px;">📭 No trades yet. Start trading to see your history!</div>';
                 return;
             }
             
-            let html = '<table><thead><tr><th>Date</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Profit</th><th>Status</th></tr></thead><tbody>';
-            trades.forEach(trade => {
-                const profitClass = (trade.profit || 0) >= 0 ? 'status-won' : 'status-lost';
+            let html = '<table><thead><tr><th>Date & Time</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Expected Return</th><th>Profit/Loss</th><th>Status</th></tr></thead><tbody>';
+            
+            for (const trade of trades) {
+                const profit = trade.profit || 0;
+                const profitClass = profit >= 0 ? 'status-won' : 'status-lost';
+                const profitSymbol = profit >= 0 ? '+' : '';
+                let statusText = '';
+                let statusClass = '';
+                
+                if (trade.status === 'won') {
+                    statusText = '✅ WON';
+                    statusClass = 'status-won';
+                } else if (trade.status === 'lost') {
+                    statusText = '❌ LOST';
+                    statusClass = 'status-lost';
+                } else {
+                    statusText = '⏳ PENDING';
+                    statusClass = 'status-pending';
+                }
+                
                 html += `<tr>
                     <td>${new Date(trade.created_at).toLocaleString()}</td>
-                    <td>${trade.coin_name} (${trade.coin})<td>
-                    <td>$${trade.amount}</td>
+                    <td>${trade.coin_name} (${trade.coin})</td>
+                    <td>$${trade.amount.toFixed(2)}</td>
                     <td>${trade.duration}s</td>
-                    <td class="${profitClass}">${(trade.profit || 0) >= 0 ? '+' : ''}$${trade.profit || 0}</td>
-                    <td class="${trade.status === 'won' ? 'status-won' : 'status-lost'}">${trade.status || 'pending'}</td>
+                    <td>+${trade.rate}% ($${(trade.expected_profit || 0).toFixed(2)})</td>
+                    <td class="${profitClass}">${profitSymbol}$${profit.toFixed(2)}</td>
+                    <td class="${statusClass}">${statusText}</td>
                 </tr>`;
-            });
-            html += '</tbody></td>';
+            }
+            
+            html += '</tbody></table>';
             container.innerHTML = html;
             
         } catch (error) {
             console.error('Error loading trade history:', error);
+            document.getElementById('historyTable').innerHTML = '<div style="text-align:center;padding:40px;">Error loading trade history</div>';
         }
     }
 
@@ -506,22 +481,28 @@
             
             if (error) throw error;
             
-            if (!trades) return;
+            if (!trades || trades.length === 0) {
+                document.getElementById('totalTrades').innerText = '0';
+                document.getElementById('winRate').innerText = '0%';
+                document.getElementById('totalVolume').innerText = '$0';
+                document.getElementById('totalProfit').innerText = '$0';
+                return;
+            }
             
             const totalTrades = trades.length;
             const wonTrades = trades.filter(t => t.status === 'won').length;
             const winRate = totalTrades > 0 ? (wonTrades / totalTrades * 100).toFixed(1) : 0;
-            const totalVolume = trades.reduce((sum, t) => sum + (t.amount || 0), 0);
+            const totalVolume = trades.reduce((sum, t) => sum + t.amount, 0);
             const totalProfit = trades.reduce((sum, t) => sum + (t.profit || 0), 0);
             
             document.getElementById('totalTrades').innerText = totalTrades;
             document.getElementById('winRate').innerText = winRate + '%';
             document.getElementById('totalVolume').innerText = `$${totalVolume.toFixed(2)}`;
-            document.getElementById('totalProfit').innerText = `${totalProfit >= 0 ? '+' : ''}$${totalProfit.toFixed(2)}`;
+            document.getElementById('totalProfit').innerHTML = `${totalProfit >= 0 ? '+' : ''}$${totalProfit.toFixed(2)}`;
             document.getElementById('totalProfit').style.color = totalProfit >= 0 ? '#00ff88' : '#ff4444';
             
         } catch (error) {
-            console.error('Error updating trade stats:', error);
+            console.error('Error updating stats:', error);
         }
     }
 
@@ -535,27 +516,20 @@
             return;
         }
         
-        const { error } = await supabase
-            .from('kyc_requests')
-            .insert([{
-                user_id: userId,
-                full_name: fullName,
-                id_type: idType,
-                id_number: idNumber,
-                status: 'pending'
-            }]);
+        await supabase.from('kyc_requests').insert({
+            user_id: userId,
+            full_name: fullName,
+            id_type: idType,
+            id_number: idNumber,
+            status: 'pending'
+        });
         
-        if (error) {
-            console.error('KYC submission error:', error);
-            alert('Error submitting KYC. Please try again.');
-        } else {
-            alert('✅ KYC verification submitted! Your verification is under review, please wait a moment.');
-            document.getElementById('kycFullName').value = '';
-            document.getElementById('idNumber').value = '';
-            document.getElementById('kycFront').value = '';
-            document.getElementById('kycBack').value = '';
-            document.getElementById('kycSelfie').value = '';
-        }
+        alert('✅ KYC verification submitted! Your verification is under review, please wait a moment.');
+        document.getElementById('kycFullName').value = '';
+        document.getElementById('idNumber').value = '';
+        document.getElementById('kycFront').value = '';
+        document.getElementById('kycBack').value = '';
+        document.getElementById('kycSelfie').value = '';
     }
 
     async function updateProfile() {
@@ -566,18 +540,9 @@
             return;
         }
         
-        const { error } = await supabase
-            .from('users')
-            .update({ full_name: newName })
-            .eq('id', userId);
-        
-        if (error) {
-            console.error('Profile update error:', error);
-            alert('Error updating profile');
-        } else {
-            alert('✅ Profile updated successfully!');
-            loadUserData();
-        }
+        await supabase.from('users').update({ full_name: newName }).eq('id', userId);
+        alert('✅ Profile updated successfully!');
+        loadUserData();
     }
 
     async function processWithdrawal() {
@@ -597,43 +562,25 @@
             return;
         }
         
-        const { error } = await supabase
-            .from('withdrawals')
-            .insert([{
-                user_id: userId,
-                amount: amount,
-                address: address,
-                status: 'pending'
-            }]);
+        await supabase.from('withdrawals').insert({
+            user_id: userId,
+            amount: amount,
+            address: address,
+            status: 'pending'
+        });
         
-        if (error) {
-            console.error('Withdrawal error:', error);
-            alert('Error submitting withdrawal');
-        } else {
-            alert(`✅ Withdrawal request of $${amount.toFixed(2)} submitted! Your withdrawal request is under review, please wait a moment.`);
-            closeModal();
-        }
+        alert(`✅ Withdrawal request of $${amount.toFixed(2)} submitted! Your withdrawal request is under review, please wait a moment.`);
+        closeModal();
     }
 
-    function openWithdrawModal() { 
-        document.getElementById('transactionModal').style.display = 'flex'; 
-    }
-    
-    function closeModal() { 
-        document.getElementById('transactionModal').style.display = 'none';
-        document.getElementById('transactionAmount').value = '';
-        document.getElementById('withdrawAddress').value = '';
-    }
+    function openWithdrawModal() { document.getElementById('transactionModal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('transactionModal').style.display = 'none'; }
 
-    function toggleTheme() {
-        document.body.classList.toggle('light-mode');
-        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-    }
-
-    function checkTheme() {
-        if (localStorage.getItem('theme') === 'light') {
-            document.body.classList.add('light-mode');
-        }
+    async function logout() {
+        await supabase.auth.signOut();
+        localStorage.removeItem('lunoUser');
+        sessionStorage.removeItem('lunoUser');
+        window.location.href = 'index.html';
     }
 
     document.querySelectorAll('.sidebar-item').forEach(item => {
@@ -663,7 +610,6 @@
     });
 
     loadUserData();
-    checkTheme();
 </script>
 
 </body>
