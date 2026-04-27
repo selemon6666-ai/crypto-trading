@@ -231,8 +231,8 @@
             border-color: transparent;
         }
 
-        .return-time { font-size: 0.7rem; font-weight: bold; }
-        .return-rate { font-size: 0.65rem; color: #00ff88; margin-top: 4px; }
+        .return-time { font-size: 0.8rem; font-weight: bold; }
+        .return-rate { font-size: 0.7rem; color: #00ff88; margin-top: 4px; }
         .return-min { font-size: 0.6rem; color: #787b86; margin-top: 4px; }
 
         .info-row {
@@ -477,20 +477,30 @@
 
             <label style="display: block; margin-bottom: 8px; color: #787b86;">⏱️ Select Duration</label>
             <div class="return-options" id="durationOptions">
-                <div class="return-option" data-time="10" data-rate="12" data-min="100">
-                    <div class="return-time">10s</div><div class="return-rate">+12%</div><div class="return-min">Min $100</div>
+                <div class="return-option" data-time="30" data-rate="12" data-min="100">
+                    <div class="return-time">30s</div>
+                    <div class="return-rate">+12%</div>
+                    <div class="return-min">Min $100</div>
                 </div>
-                <div class="return-option" data-time="30" data-rate="18" data-min="15000">
-                    <div class="return-time">30s</div><div class="return-rate">+18%</div><div class="return-min">Min $15K</div>
+                <div class="return-option" data-time="60" data-rate="18" data-min="15000">
+                    <div class="return-time">60s</div>
+                    <div class="return-rate">+18%</div>
+                    <div class="return-min">Min $15K</div>
                 </div>
-                <div class="return-option" data-time="60" data-rate="25" data-min="60000">
-                    <div class="return-time">60s</div><div class="return-rate">+25%</div><div class="return-min">Min $60K</div>
+                <div class="return-option" data-time="90" data-rate="25" data-min="60000">
+                    <div class="return-time">90s</div>
+                    <div class="return-rate">+25%</div>
+                    <div class="return-min">Min $60K</div>
                 </div>
-                <div class="return-option" data-time="120" data-rate="32" data-min="200000">
-                    <div class="return-time">120s</div><div class="return-rate">+32%</div><div class="return-min">Min $200K</div>
+                <div class="return-option" data-time="180" data-rate="32" data-min="200000">
+                    <div class="return-time">180s</div>
+                    <div class="return-rate">+32%</div>
+                    <div class="return-min">Min $200K</div>
                 </div>
-                <div class="return-option" data-time="180" data-rate="45" data-min="900000">
-                    <div class="return-time">180s</div><div class="return-rate">+45%</div><div class="return-min">Min $900K</div>
+                <div class="return-option" data-time="300" data-rate="45" data-min="900000">
+                    <div class="return-time">300s</div>
+                    <div class="return-rate">+45%</div>
+                    <div class="return-min">Min $900K</div>
                 </div>
             </div>
 
@@ -579,7 +589,6 @@
     function closeModal() {
         const modal = document.getElementById('resultModal');
         modal.style.display = 'none';
-        // After closing modal, redirect or refresh
         loadUserBalance();
     }
 
@@ -651,7 +660,6 @@
         const duration = selectedDuration;
         
         if (isWin) {
-            // Update trade as WON
             const { error: updateError } = await supabaseClient
                 .from('trades')
                 .update({ 
@@ -668,7 +676,6 @@
                 return;
             }
             
-            // Add profit to user balance
             const { data: user } = await supabaseClient
                 .from('users')
                 .select('balance')
@@ -692,7 +699,6 @@
             );
             showToast('Trade Won!', `You earned $${expectedProfit.toFixed(2)}!`, 'success');
         } else {
-            // Update trade as LOST
             const { error: updateError } = await supabaseClient
                 .from('trades')
                 .update({ 
@@ -721,10 +727,8 @@
             showToast('Trade Lost', `You lost $${amount.toFixed(2)}`, 'error');
         }
         
-        // Reset pending trade
         pendingTrade = { id: null, amount: null, expectedProfit: null, isWin: null };
         
-        // Clear localStorage
         localStorage.removeItem('tradeEndTime');
         localStorage.removeItem('pendingTradeData');
     }
@@ -736,7 +740,6 @@
         let remaining = seconds;
         timerDisplay.innerText = `${remaining}s`;
         
-        // Store end time in localStorage for page refresh persistence
         const endTime = Date.now() + (seconds * 1000);
         localStorage.setItem('tradeEndTime', endTime.toString());
         localStorage.setItem('pendingTradeData', JSON.stringify({
@@ -756,18 +759,13 @@
             if (remaining <= 0) {
                 clearInterval(countdownInterval);
                 countdownInterval = null;
-                
-                // Countdown finished - settle the trade
                 await settleTrade();
-                
-                // Unlock interface
                 activeTrade = false;
                 lockTradeInterface(false);
             }
         }, 1000);
     }
 
-    // Check for active trade on page load (for refresh recovery)
     function checkActiveTrade() {
         const savedEndTime = localStorage.getItem('tradeEndTime');
         const savedTradeData = localStorage.getItem('pendingTradeData');
@@ -793,11 +791,9 @@
                 
                 startCountdown(remaining, tradeData.tradeId, tradeData.amount, tradeData.expectedProfit, tradeData.isWin);
             } else {
-                // Trade should have completed, clean up
                 localStorage.removeItem('tradeEndTime');
                 localStorage.removeItem('pendingTradeData');
                 
-                // Try to settle if needed
                 if (savedTradeData) {
                     const tradeData = JSON.parse(savedTradeData);
                     pendingTrade = {
@@ -837,8 +833,6 @@
         }
     }
 
-    // ========== TRADE INTERFACE FUNCTIONS ==========
-    
     function lockTradeInterface(lock) {
         const amountInput = document.getElementById('amount');
         const cryptoSelect = document.getElementById('cryptoSelect');
@@ -943,8 +937,6 @@
         calculateReturn();
     }
 
-    // ========== CONFIRM TRADE - STARTS COUNTDOWN ==========
-    
     async function confirmTrade() {
         if (activeTrade) {
             showToast('Trade Locked', 'You have an active trade! Please wait for it to complete.', 'error');
@@ -977,12 +969,10 @@
             
             showToast('Trade Placed', `Your trade will complete in ${selectedDuration} seconds...`, 'info');
             
-            // Get admin outcome BEFORE placing trade
             const adminOutcome = await getTradeOutcome(currentCoin);
             const isWin = adminOutcome === 'win';
             const expectedReturnAmount = amount * (selectedRate / 100);
             
-            // Deduct amount from balance (user pays now)
             const newBalance = userBalance - totalPay;
             const { error: updateError } = await supabaseClient
                 .from('users')
@@ -997,7 +987,6 @@
             userBalance = newBalance;
             document.getElementById('availableAmount').innerHTML = userBalance.toFixed(2) + ' USDT';
             
-            // Create trade record with PENDING status
             const tradeId = Date.now();
             const { error: tradeError } = await supabaseClient.from('trades').insert({
                 id: tradeId,
@@ -1017,7 +1006,6 @@
                 return;
             }
             
-            // Store pending trade for after countdown
             pendingTrade = {
                 id: tradeId,
                 amount: amount,
@@ -1025,7 +1013,6 @@
                 isWin: isWin
             };
             
-            // Lock interface and start countdown
             activeTrade = true;
             lockTradeInterface(true);
             startCountdown(selectedDuration, tradeId, amount, expectedReturnAmount, isWin);
@@ -1045,8 +1032,6 @@
         window.location.href = 'index.html';
     }
 
-    // ========== EVENT LISTENERS ==========
-    
     function setupEventListeners() {
         document.getElementById('buyBtn').addEventListener('click', () => setTradeType('buy'));
         document.getElementById('sellBtn').addEventListener('click', () => setTradeType('sell'));
@@ -1077,13 +1062,11 @@
         });
     }
 
-    // ========== INITIALIZE ==========
-    
     async function init() {
         await loadUserBalance();
         changeCrypto();
         setupEventListeners();
-        checkActiveTrade(); // Check for any active trade on page load
+        checkActiveTrade();
     }
     
     init();
