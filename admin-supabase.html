@@ -105,8 +105,8 @@
         .toggle-switch {
             position: relative;
             display: inline-block;
-            width: 100px;
-            height: 44px;
+            width: 120px;
+            height: 50px;
         }
         
         .toggle-switch input {
@@ -124,15 +124,15 @@
             bottom: 0;
             background-color: #ff4444;
             transition: 0.3s;
-            border-radius: 44px;
+            border-radius: 50px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
         .toggle-slider:before {
             position: absolute;
             content: "";
-            height: 36px;
-            width: 36px;
+            height: 42px;
+            width: 42px;
             left: 4px;
             bottom: 4px;
             background-color: white;
@@ -145,16 +145,22 @@
         }
         
         input:checked + .toggle-slider:before {
-            transform: translateX(56px);
+            transform: translateX(70px);
         }
         
         .toggle-label {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
         }
         
         .toggle-label.lose { color: #ff4444; }
         .toggle-label.win { color: #00ff88; }
+        
+        .current-status {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
         
         .coin-grid {
             display: grid;
@@ -253,10 +259,11 @@
             border-radius: 12px;
             margin-top: 15px;
             font-weight: bold;
+            font-size: 1rem;
         }
         
-        .global-win { background: rgba(0, 255, 136, 0.15); color: #00ff88; }
-        .global-lose { background: rgba(255, 68, 68, 0.15); color: #ff4444; }
+        .global-win { background: rgba(0, 255, 136, 0.15); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.3); }
+        .global-lose { background: rgba(255, 68, 68, 0.15); color: #ff4444; border: 1px solid rgba(255, 68, 68, 0.3); }
         
         table {
             width: 100%;
@@ -323,7 +330,6 @@
         
         .admin-content { display: none; }
         
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -442,6 +448,7 @@
                 <span class="toggle-label win">WIN</span>
             </div>
             <div id="globalStatus" class="global-status global-win">🟢 GLOBAL MODE: WIN</div>
+            <div class="current-status" id="dbStatus"></div>
         </div>
         
         <!-- Per-Coin Control -->
@@ -619,32 +626,86 @@
             await loadStats();
         }
         
-        // ========== SETTINGS FUNCTIONS ==========
+        // ========== SETTINGS FUNCTIONS (FIXED) ==========
         async function loadGlobalSetting() {
-            const { data, error } = await supabaseClient
-                .from('admin_settings')
-                .select('setting_value')
-                .eq('setting_key', 'default_trade_outcome')
-                .single();
-            
-            if (!error && data) {
-                const isWin = data.setting_value === 'win';
-                globalToggle.checked = isWin;
-                updateGlobalDisplay(isWin);
+            try {
+                // First, ensure the table has a default value
+                const { data: existing, error: checkError } = await supabaseClient
+                    .from('admin_settings')
+                    .select('setting_value')
+                    .eq('setting_key', 'default_trade_outcome')
+                    .single();
+                
+                if (checkError && checkError.code === 'PGRST116') {
+                    // No record found, create default
+                    await supabaseClient
+                        .from('admin_settings')
+                        .insert({ setting_key: 'default_trade_outcome', setting_value: 'win', updated_at: new Date() });
+                }
+                
+                const { data, error } = await supabaseClient
+                    .from('admin_settings')
+                    .select('setting_value')
+                    .eq('setting_key', 'default_trade_outcome')
+                    .single();
+                
+                if (!error && data) {
+                    const isWin = data.setting_value === 'win';
+                    globalToggle.checked = isWin;
+                    updateGlobalDisplay(isWin);
+                    document.getElementById('dbStatus').innerHTML = `📀 Database value: <strong>${data.setting_value.toUpperCase()}</strong>`;
+                } else {
+                    // Default to WIN if error
+                    globalToggle.checked = true;
+                    updateGlobalDisplay(true);
+                    document.getElementById('dbStatus').innerHTML = `📀 Database value: <strong>WIN (default)</strong>`;
+                }
+            } catch (e) {
+                console.error('Error loading global setting:', e);
+                globalToggle.checked = true;
+                updateGlobalDisplay(true);
             }
         }
         
         async function updateGlobalSetting(isWin) {
             const outcome = isWin ? 'win' : 'lose';
             
-            const { error } = await supabaseClient
-                .from('admin_settings')
-                .upsert({ setting_key: 'default_trade_outcome', setting_value: outcome, updated_at: new Date() });
-            
-            if (!error) {
-                updateGlobalDisplay(isWin);
-                showToast('Global Mode Updated', `All new trades will be ${outcome.toUpperCase()}!`, 'success');
-            } else {
+            try {
+                // First check if record exists
+                const { data: existing } = await supabaseClient
+                    .from('admin_settings')
+                    .select('setting_key')
+                    .eq('setting_key', 'default_trade_outcome')
+                    .single();
+                
+                let error;
+                if (existing) {
+                    // Update existing
+                    const result = await supabaseClient
+                        .from('admin_settings')
+                        .update({ setting_value: outcome, updated_at: new Date() })
+                        .eq('setting_key', 'default_trade_outcome');
+                    error = result.error;
+                } else {
+                    // Insert new
+                    const result = await supabaseClient
+                        .from('admin_settings')
+                        .insert({ setting_key: 'default_trade_outcome', setting_value: outcome, updated_at: new Date() });
+                    error = result.error;
+                }
+                
+                if (!error) {
+                    updateGlobalDisplay(isWin);
+                    document.getElementById('dbStatus').innerHTML = `📀 Database value: <strong>${outcome.toUpperCase()}</strong>`;
+                    showToast('Global Mode Updated', `All new trades will be ${outcome.toUpperCase()}!`, 'success');
+                    
+                    // Verify the update
+                    await loadGlobalSetting();
+                } else {
+                    showToast('Error', 'Failed to update setting: ' + error.message, 'error');
+                    globalToggle.checked = !isWin;
+                }
+            } catch (e) {
                 showToast('Error', 'Failed to update setting', 'error');
                 globalToggle.checked = !isWin;
             }
@@ -720,9 +781,8 @@
             }
         }
         
-        // ========== USER MANAGEMENT FUNCTIONS (NEW!) ==========
+        // ========== USER MANAGEMENT FUNCTIONS ==========
         
-        // Open Balance Modal
         window.openBalanceModal = function(userId, email, currentBalance) {
             currentEditUser = { id: userId, email: email, balance: currentBalance };
             document.getElementById('balanceUserEmail').innerHTML = `User: ${email}<br>Current Balance: <strong>$${currentBalance.toLocaleString()}</strong>`;
@@ -731,7 +791,6 @@
             balanceModal.style.display = 'flex';
         };
         
-        // Save Balance Changes
         async function saveBalance() {
             const amount = parseFloat(document.getElementById('balanceAmount').value);
             const action = document.getElementById('balanceAction').value;
@@ -763,7 +822,6 @@
             }
         }
         
-        // Open KYC Modal
         window.openKycModal = function(userId, email, currentStatus) {
             currentEditUser = { id: userId, email: email, kycStatus: currentStatus };
             document.getElementById('kycUserEmail').innerHTML = `User: ${email}<br>Current Status: <strong>${currentStatus}</strong>`;
@@ -771,7 +829,6 @@
             kycModal.style.display = 'flex';
         };
         
-        // Save KYC Status
         async function saveKycStatus() {
             const newStatus = document.getElementById('kycStatusSelect').value;
             
@@ -810,19 +867,29 @@
                 const kycText = user.kyc_status === 'verified' ? '✅ Verified' : (user.kyc_status === 'rejected' ? '❌ Rejected' : '⏳ Pending');
                 html += `
                     <tr>
-                        <td>${user.email}</td>
-                        <td>${user.full_name || 'N/A'}</td>
+                        <td>${escapeHtml(user.email)}</td>
+                        <td>${escapeHtml(user.full_name || 'N/A')}</td>
                         <td><strong>$${(user.balance || 0).toLocaleString()}</strong></td>
                         <td><span class="status-badge ${kycClass}">${kycText}</span></td>
                         <td>${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</td>
                         <td>
-                            <button class="btn-edit-balance" onclick="window.openBalanceModal('${user.id}', '${user.email}', ${user.balance || 0})">💰 Edit Balance</button>
-                            <button class="btn-edit-kyc" onclick="window.openKycModal('${user.id}', '${user.email}', '${user.kyc_status}')">✅ Edit KYC</button>
+                            <button class="btn-edit-balance" onclick="window.openBalanceModal('${user.id}', '${escapeHtml(user.email)}', ${user.balance || 0})">💰 Edit Balance</button>
+                            <button class="btn-edit-kyc" onclick="window.openKycModal('${user.id}', '${escapeHtml(user.email)}', '${user.kyc_status}')">✅ Edit KYC</button>
                         </td>
                     </tr>
                 `;
             });
             container.innerHTML = html;
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return str;
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
         }
         
         async function loadRecentTrades() {
@@ -844,7 +911,7 @@
                 const outcomeText = trade.status === 'won' ? '✅ WON' : (trade.status === 'lost' ? '❌ LOST' : '⏳ PENDING');
                 html += `
                     <tr>
-                        <td>${trade.users?.email || 'N/A'}</td>
+                        <td>${escapeHtml(trade.users?.email || 'N/A')}</td>
                         <td>${trade.coin_name}</td>
                         <td>$${trade.amount}</td>
                         <td><span class="status-badge ${outcomeClass}">${outcomeText}</span></td>
@@ -873,8 +940,8 @@
             data.forEach(req => {
                 html += `
                     <tr>
-                        <td>${req.users?.email || 'N/A'}</td>
-                        <td>${req.full_name}</td>
+                        <td>${escapeHtml(req.users?.email || 'N/A')}</td>
+                        <td>${escapeHtml(req.full_name)}</td>
                         <td>${req.id_type}</td>
                         <td>${req.id_number}</td>
                         <td>
@@ -922,7 +989,7 @@
             data.forEach(dep => {
                 html += `
                     <tr>
-                        <td>${dep.users?.email || 'N/A'}</td>
+                        <td>${escapeHtml(dep.users?.email || 'N/A')}</td>
                         <td>$${dep.amount}</td>
                         <td>${dep.currency}</td>
                         <td>${new Date(dep.created_at).toLocaleString()}</td>
@@ -930,7 +997,7 @@
                     </tr>
                 `;
             });
-            html += '</tbody></table>';
+            html += '</tbody></tr>';
             container.innerHTML = html;
         }
         
@@ -960,7 +1027,7 @@
             data.forEach(wd => {
                 html += `
                     <tr>
-                        <td>${wd.users?.email || 'N/A'}</td>
+                        <td>${escapeHtml(wd.users?.email || 'N/A')}</td>
                         <td>$${wd.amount}</td>
                         <td>${wd.address.substring(0, 20)}...</td>
                         <td>${new Date(wd.created_at).toLocaleString()}</td>
@@ -1023,13 +1090,11 @@
         document.getElementById('closeBalanceModal').addEventListener('click', () => balanceModal.style.display = 'none');
         document.getElementById('closeKycModal').addEventListener('click', () => kycModal.style.display = 'none');
         
-        // Close modal when clicking outside
         window.addEventListener('click', (e) => {
             if (e.target === balanceModal) balanceModal.style.display = 'none';
             if (e.target === kycModal) kycModal.style.display = 'none';
         });
         
-        // Check for existing session
         async function checkSession() {
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (user) {
