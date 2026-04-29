@@ -752,7 +752,7 @@
         return false;
     }
 
-    // Professional Modal Function
+    // Professional Modal Function - Updated to show coin symbol instead of heart
     function showProfessionalModal(coinName, coinSymbol, amount, direction, entryPrice, exitPrice, profit, isWin, duration) {
         const modal = document.getElementById('resultModal');
         const modalIcon = document.getElementById('modalIcon');
@@ -766,16 +766,35 @@
         
         modalTitle.innerText = 'Trade Completed';
         
+        // Set icon based on coin symbol (e.g., ₿ for BTC, Ξ for ETH, etc.)
+        const coinIcons = {
+            'BTC': '₿',
+            'ETH': 'Ξ',
+            'BNB': 'BNB',
+            'SOL': '◎',
+            'XRP': 'XRP',
+            'ADA': '₳',
+            'DOGE': 'Ð',
+            'DOT': 'DOT',
+            'LINK': 'LINK',
+            'MATIC': 'MATIC',
+            'UNI': 'UNI',
+            'AAVE': 'AAVE',
+            'SHIB': 'SHIB'
+        };
+        
+        const coinIcon = coinIcons[coinSymbol] || coinSymbol;
+        
         if (isWin) {
             resultText.innerText = 'WIN';
             resultText.className = 'win-badge';
-            modalIcon.innerHTML = '🎉';
+            modalIcon.innerHTML = `${coinIcon}`;
             modalIcon.style.color = '#00ff88';
             profitLossElem.className = 'profit-positive';
         } else {
             resultText.innerText = 'LOSS';
             resultText.className = 'lose-badge';
-            modalIcon.innerHTML = '💔';
+            modalIcon.innerHTML = `${coinIcon}`;
             modalIcon.style.color = '#ff4444';
             profitLossElem.className = 'profit-negative';
         }
@@ -1211,7 +1230,7 @@
 
     async function init() {
         await loadUserBalance();
-        await changeCrypto(); // This will fetch real price
+        await changeCrypto();
         setupEventListeners();
         checkActiveTrade();
         
