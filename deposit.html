@@ -19,7 +19,6 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        /* Light Mode */
         body.light-mode {
             background: #ffffff;
             color: #1e222d;
@@ -69,7 +68,6 @@
             border-color: #e0e0e0;
         }
 
-        /* Navigation */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -336,7 +334,7 @@
             border: 1px solid rgba(255, 68, 68, 0.3);
             border-radius: 8px;
             padding: 10px;
-            margin-bottom: 15px;
+            margin: 15px 20px;
             color: #ff4444;
             font-size: 0.8rem;
             display: none;
@@ -438,65 +436,73 @@
 </div>
 
 <script>
-    // Supabase configuration
-    const SUPABASE_URL = 'https://zvfnqldeazdjokuqfegg.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Zm5xbGRlYXpkam9rdXFmZWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDI0OTMsImV4cCI6MjA5MjcxODQ5M30.MyYRk6SPO9PfFkWlNUYdZMVbcEqUOizNMiriMuZGJ8o';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // ============================================
+    // SUPABASE CONFIGURATION (SINGLE DECLARATION)
+    // ============================================
+    const SB_URL = 'https://zvfnqldeazdjokuqfegg.supabase.co';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Zm5xbGRlYXpkam9rdXFmZWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDI0OTMsImV4cCI6MjA5MjcxODQ5M30.MyYRk6SPO9PfFkWlNUYdZMVbcEqUOizNMiriMuZGJ8o';
+    const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
     
     let userId = null;
 
-    // ========== LOAD DEPOSIT ADDRESSES FROM SUPABASE ==========
+    // ========== LOAD DEPOSIT ADDRESSES ==========
     async function loadDepositAddresses() {
         try {
             console.log('Loading deposit addresses...');
             
-            // Direct query to deposit_addresses table
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('deposit_addresses')
                 .select('*');
             
             if (error) {
                 console.error('Error fetching addresses:', error);
-                document.getElementById('addressError').innerHTML = `❌ Error loading addresses: ${error.message}`;
+                document.getElementById('addressError').innerHTML = `❌ Error: ${error.message}`;
                 document.getElementById('addressError').style.display = 'block';
-                
-                // Set fallback addresses
-                document.getElementById('ethAddress').innerHTML = '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
-                document.getElementById('btcAddress').innerHTML = 'bc1q7nzqm4jxkhit6jwy4de2g50';
-                document.getElementById('usdtAddress').innerHTML = '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
+                setFallbackAddresses();
                 return;
             }
             
             if (!data || data.length === 0) {
-                console.warn('No addresses found in database');
-                document.getElementById('addressError').innerHTML = '⚠️ No deposit addresses configured. Please contact support.';
+                console.warn('No addresses found');
+                document.getElementById('addressError').innerHTML = '⚠️ No deposit addresses configured';
                 document.getElementById('addressError').style.display = 'block';
-                
-                // Set fallback addresses
-                document.getElementById('ethAddress').innerHTML = '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
-                document.getElementById('btcAddress').innerHTML = 'bc1q7nzqm4jxkhit6jwy4de2g50';
-                document.getElementById('usdtAddress').innerHTML = '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
+                setFallbackAddresses();
                 return;
             }
             
             console.log('Addresses loaded:', data);
             
-            // Find addresses by currency
             const ethAddr = data.find(a => a.currency === 'ETH');
             const btcAddr = data.find(a => a.currency === 'BTC');
             const usdtAddr = data.find(a => a.currency === 'USDT');
             
-            document.getElementById('ethAddress').innerHTML = ethAddr?.address || '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
-            document.getElementById('btcAddress').innerHTML = btcAddr?.address || 'bc1q7nzqm4jxkhit6jwy4de2g50';
-            document.getElementById('usdtAddress').innerHTML = usdtAddr?.address || '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
+            document.getElementById('ethAddress').innerHTML = ethAddr?.address || getFallbackAddress('ETH');
+            document.getElementById('btcAddress').innerHTML = btcAddr?.address || getFallbackAddress('BTC');
+            document.getElementById('usdtAddress').innerHTML = usdtAddr?.address || getFallbackAddress('USDT');
             
             document.getElementById('addressError').style.display = 'none';
             
         } catch (e) {
-            console.error('Error loading deposit addresses:', e);
+            console.error('Error:', e);
             document.getElementById('addressError').innerHTML = `❌ Error: ${e.message}`;
             document.getElementById('addressError').style.display = 'block';
+            setFallbackAddresses();
         }
+    }
+    
+    function getFallbackAddress(currency) {
+        const fallbacks = {
+            'ETH': '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50',
+            'BTC': 'bc1q7nzqm4jxkhit6jwy4de2g50',
+            'USDT': '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50'
+        };
+        return fallbacks[currency] || 'Address not available';
+    }
+    
+    function setFallbackAddresses() {
+        document.getElementById('ethAddress').innerHTML = getFallbackAddress('ETH');
+        document.getElementById('btcAddress').innerHTML = getFallbackAddress('BTC');
+        document.getElementById('usdtAddress').innerHTML = getFallbackAddress('USDT');
     }
 
     // ========== COPY ADDRESS ==========
@@ -506,44 +512,15 @@
         if (type === 'btc') address = document.getElementById('btcAddress').innerText;
         if (type === 'usdt') address = document.getElementById('usdtAddress').innerText;
         
-        navigator.clipboard.writeText(address).then(() => {
-            showToast('✅ Copied!', `${type.toUpperCase()} address copied to clipboard`, 'success');
-        }).catch(() => {
-            alert(`✅ ${type.toUpperCase()} address copied!\n\n${address}`);
-        });
-    }
-
-    // ========== SHOW TOAST NOTIFICATION ==========
-    function showToast(title, message, type) {
-        const toastContainer = document.getElementById('toastContainer') || createToastContainer();
-        const toast = document.createElement('div');
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: ${type === 'success' ? '#00ff88' : '#ff4444'};
-            color: #1e222d;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            z-index: 9999;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            animation: slideIn 0.3s ease;
-        `;
-        toast.innerHTML = `<strong>${title}</strong><br>${message}`;
-        toastContainer.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-    
-    function createToastContainer() {
-        let container = document.getElementById('toastContainer');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'toastContainer';
-            container.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999;';
-            document.body.appendChild(container);
+        if (address && address !== 'Loading...') {
+            navigator.clipboard.writeText(address).then(() => {
+                alert(`✅ ${type.toUpperCase()} address copied!`);
+            }).catch(() => {
+                alert(`✅ ${type.toUpperCase()} address:\n\n${address}`);
+            });
+        } else {
+            alert('⚠️ Address not loaded yet. Please wait.');
         }
-        return container;
     }
 
     // ========== SUBMIT DEPOSIT ==========
@@ -561,16 +538,15 @@
             return; 
         }
         
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabaseClient.auth.getUser();
         if (!user) { 
             alert('⚠️ Please login first'); 
             window.location.href = 'index.html';
             return; 
         }
         
-        // Create deposit record
         const depositId = Date.now();
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from('deposits')
             .insert({
                 id: depositId,
@@ -588,25 +564,25 @@
             return;
         }
         
-        document.getElementById('modalMessage').innerHTML = `Deposit request of $${amount.toFixed(2)} ${currency} submitted!<br><br>Your deposit is under review, please wait a moment.`;
+        document.getElementById('modalMessage').innerHTML = `Deposit request of $${amount.toFixed(2)} ${currency} submitted!<br><br>Your deposit is under review.`;
         document.getElementById('successModal').style.display = 'flex';
         
         document.getElementById('depositAmount').value = '';
         document.getElementById('paymentProof').value = '';
     }
 
-    // ========== AUTH FUNCTIONS ==========
+    // ========== AUTH & UI FUNCTIONS ==========
     async function logout() {
-        await supabase.auth.signOut();
+        await supabaseClient.auth.signOut();
         localStorage.removeItem('lunoUser');
         sessionStorage.removeItem('lunoUser');
         window.location.href = 'index.html';
     }
 
     async function displayUsername() {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabaseClient.auth.getUser();
         if (user) {
-            const { data: profile } = await supabase
+            const { data: profile } = await supabaseClient
                 .from('users')
                 .select('full_name')
                 .eq('id', user.id)
@@ -628,7 +604,7 @@
     }
 
     async function checkAuth() {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabaseClient.auth.getUser();
         if (!user) {
             window.location.href = 'index.html';
         }
@@ -639,16 +615,6 @@
         document.getElementById('successModal').style.display = 'none';
         window.location.href = 'profile.html';
     }
-
-    // Add animation style
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-    `;
-    document.head.appendChild(style);
 
     // ========== INITIALIZE ==========
     checkAuth();
