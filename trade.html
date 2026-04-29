@@ -327,9 +327,19 @@
         }
 
         .modal-icon {
-            font-size: 3rem;
-            display: block;
-            margin-bottom: 8px;
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 10px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
         }
 
         .modal-header h3 {
@@ -487,6 +497,7 @@
             .navbar { padding: 12px 20px; flex-direction: column; }
             .nav-links { flex-wrap: wrap; justify-content: center; }
             .professional-modal { width: 90%; margin: 20px; }
+            .modal-icon { width: 50px; height: 50px; }
         }
     </style>
 </head>
@@ -608,11 +619,14 @@
     </div>
 </div>
 
-<!-- Professional Result Modal -->
+<!-- Professional Result Modal with Coin Image -->
 <div id="resultModal" class="modal">
     <div class="professional-modal">
         <div class="modal-header">
-            <div class="modal-icon" id="modalIcon">🎉</div>
+            <div class="modal-icon" id="modalIcon">
+                <img src="" alt="Coin Icon" id="coinIconImg" style="display:none;">
+                <span id="coinIconText" style="font-size: 2.5rem;">₿</span>
+            </div>
             <h3 id="modalTitle">Trade Completed</h3>
         </div>
         <div class="modal-body">
@@ -680,6 +694,40 @@
         exitPrice: null
     };
 
+    // Coin images URLs (from CoinGecko CDN)
+    const coinImages = {
+        'BTC': 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png',
+        'ETH': 'https://assets.coingecko.com/coins/images/279/small/ethereum.png',
+        'BNB': 'https://assets.coingecko.com/coins/images/825/small/bnb-icon2.png',
+        'SOL': 'https://assets.coingecko.com/coins/images/4128/small/solana.png',
+        'XRP': 'https://assets.coingecko.com/coins/images/44/small/xrp-symbol-white-128.png',
+        'ADA': 'https://assets.coingecko.com/coins/images/975/small/cardano.png',
+        'DOGE': 'https://assets.coingecko.com/coins/images/5/small/dogecoin.png',
+        'DOT': 'https://assets.coingecko.com/coins/images/12171/small/polkadot.png',
+        'LINK': 'https://assets.coingecko.com/coins/images/877/small/chainlink-new-logo.png',
+        'MATIC': 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png',
+        'UNI': 'https://assets.coingecko.com/coins/images/12504/small/uniswap-uni.png',
+        'AAVE': 'https://assets.coingecko.com/coins/images/12645/small/aave.png',
+        'SHIB': 'https://assets.coingecko.com/coins/images/11939/small/shiba.png'
+    };
+
+    // Fallback text symbols if image fails to load
+    const coinTextSymbols = {
+        'BTC': '₿',
+        'ETH': 'Ξ',
+        'BNB': 'BNB',
+        'SOL': '◎',
+        'XRP': 'XRP',
+        'ADA': '₳',
+        'DOGE': 'Ð',
+        'DOT': 'DOT',
+        'LINK': 'LINK',
+        'MATIC': 'MATIC',
+        'UNI': 'UNI',
+        'AAVE': 'AAVE',
+        'SHIB': 'SHIB'
+    };
+
     // CoinGecko API mapping
     const coinGeckoIds = {
         'BTC': 'bitcoin',
@@ -736,7 +784,6 @@
             document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
             document.getElementById('coinPrice').style.color = '#00ff88';
             
-            // Add a small indicator that price is live
             const priceElement = document.getElementById('coinPrice');
             const existingBadge = document.querySelector('.price-update-badge');
             if (!existingBadge) {
@@ -752,10 +799,9 @@
         return false;
     }
 
-    // Professional Modal Function - Updated to show coin symbol instead of heart
+    // Professional Modal Function with Coin Image
     function showProfessionalModal(coinName, coinSymbol, amount, direction, entryPrice, exitPrice, profit, isWin, duration) {
         const modal = document.getElementById('resultModal');
-        const modalIcon = document.getElementById('modalIcon');
         const modalTitle = document.getElementById('modalTitle');
         const resultText = document.getElementById('resultText');
         const tradeDirection = document.getElementById('tradeDirection');
@@ -763,39 +809,37 @@
         const entryPriceElem = document.getElementById('entryPrice');
         const exitPriceElem = document.getElementById('exitPrice');
         const profitLossElem = document.getElementById('profitLoss');
+        const coinIconImg = document.getElementById('coinIconImg');
+        const coinIconText = document.getElementById('coinIconText');
         
         modalTitle.innerText = 'Trade Completed';
         
-        // Set icon based on coin symbol (e.g., ₿ for BTC, Ξ for ETH, etc.)
-        const coinIcons = {
-            'BTC': '₿',
-            'ETH': 'Ξ',
-            'BNB': 'BNB',
-            'SOL': '◎',
-            'XRP': 'XRP',
-            'ADA': '₳',
-            'DOGE': 'Ð',
-            'DOT': 'DOT',
-            'LINK': 'LINK',
-            'MATIC': 'MATIC',
-            'UNI': 'UNI',
-            'AAVE': 'AAVE',
-            'SHIB': 'SHIB'
-        };
+        // Set coin icon (image or text fallback)
+        const coinImageUrl = coinImages[coinSymbol];
+        if (coinImageUrl) {
+            coinIconImg.src = coinImageUrl;
+            coinIconImg.style.display = 'block';
+            coinIconText.style.display = 'none';
+            // Handle image load error - fallback to text symbol
+            coinIconImg.onerror = function() {
+                this.style.display = 'none';
+                coinIconText.style.display = 'block';
+                coinIconText.innerHTML = coinTextSymbols[coinSymbol] || coinSymbol;
+            };
+        } else {
+            coinIconImg.style.display = 'none';
+            coinIconText.style.display = 'block';
+            coinIconText.innerHTML = coinTextSymbols[coinSymbol] || coinSymbol;
+        }
         
-        const coinIcon = coinIcons[coinSymbol] || coinSymbol;
-        
+        // Set result badge
         if (isWin) {
             resultText.innerText = 'WIN';
             resultText.className = 'win-badge';
-            modalIcon.innerHTML = `${coinIcon}`;
-            modalIcon.style.color = '#00ff88';
             profitLossElem.className = 'profit-positive';
         } else {
             resultText.innerText = 'LOSS';
             resultText.className = 'lose-badge';
-            modalIcon.innerHTML = `${coinIcon}`;
-            modalIcon.style.color = '#ff4444';
             profitLossElem.className = 'profit-negative';
         }
         
@@ -1025,18 +1069,15 @@
         const select = document.getElementById('cryptoSelect');
         currentCoin = select.value;
         
-        // Show loading state
         document.getElementById('coinPrice').innerHTML = 'Loading...';
         document.getElementById('coinPrice').style.color = '#ffaa00';
         
-        // Fetch real price
         const realPrice = await fetchRealTimePrice(currentCoin);
         if (realPrice && realPrice > 0) {
             currentCoinPrice = realPrice;
             document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
             document.getElementById('coinPrice').style.color = '#00ff88';
         } else {
-            // Fallback to stored price if API fails
             document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
             document.getElementById('coinPrice').style.color = '#ffaa00';
             showToast('Price Alert', 'Using cached price data', 'info');
@@ -1149,7 +1190,6 @@
             const isWin = adminOutcome === 'win';
             const expectedReturnAmount = amount * (selectedRate / 100);
             
-            // Use real-time current price for entry
             const entryPrice = currentCoinPrice;
             const exitPrice = isWin ? currentCoinPrice * (1 + selectedRate / 100) : currentCoinPrice * (1 - selectedRate / 100);
             
@@ -1234,7 +1274,6 @@
         setupEventListeners();
         checkActiveTrade();
         
-        // Refresh price every 30 seconds
         priceRefreshInterval = setInterval(async () => {
             if (!activeTrade) {
                 await updateCurrentPrice();
