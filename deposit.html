@@ -19,6 +19,7 @@
             transition: background 0.3s, color 0.3s;
         }
 
+        /* Light Mode */
         body.light-mode {
             background: #ffffff;
             color: #1e222d;
@@ -68,6 +69,7 @@
             border-color: #e0e0e0;
         }
 
+        /* Navigation */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -329,6 +331,17 @@
             transform: translateY(-1px);
         }
 
+        .error-msg {
+            background: rgba(255, 68, 68, 0.15);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            color: #ff4444;
+            font-size: 0.8rem;
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .navbar {
                 padding: 12px 20px;
@@ -369,6 +382,8 @@
         <div class="card-header">
             <h1>💰 Deposit Funds</h1>
         </div>
+
+        <div id="addressError" class="error-msg"></div>
 
         <div class="address-section">
             <div class="address-title">🔷 ETH</div>
@@ -423,14 +438,14 @@
 </div>
 
 <script>
-    // Supabase configuration - DIRECT initialization (no external file dependency)
+    // Supabase configuration
     const SUPABASE_URL = 'https://zvfnqldeazdjokuqfegg.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Zm5xbGRlYXpkam9rdXFmZWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDI0OTMsImV4cCI6MjA5MjcxODQ5M30.MyYRk6SPO9PfFkWlNUYdZMVbcEqUOizNMiriMuZGJ8o';
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     
     let userId = null;
 
-    // ========== LOAD DEPOSIT ADDRESSES ==========
+    // ========== LOAD DEPOSIT ADDRESSES FROM SUPABASE ==========
     async function loadDepositAddresses() {
         try {
             console.log('Loading deposit addresses...');
@@ -442,39 +457,49 @@
             
             if (error) {
                 console.error('Error fetching addresses:', error);
-                // Fallback to default addresses
+                document.getElementById('addressError').innerHTML = `❌ Error loading addresses: ${error.message}`;
+                document.getElementById('addressError').style.display = 'block';
+                
+                // Set fallback addresses
                 document.getElementById('ethAddress').innerHTML = '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
                 document.getElementById('btcAddress').innerHTML = 'bc1q7nzqm4jxkhit6jwy4de2g50';
                 document.getElementById('usdtAddress').innerHTML = '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
                 return;
             }
             
-            if (data && data.length > 0) {
-                // Find addresses by currency
-                const ethAddr = data.find(a => a.currency === 'ETH');
-                const btcAddr = data.find(a => a.currency === 'BTC');
-                const usdtAddr = data.find(a => a.currency === 'USDT');
+            if (!data || data.length === 0) {
+                console.warn('No addresses found in database');
+                document.getElementById('addressError').innerHTML = '⚠️ No deposit addresses configured. Please contact support.';
+                document.getElementById('addressError').style.display = 'block';
                 
-                document.getElementById('ethAddress').innerHTML = ethAddr?.address || '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
-                document.getElementById('btcAddress').innerHTML = btcAddr?.address || 'bc1q7nzqm4jxkhit6jwy4de2g50';
-                document.getElementById('usdtAddress').innerHTML = usdtAddr?.address || '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
-                
-                console.log('Addresses loaded successfully');
-            } else {
-                // No data in table, use defaults
+                // Set fallback addresses
                 document.getElementById('ethAddress').innerHTML = '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
                 document.getElementById('btcAddress').innerHTML = 'bc1q7nzqm4jxkhit6jwy4de2g50';
                 document.getElementById('usdtAddress').innerHTML = '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
+                return;
             }
+            
+            console.log('Addresses loaded:', data);
+            
+            // Find addresses by currency
+            const ethAddr = data.find(a => a.currency === 'ETH');
+            const btcAddr = data.find(a => a.currency === 'BTC');
+            const usdtAddr = data.find(a => a.currency === 'USDT');
+            
+            document.getElementById('ethAddress').innerHTML = ethAddr?.address || '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
+            document.getElementById('btcAddress').innerHTML = btcAddr?.address || 'bc1q7nzqm4jxkhit6jwy4de2g50';
+            document.getElementById('usdtAddress').innerHTML = usdtAddr?.address || '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
+            
+            document.getElementById('addressError').style.display = 'none';
+            
         } catch (e) {
             console.error('Error loading deposit addresses:', e);
-            // Fallback to default addresses
-            document.getElementById('ethAddress').innerHTML = '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
-            document.getElementById('btcAddress').innerHTML = 'bc1q7nzqm4jxkhit6jwy4de2g50';
-            document.getElementById('usdtAddress').innerHTML = '0x0406E6CF3F0A79d6510A91Ebc1q7nzqm4jxkhit6jwy4de2g50';
+            document.getElementById('addressError').innerHTML = `❌ Error: ${e.message}`;
+            document.getElementById('addressError').style.display = 'block';
         }
     }
 
+    // ========== COPY ADDRESS ==========
     function copyAddress(type) {
         let address = '';
         if (type === 'eth') address = document.getElementById('ethAddress').innerText;
@@ -482,62 +507,74 @@
         if (type === 'usdt') address = document.getElementById('usdtAddress').innerText;
         
         navigator.clipboard.writeText(address).then(() => {
-            showToast(`✅ ${type.toUpperCase()} address copied!`, 'success');
+            showToast('✅ Copied!', `${type.toUpperCase()} address copied to clipboard`, 'success');
         }).catch(() => {
-            alert(`✅ ${type.toUpperCase()} address copied!`);
+            alert(`✅ ${type.toUpperCase()} address copied!\n\n${address}`);
         });
     }
 
-    function showToast(message, type) {
+    // ========== SHOW TOAST NOTIFICATION ==========
+    function showToast(title, message, type) {
+        const toastContainer = document.getElementById('toastContainer') || createToastContainer();
         const toast = document.createElement('div');
-        toast.style.position = 'fixed';
-        toast.style.bottom = '20px';
-        toast.style.right = '20px';
-        toast.style.backgroundColor = type === 'success' ? '#00ff88' : '#ff4444';
-        toast.style.color = '#1e222d';
-        toast.style.padding = '12px 20px';
-        toast.style.borderRadius = '8px';
-        toast.style.fontWeight = 'bold';
-        toast.style.zIndex = '9999';
-        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-        toast.innerHTML = message;
-        document.body.appendChild(toast);
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#00ff88' : '#ff4444'};
+            color: #1e222d;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        `;
+        toast.innerHTML = `<strong>${title}</strong><br>${message}`;
+        toastContainer.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
+    
+    function createToastContainer() {
+        let container = document.getElementById('toastContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999;';
+            document.body.appendChild(container);
+        }
+        return container;
+    }
 
-    // ========== DEPOSIT SUBMISSION ==========
+    // ========== SUBMIT DEPOSIT ==========
     async function submitDeposit() {
         const amount = parseFloat(document.getElementById('depositAmount').value);
         const currency = document.getElementById('depositCurrency').value;
         const fileInput = document.getElementById('paymentProof');
         
         if (isNaN(amount) || amount <= 0) { 
-            showToast('Please enter a valid amount', 'error');
+            alert('⚠️ Please enter a valid amount'); 
             return; 
         }
         if (fileInput.files.length === 0) { 
-            showToast('Please upload proof of payment', 'error');
+            alert('⚠️ Please upload proof of payment'); 
             return; 
         }
         
-        // Get current user
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
-        if (userError || !user) { 
-            showToast('Please login first', 'error');
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { 
+            alert('⚠️ Please login first'); 
             window.location.href = 'index.html';
             return; 
         }
         
-        userId = user.id;
-        
-        // Create deposit request
+        // Create deposit record
         const depositId = Date.now();
-        const { error: depositError } = await supabase
+        const { error } = await supabase
             .from('deposits')
             .insert({
                 id: depositId,
-                user_id: userId,
+                user_id: user.id,
                 amount: amount,
                 currency: currency,
                 proof_url: fileInput.files[0].name,
@@ -545,9 +582,9 @@
                 created_at: new Date()
             });
         
-        if (depositError) {
-            console.error('Deposit error:', depositError);
-            showToast('Error submitting deposit request', 'error');
+        if (error) {
+            console.error('Deposit error:', error);
+            alert('❌ Failed to submit deposit: ' + error.message);
             return;
         }
         
@@ -556,11 +593,6 @@
         
         document.getElementById('depositAmount').value = '';
         document.getElementById('paymentProof').value = '';
-    }
-
-    function closeModal() {
-        document.getElementById('successModal').style.display = 'none';
-        window.location.href = 'profile.html';
     }
 
     // ========== AUTH FUNCTIONS ==========
@@ -574,13 +606,11 @@
     async function displayUsername() {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-            // Get user profile from users table
             const { data: profile } = await supabase
                 .from('users')
                 .select('full_name')
                 .eq('id', user.id)
                 .single();
-            
             document.getElementById('displayUsername').innerText = profile?.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'Trader';
         }
     }
@@ -605,15 +635,26 @@
         userId = user?.id;
     }
 
-    // ========== INITIALIZE ==========
-    async function init() {
-        await checkAuth();
-        await displayUsername();
-        await loadDepositAddresses();
-        checkTheme();
+    function closeModal() {
+        document.getElementById('successModal').style.display = 'none';
+        window.location.href = 'profile.html';
     }
-    
-    init();
+
+    // Add animation style
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // ========== INITIALIZE ==========
+    checkAuth();
+    displayUsername();
+    loadDepositAddresses();
+    checkTheme();
 </script>
 
 </body>
