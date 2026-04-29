@@ -476,6 +476,12 @@
         .toast-close { cursor: pointer; font-size: 1.2rem; opacity: 0.7; }
         .toast-close:hover { opacity: 1; }
 
+        .price-update-badge {
+            font-size: 0.6rem;
+            color: #787b86;
+            margin-left: 8px;
+        }
+
         @media (max-width: 550px) {
             .return-options { grid-template-columns: repeat(2, 1fr); }
             .navbar { padding: 12px 20px; flex-direction: column; }
@@ -659,6 +665,7 @@
     let currentCoinPrice = 65234;
     let activeTrade = false;
     let countdownInterval = null;
+    let priceRefreshInterval = null;
     
     let pendingTrade = {
         id: null,
@@ -673,9 +680,21 @@
         exitPrice: null
     };
 
-    const coinPrices = {
-        BTC: 65234, ETH: 3420, BNB: 580, SOL: 145, XRP: 0.62, ADA: 0.48,
-        DOGE: 0.124, DOT: 7.25, LINK: 15.4, MATIC: 0.72, UNI: 8.15, AAVE: 98.5, SHIB: 0.000018
+    // CoinGecko API mapping
+    const coinGeckoIds = {
+        'BTC': 'bitcoin',
+        'ETH': 'ethereum', 
+        'BNB': 'binancecoin',
+        'SOL': 'solana',
+        'XRP': 'ripple',
+        'ADA': 'cardano',
+        'DOGE': 'dogecoin',
+        'DOT': 'polkadot',
+        'LINK': 'chainlink',
+        'MATIC': 'polygon',
+        'UNI': 'uniswap',
+        'AAVE': 'aave',
+        'SHIB': 'shiba-inu'
     };
     
     const coinNames = {
@@ -683,6 +702,55 @@
         XRP: 'XRP', ADA: 'Cardano', DOGE: 'Dogecoin', DOT: 'Polkadot',
         LINK: 'Chainlink', MATIC: 'Polygon', UNI: 'Uniswap', AAVE: 'Aave', SHIB: 'Shiba Inu'
     };
+
+    // Fetch real-time price from CoinGecko
+    async function fetchRealTimePrice(coinSymbol) {
+        try {
+            const coinId = coinGeckoIds[coinSymbol];
+            if (!coinId) return null;
+            
+            const response = await fetch(
+                `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`
+            );
+            
+            if (!response.ok) throw new Error('API error');
+            
+            const data = await response.json();
+            const price = data[coinId]?.usd;
+            
+            if (price && price > 0) {
+                return price;
+            }
+            return null;
+        } catch (error) {
+            console.error(`Error fetching ${coinSymbol} price:`, error);
+            return null;
+        }
+    }
+
+    // Update current coin price
+    async function updateCurrentPrice() {
+        const realPrice = await fetchRealTimePrice(currentCoin);
+        if (realPrice && realPrice > 0) {
+            currentCoinPrice = realPrice;
+            document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
+            document.getElementById('coinPrice').style.color = '#00ff88';
+            
+            // Add a small indicator that price is live
+            const priceElement = document.getElementById('coinPrice');
+            const existingBadge = document.querySelector('.price-update-badge');
+            if (!existingBadge) {
+                const badge = document.createElement('span');
+                badge.className = 'price-update-badge';
+                badge.innerHTML = ' 🔴 LIVE';
+                priceElement.parentElement.appendChild(badge);
+            }
+            
+            calculateReturn();
+            return true;
+        }
+        return false;
+    }
 
     // Professional Modal Function
     function showProfessionalModal(coinName, coinSymbol, amount, direction, entryPrice, exitPrice, profit, isWin, duration) {
@@ -698,7 +766,6 @@
         
         modalTitle.innerText = 'Trade Completed';
         
-        // Set result badge
         if (isWin) {
             resultText.innerText = 'WIN';
             resultText.className = 'win-badge';
@@ -713,7 +780,6 @@
             profitLossElem.className = 'profit-negative';
         }
         
-        // Set trade details
         tradeDirection.innerText = direction || 'UP';
         tradeAmount.innerText = `${amount.toFixed(2)} USDT`;
         entryPriceElem.innerText = `$${entryPrice.toFixed(2)}`;
@@ -936,12 +1002,28 @@
         }
     }
 
-    function changeCrypto() {
+    async function changeCrypto() {
         const select = document.getElementById('cryptoSelect');
         currentCoin = select.value;
-        currentCoinPrice = coinPrices[currentCoin] || 50000;
+        
+        // Show loading state
+        document.getElementById('coinPrice').innerHTML = 'Loading...';
+        document.getElementById('coinPrice').style.color = '#ffaa00';
+        
+        // Fetch real price
+        const realPrice = await fetchRealTimePrice(currentCoin);
+        if (realPrice && realPrice > 0) {
+            currentCoinPrice = realPrice;
+            document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
+            document.getElementById('coinPrice').style.color = '#00ff88';
+        } else {
+            // Fallback to stored price if API fails
+            document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
+            document.getElementById('coinPrice').style.color = '#ffaa00';
+            showToast('Price Alert', 'Using cached price data', 'info');
+        }
+        
         document.getElementById('coinName').innerHTML = `${coinNames[currentCoin]} (${currentCoin})`;
-        document.getElementById('coinPrice').innerHTML = formatPrice(currentCoinPrice);
         calculateReturn();
     }
 
@@ -949,7 +1031,7 @@
         if (price < 0.01) return `$${price.toFixed(6)}`;
         if (price < 1) return `$${price.toFixed(4)}`;
         if (price < 10) return `$${price.toFixed(2)}`;
-        return `$${price.toLocaleString()}`;
+        return `$${price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     }
 
     function setTradeType(type) {
@@ -1048,10 +1130,9 @@
             const isWin = adminOutcome === 'win';
             const expectedReturnAmount = amount * (selectedRate / 100);
             
-            // Calculate entry and exit prices
-            const currentPrice = currentCoinPrice;
-            const entryPrice = currentPrice;
-            const exitPrice = isWin ? currentPrice * (1 + selectedRate / 100) : currentPrice * (1 - selectedRate / 100);
+            // Use real-time current price for entry
+            const entryPrice = currentCoinPrice;
+            const exitPrice = isWin ? currentCoinPrice * (1 + selectedRate / 100) : currentCoinPrice * (1 - selectedRate / 100);
             
             const newBalance = userBalance - totalPay;
             await supabaseClient.from('users').update({ balance: newBalance }).eq('id', userId);
@@ -1096,6 +1177,8 @@
     }
 
     async function logout() {
+        if (priceRefreshInterval) clearInterval(priceRefreshInterval);
+        if (countdownInterval) clearInterval(countdownInterval);
         await supabaseClient.auth.signOut();
         localStorage.clear();
         window.location.href = 'index.html';
@@ -1128,9 +1211,16 @@
 
     async function init() {
         await loadUserBalance();
-        changeCrypto();
+        await changeCrypto(); // This will fetch real price
         setupEventListeners();
         checkActiveTrade();
+        
+        // Refresh price every 30 seconds
+        priceRefreshInterval = setInterval(async () => {
+            if (!activeTrade) {
+                await updateCurrentPrice();
+            }
+        }, 30000);
     }
     
     init();
